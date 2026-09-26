@@ -27,7 +27,8 @@ Consume la API del backend: [barberia-backend](https://github.com/jherargm412-de
 3. Copiar el archivo de variables:
 
    ```bash
-   cp .env.example .env
+   cp .env.example .env       # macOS / Linux / Git Bash / PowerShell
+   copy .env.example .env     # Windows (CMD)
    ```
 
    `VITE_API_URL` es la dirección del backend. Si no cambiaste el puerto, déjala como está.
