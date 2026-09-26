@@ -4,13 +4,13 @@ Cada carpeta aquí es **un módulo del sistema** y tiene el **mismo nombre que s
 
 | Backend (`com.example.backend.…`) | Frontend (`src/modulos/…`) |
 |---|---|
-| `modulo_seguridad_usuarios` | `seguridad_usuarios` |
-| `modulo_gestion_clientes` | `gestion_clientes` |
-| `modulo_gestion_empleados` | `gestion_empleados` |
-| `modulo_servicios_reservas` | `servicios_reservas` |
-| `modulo_ventas_caja` | `ventas_caja` |
-| `modulo_inventario_compras` | `inventario_compras` |
-| `modulo_reportes` | `reportes` |
+| `modulos.seguridad_usuarios` | `seguridad_usuarios` |
+| `modulos.gestion_clientes` | `gestion_clientes` |
+| `modulos.gestion_empleados` | `gestion_empleados` |
+| `modulos.servicios_reservas` | `servicios_reservas` |
+| `modulos.ventas_caja` | `ventas_caja` |
+| `modulos.inventario_compras` | `inventario_compras` |
+| `modulos.reportes` | `reportes` |
 
 ## Estructura de un módulo
 
