@@ -9,6 +9,12 @@ import {
   UsuarioEditarPage,
   UsuariosListPage,
 } from '../modulos/seguridad_usuarios';
+import {
+  PERMISOS_SERVICIOS,
+  ServicioCrearPage,
+  ServicioEditarPage,
+  ServiciosListPage,
+} from '../modulos/servicios_reservas';
 import MainLayout from '../shared/layouts/MainLayout';
 import InicioPage from '../shared/pages/InicioPage';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
@@ -35,6 +41,13 @@ export default function AppRouter() {
               <Route path="/usuarios/nuevo" element={<UsuarioCrearPage />} />
               <Route path="/usuarios/:id/editar" element={<UsuarioEditarPage />} />
             </Route>
+          </Route>
+
+          {/* CU08 Catálogo de servicios: requiere el permiso SERVICIO_GESTIONAR */}
+          <Route element={<RequierePermiso permiso={PERMISOS_SERVICIOS.GESTIONAR} />}>
+            <Route path="/servicios" element={<ServiciosListPage />} />
+            <Route path="/servicios/nuevo" element={<ServicioCrearPage />} />
+            <Route path="/servicios/:id/editar" element={<ServicioEditarPage />} />
           </Route>
         </Route>
       </Route>
