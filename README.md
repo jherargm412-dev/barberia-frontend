@@ -42,6 +42,8 @@ Consume la API del backend: [barberia-backend](https://github.com/jherargm412-de
    Abre `http://localhost:5173`. Inicia sesión con el administrador que configuraste en el
    `.env` del backend (`APP_SEED_ADMIN_EMAIL` / `APP_SEED_ADMIN_PASSWORD`).
 
+   Cómo usar cada pantalla: [Manual de usuario](docs/manual-usuario.md).
+
 ## Comandos
 
 | Comando | Para qué |
