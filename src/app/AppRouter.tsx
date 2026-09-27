@@ -1,6 +1,9 @@
 import { Route, Routes } from 'react-router-dom';
 import {
+  BitacoraListPage,
   LoginPage,
+  MENSAJES_BITACORA,
+  PERMISOS_BITACORA,
   PERMISOS_USUARIOS,
   RequierePermiso,
   RutaProtegida,
@@ -53,6 +56,13 @@ export default function AppRouter() {
               <Route path="/usuarios/nuevo" element={<UsuarioCrearPage />} />
               <Route path="/usuarios/:id/editar" element={<UsuarioEditarPage />} />
             </Route>
+          </Route>
+
+          {/* CU05 Consultar Bitácora: solo el Administrador (BITACORA_CONSULTAR). Solo lectura. */}
+          <Route
+            element={<RequierePermiso permiso={PERMISOS_BITACORA.CONSULTAR} mensaje={MENSAJES_BITACORA.SIN_PERMISO} />}
+          >
+            <Route path="/bitacora" element={<BitacoraListPage />} />
           </Route>
 
           {/* CU08 Catálogo de servicios: requiere el permiso SERVICIO_GESTIONAR */}

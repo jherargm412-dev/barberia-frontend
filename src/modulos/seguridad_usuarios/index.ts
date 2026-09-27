@@ -14,3 +14,7 @@ export { default as UsuarioCrearPage } from './pages/gestionar_usuarios/UsuarioC
 export { default as UsuarioEditarPage } from './pages/gestionar_usuarios/UsuarioEditarPage';
 export { default as UsuarioDetallePage } from './pages/gestionar_usuarios/UsuarioDetallePage';
 export { PERMISOS as PERMISOS_USUARIOS } from './constants/gestionar_usuarios';
+
+// CU05 Consultar Bitácora
+export { default as BitacoraListPage } from './pages/consultar_bitacora/BitacoraListPage';
+export { PERMISOS_BITACORA, MENSAJES_BITACORA } from './constants/consultar_bitacora';
