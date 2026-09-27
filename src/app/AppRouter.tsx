@@ -16,6 +16,7 @@ import {
   ServiciosListPage,
 } from '../modulos/servicios_reservas';
 import MainLayout from '../shared/layouts/MainLayout';
+import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
 import InicioPage from '../shared/pages/InicioPage';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 
@@ -30,6 +31,17 @@ export default function AppRouter() {
       <Route element={<RutaProtegida />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<InicioPage />} />
+          {/* CU06: cada ruta exige el permiso de la operación que presenta. */}
+          <Route element={<RequierePermiso permiso={PERMISOS_CLIENTES.CONSULTAR} />}>
+            <Route path="/clientes" element={<ClientesListPage />} />
+            <Route path="/clientes/:id" element={<ClienteDetallePage />} />
+          </Route>
+          <Route element={<RequierePermiso permiso={PERMISOS_CLIENTES.CREAR} />}>
+            <Route path="/clientes/nuevo" element={<ClienteCrearPage />} />
+          </Route>
+          <Route element={<RequierePermiso permiso={PERMISOS_CLIENTES.EDITAR} />}>
+            <Route path="/clientes/:id/editar" element={<ClienteEditarPage />} />
+          </Route>
 
           {/* Gestión de usuarios: requiere el permiso USUARIO_GESTIONAR */}
           <Route element={<RequierePermiso permiso={PERMISOS_USUARIOS.GESTIONAR} />}>

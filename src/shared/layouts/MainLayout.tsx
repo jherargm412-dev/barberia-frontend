@@ -30,6 +30,8 @@ interface OpcionMenu {
 
 const OPCIONES: OpcionMenu[] = [
   { texto: 'Inicio', ruta: '/', icono: <HomeIcon /> },
+  // La opción de CU06 solo aparece para usuarios que pueden consultar clientes.
+  { texto: 'Clientes', ruta: '/clientes', icono: <PeopleIcon />, permiso: 'CLIENTE_CONSULTAR' },
   { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
   { texto: 'Servicios', ruta: '/servicios', icono: <ContentCutIcon />, permiso: 'SERVICIO_GESTIONAR' },
 ];
