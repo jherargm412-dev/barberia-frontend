@@ -1,4 +1,5 @@
 import ContentCutIcon from '@mui/icons-material/ContentCut';
+import HistoryIcon from '@mui/icons-material/History';
 import HomeIcon from '@mui/icons-material/Home';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -34,6 +35,7 @@ const OPCIONES: OpcionMenu[] = [
   { texto: 'Clientes', ruta: '/clientes', icono: <PeopleIcon />, permiso: 'CLIENTE_CONSULTAR' },
   { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
   { texto: 'Servicios', ruta: '/servicios', icono: <ContentCutIcon />, permiso: 'SERVICIO_GESTIONAR' },
+  { texto: 'Bitácora', ruta: '/bitacora', icono: <HistoryIcon />, permiso: 'BITACORA_CONSULTAR' },
 ];
 
 /** Estructura de las páginas privadas: barra superior + menú lateral + contenido. */
