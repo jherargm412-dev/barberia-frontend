@@ -20,6 +20,7 @@ import {
 } from '../modulos/servicios_reservas';
 import MainLayout from '../shared/layouts/MainLayout';
 import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
+import { BarberoCrearPage, BarberoEditarPage, BarberosListPage, PERMISOS_BARBEROS } from '../modulos/gestion_empleados';
 import InicioPage from '../shared/pages/InicioPage';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 
@@ -70,6 +71,17 @@ export default function AppRouter() {
             <Route path="/servicios" element={<ServiciosListPage />} />
             <Route path="/servicios/nuevo" element={<ServicioCrearPage />} />
             <Route path="/servicios/:id/editar" element={<ServicioEditarPage />} />
+          </Route>
+
+          {/* CU16 Gestionar Barberos: USUARIO_GESTIONAR (igual que CU01) */}
+          <Route element={<RequierePermiso permiso={PERMISOS_BARBEROS.GESTIONAR} />}>
+            <Route path="/barberos" element={<BarberosListPage />} />
+            <Route path="/barberos/:id/editar" element={<BarberoEditarPage />} />
+
+            {/* Registrar asigna el rol Barbero: además requiere ROL_ASIGNAR */}
+            <Route element={<RequierePermiso permiso={PERMISOS_BARBEROS.ASIGNAR_ROL} />}>
+              <Route path="/barberos/nuevo" element={<BarberoCrearPage />} />
+            </Route>
           </Route>
         </Route>
       </Route>
