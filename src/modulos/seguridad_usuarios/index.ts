@@ -15,6 +15,16 @@ export { default as UsuarioEditarPage } from './pages/gestionar_usuarios/Usuario
 export { default as UsuarioDetallePage } from './pages/gestionar_usuarios/UsuarioDetallePage';
 export { PERMISOS as PERMISOS_USUARIOS } from './constants/gestionar_usuarios';
 
+// CU03 Gestionar Roles y Permisos
+export { default as RolesListPage } from './pages/gestionar_roles_permisos/RolesListPage';
+export { default as RolCrearPage } from './pages/gestionar_roles_permisos/RolCrearPage';
+export { default as RolEditarPage } from './pages/gestionar_roles_permisos/RolEditarPage';
+export { PERMISOS_ROLES } from './constants/gestionar_roles_permisos';
+
+// CU04 Configurar Perfil Personal
+export { default as PerfilPage } from './pages/configurar_perfil/PerfilPage';
+export { PERMISOS_PERFIL } from './constants/configurar_perfil';
+
 // CU05 Consultar Bitácora
 export { default as BitacoraListPage } from './pages/consultar_bitacora/BitacoraListPage';
 export { PERMISOS_BITACORA, MENSAJES_BITACORA } from './constants/consultar_bitacora';
