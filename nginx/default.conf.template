@@ -1,0 +1,22 @@
+server {
+    listen ${PORT};
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Archivos de Vite con hash en el nombre (index-B5tiA-ZG.js): no cambian nunca, caché de 1 año.
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # index.html siempre fresco, para que tras un despliegue el navegador cargue la versión nueva.
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+    }
+
+    # Fallback de SPA: /activar?token=..., /usuarios, etc. no son archivos; las resuelve React Router.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
