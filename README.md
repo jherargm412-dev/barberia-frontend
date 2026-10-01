@@ -52,6 +52,27 @@ Consume la API del backend: [barberia-backend](https://github.com/jherargm412-de
 
 Antes de abrir un Pull Request, corre `npm run build` y `npm run lint`: los dos deben pasar sin errores.
 
+## Despliegue (Railway)
+
+Railway construye la imagen con el `Dockerfile` (compila con Vite y sirve con nginx) cada vez
+que se hace merge a `main`.
+
+- Variable del servicio: `VITE_API_URL=https://<backend>.up.railway.app/api/v1`.
+  Se fija **al compilar**: si la cambias, hay que volver a desplegar (no basta con reiniciar).
+- `nginx/default.conf.template` devuelve `index.html` para cualquier ruta, así funcionan los
+  enlaces directos como `/activar?token=...` y recargar la página en `/usuarios`.
+
+### Probar la imagen en tu máquina (Docker Desktop)
+
+Con el backend levantado (`docker compose up` en el repo del backend):
+
+```bash
+docker build --build-arg VITE_API_URL=http://localhost:8080/api/v1 -t barberia-frontend .
+docker run --rm -p 8081:80 barberia-frontend
+```
+
+Abre `http://localhost:8081`.
+
 ## 📁 Estructura del Repositorio
 
 ```
@@ -71,6 +92,8 @@ barberia-frontend/
 │       ├── inventario_compras/ # Por implementar
 │       └── reportes/           # Por implementar
 │
+├── nginx/                      # Configuración de nginx para la imagen de Docker
+├── Dockerfile                  # Imagen para Railway
 ├── .env.example                # Plantilla de variables (VITE_API_URL)
 ├── vite.config.ts              # Configuración de Vite
 └── package.json                # Dependencias y scripts
