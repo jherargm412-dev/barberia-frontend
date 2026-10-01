@@ -1,3 +1,4 @@
+import { cumplePoliticaContrasena, MENSAJE_POLITICA_CONTRASENA } from '../../../../shared/utils/politicaContrasena';
 import type {
   ActualizarEmpleadoRequest,
   Empleado,
@@ -44,7 +45,10 @@ export function validarEmpleado(v: EmpleadoFormValores, registrar: boolean): Err
   if (!v.correo.trim()) errores.correo = 'El correo es obligatorio';
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.correo.trim())) errores.correo = 'Formato de correo no válido';
 
-  if (registrar && !v.contrasena.trim()) errores.contrasena = 'La contraseña es obligatoria';
+  if (registrar) {
+    if (!v.contrasena.trim()) errores.contrasena = 'La contraseña es obligatoria';
+    else if (!cumplePoliticaContrasena(v.contrasena)) errores.contrasena = MENSAJE_POLITICA_CONTRASENA;
+  }
 
   const telefono = v.telefono.trim();
   if (telefono) {

@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState, type FormEvent } from 'react';
+import RequisitosContrasena from '../../../../shared/components/RequisitosContrasena';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { cambiarContrasena } from '../../api/configurar_perfil/perfilApi';
 import {
@@ -77,16 +78,20 @@ export default function CambiarContrasenaForm() {
           error={!!errores.contrasenaActual}
           helperText={errores.contrasenaActual}
         />
-        <TextField
-          label="Nueva contraseña"
-          type={tipo}
-          required
-          autoComplete="new-password"
-          value={valores.contrasenaNueva}
-          onChange={(e) => cambiar('contrasenaNueva', e.target.value)}
-          error={!!errores.contrasenaNueva}
-          helperText={errores.contrasenaNueva}
-        />
+        <Box>
+          <TextField
+            label="Nueva contraseña"
+            type={tipo}
+            required
+            fullWidth
+            autoComplete="new-password"
+            value={valores.contrasenaNueva}
+            onChange={(e) => cambiar('contrasenaNueva', e.target.value)}
+            error={!!errores.contrasenaNueva}
+            helperText={errores.contrasenaNueva}
+          />
+          <RequisitosContrasena contrasena={valores.contrasenaNueva} />
+        </Box>
         <TextField
           label="Confirmar nueva contraseña"
           type={tipo}
