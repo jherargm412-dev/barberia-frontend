@@ -1,7 +1,9 @@
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 import Divider from '@mui/material/Divider';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -110,8 +112,19 @@ export default function EmpleadoForm({ valoresIniciales, registrar, onGuardar, o
             slotProps={{ htmlInput: { maxLength: 15, inputMode: 'tel' } }}
           />
         </Stack>
+        {registrar && (
+          <FormControlLabel
+            label="Enviar invitación por correo (el empleado elige su propia contraseña)"
+            control={
+              <Checkbox
+                checked={valores.enviarInvitacion}
+                onChange={(e) => cambiar('enviarInvitacion', e.target.checked)}
+              />
+            }
+          />
+        )}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          {registrar && (
+          {registrar && !valores.enviarInvitacion && (
             <Box sx={{ flex: 1 }}>
               <TextField
                 label="Contraseña inicial"

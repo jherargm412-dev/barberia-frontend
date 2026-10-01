@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import {
+  ActivarCuentaPage,
   BitacoraListPage,
   LoginPage,
   MENSAJES_BITACORA,
@@ -43,6 +44,7 @@ export default function AppRouter() {
       {/* Públicas */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/recuperar" element={<RecuperarContrasenaPage />} />
+      <Route path="/activar" element={<ActivarCuentaPage />} />
 
       {/* Privadas: requieren sesión y usan el layout con menú */}
       <Route element={<RutaProtegida />}>
