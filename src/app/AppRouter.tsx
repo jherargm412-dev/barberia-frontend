@@ -8,6 +8,7 @@ import {
   PERMISOS_PERFIL,
   PERMISOS_ROLES,
   PERMISOS_USUARIOS,
+  RecuperarContrasenaPage,
   RequierePermiso,
   RolCrearPage,
   RolEditarPage,
@@ -39,8 +40,9 @@ import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 export default function AppRouter() {
   return (
     <Routes>
-      {/* Pública */}
+      {/* Públicas */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/recuperar" element={<RecuperarContrasenaPage />} />
 
       {/* Privadas: requieren sesión y usan el layout con menú */}
       <Route element={<RutaProtegida />}>

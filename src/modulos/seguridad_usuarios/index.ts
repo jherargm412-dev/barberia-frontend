@@ -8,6 +8,9 @@ export { default as RequierePermiso } from './components/iniciar_sesion/Requiere
 export { default as LoginPage } from './pages/iniciar_sesion/LoginPage';
 export type { UsuarioSesion } from './types/iniciar_sesion';
 
+// CU02 (05 §5.5) Recuperar contraseña
+export { default as RecuperarContrasenaPage } from './pages/recuperar_contrasena/RecuperarContrasenaPage';
+
 // CU01 Gestionar Usuarios
 export { default as UsuariosListPage } from './pages/gestionar_usuarios/UsuariosListPage';
 export { default as UsuarioCrearPage } from './pages/gestionar_usuarios/UsuarioCrearPage';
