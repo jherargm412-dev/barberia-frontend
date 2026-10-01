@@ -47,8 +47,10 @@ export default function CambiarContrasenaForm() {
       setValores(CONTRASENA_VACIA); // nunca dejamos contraseñas escritas en pantalla
     } catch (err) {
       // P. ej. "La contraseña actual es incorrecta" (el backend responde 400, no cierra la sesión).
-      const { mensaje: mensajeBackend } = obtenerError(err);
+      // Los campos (contrasenaActual, contrasenaNueva, confirmacion) se llaman igual que en el formulario.
+      const { mensaje: mensajeBackend, campos } = obtenerError(err);
       setError(mensajeBackend);
+      setErrores(campos);
     } finally {
       setEnviando(false);
     }

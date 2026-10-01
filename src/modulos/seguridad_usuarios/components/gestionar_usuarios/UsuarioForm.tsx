@@ -92,6 +92,11 @@ export default function UsuarioForm({
 
   const mostrarEmpleado = esEmpleado(valores.roles);
 
+  // Roles que el usuario ya tenía y que ya no vienen en la lista de activos (desactivados en CU03).
+  // Se calculan desde los valores iniciales para que la casilla no desaparezca al desmarcarla.
+  const rolesInactivos =
+    roles.length === 0 ? [] : valoresIniciales.roles.filter((nombre) => !roles.some((r) => r.nombre === nombre));
+
   return (
     <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: 3 }}>
       <Stack spacing={2}>
@@ -165,7 +170,22 @@ export default function UsuarioForm({
                 }
               />
             ))}
+            {rolesInactivos.map((nombre) => (
+              <FormControlLabel
+                key={nombre}
+                label={`${nombre} (inactivo)`}
+                control={
+                  <Checkbox checked={valores.roles.includes(nombre)} onChange={() => alternarRol(nombre)} />
+                }
+              />
+            ))}
           </FormGroup>
+          {rolesInactivos.length > 0 && (
+            <FormHelperText>
+              Un rol inactivo no otorga permisos. Se puede conservar o quitar, pero no volver a asignar una vez
+              guardado.
+            </FormHelperText>
+          )}
           {errores.roles && <FormHelperText>{errores.roles}</FormHelperText>}
         </FormControl>
 
