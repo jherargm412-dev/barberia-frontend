@@ -8,10 +8,12 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
+import { useAuth } from '../../../seguridad_usuarios';
 import { desvincularEmpleado, listarEmpleados, reactivarEmpleado } from '../../api/gestionar_barberos/empleadosApi';
 import EmpleadosFiltros from '../../components/gestionar_barberos/EmpleadosFiltros';
 import EmpleadosTabla from '../../components/gestionar_barberos/EmpleadosTabla';
 import ServiciosEmpleadoDialog from '../../components/gestionar_barberos/ServiciosEmpleadoDialog';
+import { PERMISOS_EMPLEADOS } from '../../constants/gestionar_barberos';
 import type { EmpleadoResumen, FiltrosEmpleados } from '../../types/gestionar_barberos';
 
 const FILTROS_INICIALES: FiltrosEmpleados = { q: '', rol: 'Barbero', estado: '', tipoContrato: '', page: 0, size: 10 };
@@ -20,6 +22,8 @@ const FILTROS_INICIALES: FiltrosEmpleados = { q: '', rol: 'Barbero', estado: '',
 export default function EmpleadosListPage() {
   const navigate = useNavigate();
   const ubicacion = useLocation();
+  const { tienePermiso } = useAuth();
+  const puedeRegistrar = tienePermiso(PERMISOS_EMPLEADOS.REGISTRAR);
 
   const [filtros, setFiltros] = useState<FiltrosEmpleados>(FILTROS_INICIALES);
   const [empleados, setEmpleados] = useState<EmpleadoResumen[]>([]);
@@ -74,9 +78,11 @@ export default function EmpleadosListPage() {
     <>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, gap: 2 }}>
         <Typography variant="h5">Barberos y empleados</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/empleados/nuevo')}>
-          Nuevo empleado
-        </Button>
+        {puedeRegistrar && (
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/empleados/nuevo')}>
+            Nuevo empleado
+          </Button>
+        )}
       </Box>
 
       <EmpleadosFiltros iniciales={FILTROS_INICIALES} onBuscar={(f) => cambiarFiltros({ ...f, page: 0 })} />

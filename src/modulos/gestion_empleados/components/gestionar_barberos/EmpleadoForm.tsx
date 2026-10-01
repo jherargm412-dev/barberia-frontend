@@ -34,11 +34,12 @@ export default function EmpleadoForm({ valoresIniciales, registrar, onGuardar, o
   const [errorGeneral, setErrorGeneral] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [turnos, setTurnos] = useState<Turno[]>([]);
+  const [errorTurnos, setErrorTurnos] = useState('');
 
   useEffect(() => {
     listarTurnos()
       .then(setTurnos)
-      .catch(() => setTurnos([]));
+      .catch((err) => setErrorTurnos(obtenerError(err).mensaje));
   }, []);
 
   function cambiar<K extends keyof EmpleadoFormValores>(campo: K, valor: EmpleadoFormValores[K]) {
@@ -204,6 +205,11 @@ export default function EmpleadoForm({ valoresIniciales, registrar, onGuardar, o
             ))}
           </TextField>
         </Stack>
+        {errorTurnos && (
+          <Alert severity="warning">
+            No se pudieron cargar los turnos ({errorTurnos}). Si guarda, el turno actual se conserva.
+          </Alert>
+        )}
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 1 }}>
           <Button onClick={onCancelar} disabled={enviando}>

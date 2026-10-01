@@ -12,6 +12,7 @@ import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { cambiarEstadoRol, listarRolesGestion } from '../../api/gestionar_roles_permisos/rolesPermisosApi';
 import RolesTabla from '../../components/gestionar_roles_permisos/RolesTabla';
+import { useAuth } from '../../context/iniciar_sesion/useAuth';
 import type { Rol } from '../../types/gestionar_roles_permisos';
 
 type FiltroEstado = 'todos' | 'activos' | 'inactivos';
@@ -20,6 +21,7 @@ type FiltroEstado = 'todos' | 'activos' | 'inactivos';
 export default function RolesListPage() {
   const navigate = useNavigate();
   const ubicacion = useLocation();
+  const { refrescarSesion } = useAuth();
 
   const [roles, setRoles] = useState<Rol[]>([]);
   const [filtro, setFiltro] = useState<FiltroEstado>('todos');
@@ -49,6 +51,8 @@ export default function RolesListPage() {
       setMensaje(respuesta.mensaje);
       setCargando(true);
       setRecargar((n) => n + 1);
+      // Activar/desactivar uno de mis roles cambia mis permisos: actualizamos menú y rutas sin recargar.
+      refrescarSesion().catch(() => undefined);
     } catch (err) {
       setError(obtenerError(err).mensaje);
     } finally {

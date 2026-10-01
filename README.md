@@ -52,20 +52,28 @@ Consume la API del backend: [barberia-backend](https://github.com/jherargm412-de
 
 Antes de abrir un Pull Request, corre `npm run build` y `npm run lint`: los dos deben pasar sin errores.
 
-## Estructura
+## 📁 Estructura del Repositorio
 
 ```
-src/
-  app/          arranque: App.tsx, AppRouter.tsx (todas las rutas), theme.ts
-  shared/       lo que usan todos los módulos: httpClient, layout con menú, utilidades
-  modulos/      un módulo por carpeta, con el mismo nombre que en el backend
-    seguridad_usuarios/
-    gestion_clientes/
-    gestion_empleados/
-    servicios_reservas/
-    ventas_caja/
-    inventario_compras/
-    reportes/
+barberia-frontend/
+│
+├── public/                     # Íconos y recursos públicos
+├── src/
+│   ├── main.tsx                # Punto de entrada de React
+│   ├── app/                    # App, rutas (AppRouter) y tema
+│   ├── shared/                 # Lo común: httpClient, layout, componentes
+│   └── modulos/
+│       ├── seguridad_usuarios/ # CU01, CU02, CU05 (Usuarios, Login, Bitácora)
+│       ├── gestion_clientes/   # CU06 (Clientes)
+│       ├── gestion_empleados/  # Por implementar
+│       ├── servicios_reservas/ # CU08 (Catálogo de servicios, Reservas)
+│       ├── ventas_caja/        # Por implementar
+│       ├── inventario_compras/ # Por implementar
+│       └── reportes/           # Por implementar
+│
+├── .env.example                # Plantilla de variables (VITE_API_URL)
+├── vite.config.ts              # Configuración de Vite
+└── package.json                # Dependencias y scripts
 ```
 
 Dentro de cada módulo va primero la **capa** (`api/`, `components/`, `pages/`…) y dentro de

@@ -29,9 +29,17 @@ export function valoresDesdeRol(r: Rol): RolFormValores {
   return { nombre: r.nombre, descripcion: r.descripcion ?? '', permisos: r.permisos };
 }
 
-/** Clonar: mismos permisos y descripción, nombre sugerido "Copia de …" (recortado a 30). */
-export function valoresClonados(r: Rol): RolFormValores {
-  return { nombre: `Copia de ${r.nombre}`.slice(0, 30), descripcion: r.descripcion ?? '', permisos: r.permisos };
+/**
+ * Clonar: misma descripción y permisos, nombre sugerido "Copia de …" (recortado a 30). Solo se copian
+ * los permisos activos del catálogo: el backend rechaza crear un rol con permisos inactivos.
+ */
+export function valoresClonados(r: Rol, catalogo: Permiso[]): RolFormValores {
+  const activos = new Set(catalogo.filter((p) => p.activo).map((p) => p.accion));
+  return {
+    nombre: `Copia de ${r.nombre}`.slice(0, 30),
+    descripcion: r.descripcion ?? '',
+    permisos: r.permisos.filter((accion) => activos.has(accion)),
+  };
 }
 
 /** Convierte los valores del formulario al body que espera el backend (descripción vacía → null). */

@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
-import { consultarRol, registrarRol } from '../../api/gestionar_roles_permisos/rolesPermisosApi';
+import { consultarRol, listarPermisos, registrarRol } from '../../api/gestionar_roles_permisos/rolesPermisosApi';
 import RolForm from '../../components/gestionar_roles_permisos/RolForm';
 import {
   construirRequest,
@@ -25,9 +25,9 @@ export default function RolCrearPage() {
 
   useEffect(() => {
     if (!idClonar) return;
-    consultarRol(Number(idClonar))
-      .then((rol) => {
-        setIniciales(valoresClonados(rol));
+    Promise.all([consultarRol(Number(idClonar)), listarPermisos()])
+      .then(([rol, catalogo]) => {
+        setIniciales(valoresClonados(rol, catalogo));
         setOrigen(rol.nombre);
       })
       .catch((err) => setError(obtenerError(err).mensaje));

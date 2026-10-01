@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { consultarRol, modificarRol } from '../../api/gestionar_roles_permisos/rolesPermisosApi';
 import RolForm from '../../components/gestionar_roles_permisos/RolForm';
+import { useAuth } from '../../context/iniciar_sesion/useAuth';
 import { ROL_ADMINISTRADOR } from '../../constants/gestionar_roles_permisos';
 import type { Rol } from '../../types/gestionar_roles_permisos';
 import { construirRequest, valoresDesdeRol, type RolFormValores } from '../../utils/gestionar_roles_permisos/rolForm';
@@ -16,6 +17,7 @@ export default function RolEditarPage() {
   const { id } = useParams(); // viene de la ruta /roles/:id/editar
   const idRol = Number(id);
   const navigate = useNavigate();
+  const { refrescarSesion } = useAuth();
 
   const [rol, setRol] = useState<Rol | null>(null);
   const [error, setError] = useState('');
@@ -28,6 +30,8 @@ export default function RolEditarPage() {
 
   async function guardar(valores: RolFormValores) {
     const respuesta = await modificarRol(idRol, construirRequest(valores));
+    // Si el rol es uno de los míos, mis permisos cambiaron: el menú y las rutas deben enterarse sin recargar.
+    await refrescarSesion().catch(() => undefined);
     navigate('/roles', { state: { mensaje: respuesta.mensaje } });
   }
 
