@@ -11,6 +11,8 @@ export interface EmpleadoFormValores {
   nombre: string;
   correo: string;
   contrasena: string;
+  /** Solo al registrar: true = sin contraseña, le llega un correo para elegirla. */
+  enviarInvitacion: boolean;
   telefono: string;
   fechaNacimiento: string;
   rol: string;
@@ -25,6 +27,7 @@ export const VALORES_VACIOS: EmpleadoFormValores = {
   nombre: '',
   correo: '',
   contrasena: '',
+  enviarInvitacion: true,
   telefono: '',
   fechaNacimiento: '',
   rol: 'Barbero',
@@ -45,7 +48,7 @@ export function validarEmpleado(v: EmpleadoFormValores, registrar: boolean): Err
   if (!v.correo.trim()) errores.correo = 'El correo es obligatorio';
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.correo.trim())) errores.correo = 'Formato de correo no válido';
 
-  if (registrar) {
+  if (registrar && !v.enviarInvitacion) {
     if (!v.contrasena.trim()) errores.contrasena = 'La contraseña es obligatoria';
     else if (!cumplePoliticaContrasena(v.contrasena)) errores.contrasena = MENSAJE_POLITICA_CONTRASENA;
   }
@@ -70,6 +73,7 @@ export function valoresDesdeEmpleado(e: Empleado): EmpleadoFormValores {
     nombre: e.nombre,
     correo: e.correo,
     contrasena: '',
+    enviarInvitacion: false,
     telefono: e.telefono ?? '',
     fechaNacimiento: e.fechaNacimiento ?? '',
     rol: e.roles[0] ?? '',
@@ -92,7 +96,12 @@ export function construirActualizar(v: EmpleadoFormValores): ActualizarEmpleadoR
 }
 
 export function construirRegistrar(v: EmpleadoFormValores): RegistrarEmpleadoRequest {
-  return { ...construirActualizar(v), contrasena: v.contrasena, rol: v.rol };
+  return {
+    ...construirActualizar(v),
+    contrasena: v.enviarInvitacion ? null : v.contrasena,
+    rol: v.rol,
+    enviarInvitacion: v.enviarInvitacion,
+  };
 }
 
 /** "09:00:00" → "09:00" */

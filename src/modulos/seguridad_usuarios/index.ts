@@ -11,6 +11,9 @@ export type { UsuarioSesion } from './types/iniciar_sesion';
 // CU02 (05 §5.5) Recuperar contraseña
 export { default as RecuperarContrasenaPage } from './pages/recuperar_contrasena/RecuperarContrasenaPage';
 
+// CU01/CU17 Activar cuenta desde la invitación por correo
+export { default as ActivarCuentaPage } from './pages/aceptar_invitacion/ActivarCuentaPage';
+
 // CU01 Gestionar Usuarios
 export { default as UsuariosListPage } from './pages/gestionar_usuarios/UsuariosListPage';
 export { default as UsuarioCrearPage } from './pages/gestionar_usuarios/UsuarioCrearPage';

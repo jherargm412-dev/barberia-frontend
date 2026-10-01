@@ -64,8 +64,10 @@ export interface ActualizarEmpleadoRequest {
 
 /** Body de POST /empleados: igual que actualizar, más contraseña y rol. */
 export interface RegistrarEmpleadoRequest extends ActualizarEmpleadoRequest {
-  contrasena: string;
+  /** Se omite cuando enviarInvitacion es true: el empleado la elige desde el correo. */
+  contrasena: string | null;
   rol: string;
+  enviarInvitacion: boolean;
 }
 
 export interface RespuestaEmpleado {

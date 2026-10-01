@@ -122,6 +122,17 @@ export default function UsuarioForm({
           helperText={errores.correo}
         />
         {pedirContrasena && (
+          <FormControlLabel
+            label="Enviar invitación por correo (el usuario elige su propia contraseña)"
+            control={
+              <Checkbox
+                checked={valores.enviarInvitacion}
+                onChange={(e) => cambiar('enviarInvitacion', e.target.checked)}
+              />
+            }
+          />
+        )}
+        {pedirContrasena && !valores.enviarInvitacion && (
           <Box>
             <TextField
               label="Contraseña"
