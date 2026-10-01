@@ -14,6 +14,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState, type FormEvent } from 'react';
+import RequisitosContrasena from '../../../../shared/components/RequisitosContrasena';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarRoles } from '../../api/gestionar_usuarios/rolesApi';
 import { TIPOS_CONTRATO, TURNOS } from '../../constants/gestionar_usuarios';
@@ -121,16 +122,20 @@ export default function UsuarioForm({
           helperText={errores.correo}
         />
         {pedirContrasena && (
-          <TextField
-            label="Contraseña"
-            type="password"
-            required
-            autoComplete="new-password"
-            value={valores.contrasena}
-            onChange={(e) => cambiar('contrasena', e.target.value)}
-            error={!!errores.contrasena}
-            helperText={errores.contrasena}
-          />
+          <Box>
+            <TextField
+              label="Contraseña"
+              type="password"
+              required
+              fullWidth
+              autoComplete="new-password"
+              value={valores.contrasena}
+              onChange={(e) => cambiar('contrasena', e.target.value)}
+              error={!!errores.contrasena}
+              helperText={errores.contrasena}
+            />
+            <RequisitosContrasena contrasena={valores.contrasena} />
+          </Box>
         )}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <TextField

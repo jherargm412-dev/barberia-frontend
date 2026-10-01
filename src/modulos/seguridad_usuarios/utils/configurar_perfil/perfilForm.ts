@@ -1,3 +1,4 @@
+import { cumplePoliticaContrasena, MENSAJE_POLITICA_CONTRASENA } from '../../../../shared/utils/politicaContrasena';
 import type { ActualizarPerfilRequest, Perfil } from '../../types/configurar_perfil';
 
 /** Valores del formulario de datos personales (todo como texto para los inputs). */
@@ -47,6 +48,7 @@ export function validarContrasena(v: ContrasenaFormValores): ErroresContrasena {
   const errores: ErroresContrasena = {};
   if (!v.contrasenaActual) errores.contrasenaActual = 'Ingrese su contraseña actual';
   if (!v.contrasenaNueva.trim()) errores.contrasenaNueva = 'Ingrese la nueva contraseña';
+  else if (!cumplePoliticaContrasena(v.contrasenaNueva)) errores.contrasenaNueva = MENSAJE_POLITICA_CONTRASENA;
   else if (v.contrasenaNueva === v.contrasenaActual) errores.contrasenaNueva = 'Debe ser distinta de la actual';
   if (!v.confirmacion) errores.confirmacion = 'Confirme la nueva contraseña';
   else if (v.confirmacion !== v.contrasenaNueva) errores.confirmacion = 'No coincide con la nueva contraseña';

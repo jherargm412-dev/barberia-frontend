@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState, type FormEvent } from 'react';
+import RequisitosContrasena from '../../../../shared/components/RequisitosContrasena';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarTurnos } from '../../api/gestionar_barberos/empleadosApi';
 import { ROLES_ALTA, TIPOS_CONTRATO } from '../../constants/gestionar_barberos';
@@ -111,17 +112,20 @@ export default function EmpleadoForm({ valoresIniciales, registrar, onGuardar, o
         </Stack>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           {registrar && (
-            <TextField
-              label="Contraseña inicial"
-              required
-              type="password"
-              autoComplete="new-password"
-              value={valores.contrasena}
-              onChange={(e) => cambiar('contrasena', e.target.value)}
-              error={!!errores.contrasena}
-              helperText={errores.contrasena ?? 'El empleado podrá cambiarla en "Mi perfil"'}
-              sx={{ flex: 1 }}
-            />
+            <Box sx={{ flex: 1 }}>
+              <TextField
+                label="Contraseña inicial"
+                required
+                fullWidth
+                type="password"
+                autoComplete="new-password"
+                value={valores.contrasena}
+                onChange={(e) => cambiar('contrasena', e.target.value)}
+                error={!!errores.contrasena}
+                helperText={errores.contrasena ?? 'El empleado podrá cambiarla en "Mi perfil"'}
+              />
+              <RequisitosContrasena contrasena={valores.contrasena} />
+            </Box>
           )}
           <TextField
             label="Fecha de nacimiento"
