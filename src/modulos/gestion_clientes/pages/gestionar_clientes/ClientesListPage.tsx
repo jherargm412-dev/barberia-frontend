@@ -12,10 +12,12 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+import AddIcon from '@mui/icons-material/Add';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { useAuth } from '../../../seguridad_usuarios';
 import { activarCliente, desactivarCliente, listarClientes } from '../../api/gestionar_clientes/clientesApi';
@@ -73,11 +75,11 @@ export default function ClientesListPage() {
   }
 
   return <>
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-      <Typography variant="h5">Clientes</Typography>
-      {tienePermiso(PERMISOS_CLIENTES.CREAR) && <Button variant="contained" onClick={() => navigate('/clientes/nuevo')}>Nuevo cliente</Button>}
-    </Box>
-    <Box component="form" onSubmit={buscar} sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+    <PageHeader title="Clientes" description="Consulta los clientes y administra sus datos y estado."
+      action={tienePermiso(PERMISOS_CLIENTES.CREAR) && <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/clientes/nuevo')}>Nuevo cliente</Button>} />
+    {/* Los campos y la búsqueda ocupan el ancho disponible en celular. */}
+    <Box component="form" onSubmit={buscar} sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap',
+      '& > *': { width: { xs: '100%', sm: 'auto' } } }}>
       <TextField label="Nombre o teléfono" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} size="small" />
       <TextField select label="Estado" value={estado === '' ? '' : String(estado)}
         onChange={(e) => setEstado(e.target.value === '' ? '' : e.target.value === 'true')} size="small" sx={{ minWidth: 150 }}>
@@ -89,13 +91,13 @@ export default function ClientesListPage() {
     {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
     {cargando && <LinearProgress />}
     <TableContainer component={Paper}>
-      <Table><TableHead><TableRow>
+      <Table sx={{ minWidth: 720 }}><TableHead><TableRow>
         <TableCell>Nombre</TableCell><TableCell>Teléfono</TableCell><TableCell>Registro</TableCell><TableCell>Estado</TableCell><TableCell>Acciones</TableCell>
       </TableRow></TableHead><TableBody>
-        {clientes.length === 0 && <TableRow><TableCell colSpan={5}>No se encontraron clientes</TableCell></TableRow>}
-        {clientes.map((cliente) => <TableRow key={cliente.idCliente}>
+        {!cargando && !error && clientes.length === 0 && <TableRow><TableCell colSpan={5} align="center" sx={{ py: 5, color: 'text.secondary' }}>No se encontraron clientes</TableCell></TableRow>}
+        {clientes.map((cliente) => <TableRow hover key={cliente.idCliente}>
           <TableCell>{cliente.nombre}</TableCell><TableCell>{cliente.telefono || '—'}</TableCell>
-          <TableCell>{cliente.fechaRegistro}</TableCell><TableCell>{cliente.activo ? 'Activo' : 'Inactivo'}</TableCell>
+          <TableCell>{cliente.fechaRegistro}</TableCell><TableCell><Chip size="small" variant="outlined" label={cliente.activo ? 'Activo' : 'Inactivo'} /></TableCell>
           <TableCell>
             <Button size="small" onClick={() => navigate(`/clientes/${cliente.idCliente}`)}>Consultar</Button>
             {tienePermiso(PERMISOS_CLIENTES.EDITAR) && <Button size="small" onClick={() => navigate(`/clientes/${cliente.idCliente}/editar`)}>Modificar</Button>}

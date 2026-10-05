@@ -18,19 +18,22 @@ import { ROL_ADMINISTRADOR } from '../../constants/gestionar_roles_permisos';
 import type { Rol } from '../../types/gestionar_roles_permisos';
 
 interface Props {
+  /** Oculta el estado vacío mientras carga o se muestra un error. */
+  mostrarVacio?: boolean;
   roles: Rol[];
   /** Paso 4: la página pide confirmación y llama al backend. */
   onCambiarEstado: (rol: Rol) => void;
 }
 
 /** CU03 paso 1: nombre, descripción, estado, permisos y usuarios de cada rol. */
-export default function RolesTabla({ roles, onCambiarEstado }: Props) {
+export default function RolesTabla({
+  mostrarVacio = true, roles, onCambiarEstado }: Props) {
   const navigate = useNavigate();
 
   return (
-    <Paper>
+    <Paper elevation={0}>
       <TableContainer>
-        <Table>
+        <Table sx={{ minWidth: 640 }}>
           <TableHead>
             <TableRow>
               <TableCell>Rol</TableCell>
@@ -41,7 +44,7 @@ export default function RolesTabla({ roles, onCambiarEstado }: Props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {roles.length === 0 && (
+            {roles.length === 0 && mostrarVacio && (
               <TableRow>
                 <TableCell colSpan={5} align="center">
                   No se encontraron roles

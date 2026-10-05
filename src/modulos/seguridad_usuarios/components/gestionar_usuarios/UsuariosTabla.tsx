@@ -15,8 +15,11 @@ import Tooltip from '@mui/material/Tooltip';
 import { useNavigate } from 'react-router-dom';
 import type { UsuarioResumen } from '../../types/gestionar_usuarios';
 import EstadoChip from './EstadoChip';
+import PersonIdentity from '../../../../shared/components/PersonIdentity';
 
 interface Props {
+  /** Oculta el estado vacío mientras carga o se muestra un error. */
+  mostrarVacio?: boolean;
   usuarios: UsuarioResumen[];
   total: number;
   pagina: number;
@@ -27,6 +30,7 @@ interface Props {
 }
 
 export default function UsuariosTabla({
+  mostrarVacio = true,
   usuarios,
   total,
   pagina,
@@ -38,9 +42,9 @@ export default function UsuariosTabla({
   const navigate = useNavigate();
 
   return (
-    <Paper>
+    <Paper elevation={0}>
       <TableContainer>
-        <Table>
+        <Table sx={{ minWidth: 720 }}>
           <TableHead>
             <TableRow>
               <TableCell>Nombre</TableCell>
@@ -51,7 +55,7 @@ export default function UsuariosTabla({
             </TableRow>
           </TableHead>
           <TableBody>
-            {usuarios.length === 0 && (
+            {usuarios.length === 0 && mostrarVacio && (
               <TableRow>
                 <TableCell colSpan={5} align="center">
                   No se encontraron usuarios
@@ -60,7 +64,7 @@ export default function UsuariosTabla({
             )}
             {usuarios.map((u) => (
               <TableRow key={u.idUsuario} hover>
-                <TableCell>{u.nombre}</TableCell>
+                <TableCell><PersonIdentity name={u.nombre} /></TableCell>
                 <TableCell>{u.correo}</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap' }}>

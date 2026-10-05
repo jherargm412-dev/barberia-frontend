@@ -42,7 +42,8 @@ export default function BitacoraFiltros({ opciones, usuarios, onBuscar }: Props)
 
   return (
     <Stack component="form" onSubmit={handleSubmit} spacing={2} sx={{ mb: 2 }}>
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+      {/* Los filtros se acomodan al espacio del contenido, incluso con el menú lateral abierto. */}
+      <Stack direction={{ xs: 'column', md: 'row' }} useFlexGap spacing={2} sx={{ flexWrap: 'wrap' }}>
         <TextField
           type="date"
           label="Desde"

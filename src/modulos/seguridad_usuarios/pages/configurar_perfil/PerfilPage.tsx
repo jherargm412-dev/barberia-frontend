@@ -6,6 +6,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { consultarPerfil } from '../../api/configurar_perfil/perfilApi';
 import CambiarContrasenaForm from '../../components/configurar_perfil/CambiarContrasenaForm';
 import DatosPersonalesForm from '../../components/configurar_perfil/DatosPersonalesForm';
@@ -37,9 +38,9 @@ export default function PerfilPage() {
 
   return (
     <>
-      <Typography variant="h5">Mi perfil</Typography>
-      <Stack direction="row" spacing={1} sx={{ mt: 1, mb: 3, alignItems: 'center', flexWrap: 'wrap' }}>
-        <Typography color="text.secondary">{perfil.correo}</Typography>
+      <PageHeader title="Mi perfil" description="Actualiza tus datos personales y revisa la seguridad de tu cuenta." />
+      <Stack direction="row" useFlexGap spacing={1} sx={{ mb: 3, alignItems: 'center', flexWrap: 'wrap', overflowWrap: 'anywhere' }}>
+        <Typography color="text.secondary" sx={{ minWidth: 0 }}>{perfil.correo}</Typography>
         {perfil.roles.map((rol) => (
           <Chip key={rol} label={rol} size="small" color="primary" variant="outlined" />
         ))}

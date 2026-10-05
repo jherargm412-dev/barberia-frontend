@@ -18,6 +18,8 @@ import { formatearPorcentaje, formatearPrecio } from '../../utils/gestionar_cata
 import EstadoServicioChip from './EstadoServicioChip';
 
 interface Props {
+  /** Oculta el estado vacío mientras carga o se muestra un error. */
+  mostrarVacio?: boolean;
   servicios: Servicio[];
   total: number;
   pagina: number;
@@ -30,6 +32,7 @@ interface Props {
 
 /** CU08 paso 3: nombre, precio, porcentaje de comisión y estado de cada servicio. */
 export default function ServiciosTabla({
+  mostrarVacio = true,
   servicios,
   total,
   pagina,
@@ -41,9 +44,9 @@ export default function ServiciosTabla({
   const navigate = useNavigate();
 
   return (
-    <Paper>
+    <Paper elevation={0}>
       <TableContainer>
-        <Table>
+        <Table sx={{ minWidth: 720 }}>
           <TableHead>
             <TableRow>
               <TableCell>Servicio</TableCell>
@@ -54,7 +57,7 @@ export default function ServiciosTabla({
             </TableRow>
           </TableHead>
           <TableBody>
-            {servicios.length === 0 && (
+            {servicios.length === 0 && mostrarVacio && (
               <TableRow>
                 <TableCell colSpan={5} align="center">
                   No se encontraron servicios

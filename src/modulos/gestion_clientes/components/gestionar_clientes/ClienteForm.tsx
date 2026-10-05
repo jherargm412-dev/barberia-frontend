@@ -2,6 +2,7 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import Paper from '@mui/material/Paper';
 import { useState, type FormEvent } from 'react';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import type { ClienteRequest } from '../../types/gestionar_clientes';
@@ -37,16 +38,16 @@ export default function ClienteForm({ inicial, guardar, cancelar }: Props) {
   }
 
   return (
-    <Box component="form" onSubmit={enviar} sx={{ maxWidth: 560, display: 'grid', gap: 2 }}>
+    <Paper component="form" onSubmit={enviar} sx={{ p: { xs: 2, sm: 3 }, maxWidth: 560, display: 'grid', gap: 2.5 }}>
       {error && <Alert severity="error">{error}</Alert>}
       <TextField label="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)}
-        required slotProps={{ htmlInput: { maxLength: 80 } }} />
+        required disabled={ocupado} autoComplete="name" slotProps={{ htmlInput: { maxLength: 80 } }} />
       <TextField label="Teléfono" value={telefono} onChange={(e) => setTelefono(e.target.value)}
-        slotProps={{ htmlInput: { maxLength: 15 } }} helperText="Opcional" />
+        disabled={ocupado} type="tel" autoComplete="tel" slotProps={{ htmlInput: { maxLength: 15 } }} helperText="Opcional" />
       <Box sx={{ display: 'flex', gap: 1 }}>
-        <Button variant="contained" type="submit" disabled={ocupado}>Guardar</Button>
+        <Button variant="contained" type="submit" loading={ocupado}>Guardar</Button>
         <Button onClick={cancelar} disabled={ocupado}>Cancelar</Button>
       </Box>
-    </Box>
+    </Paper>
   );
 }

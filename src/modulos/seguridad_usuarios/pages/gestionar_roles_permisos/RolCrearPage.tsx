@@ -1,6 +1,6 @@
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
@@ -43,9 +43,7 @@ export default function RolCrearPage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        {origen ? `Nuevo rol (copia de ${origen})` : 'Nuevo rol'}
-      </Typography>
+      <PageHeader title={origen ? `Nuevo rol (copia de ${origen})` : 'Nuevo rol'} />
       <RolForm
         valoresIniciales={iniciales}
         textoBoton="Guardar"

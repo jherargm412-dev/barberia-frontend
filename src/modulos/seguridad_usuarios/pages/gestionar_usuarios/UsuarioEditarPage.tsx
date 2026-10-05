@@ -1,6 +1,7 @@
+import PageHeader from '../../../../shared/components/PageHeader';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
+
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
@@ -34,9 +35,7 @@ export default function UsuarioEditarPage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        Editar usuario
-      </Typography>
+      <PageHeader title="Editar usuario" />
       <UsuarioForm
         valoresIniciales={valoresDesdeUsuario(usuario)}
         pedirContrasena={false}
