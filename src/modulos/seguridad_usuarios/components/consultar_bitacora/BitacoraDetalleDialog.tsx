@@ -41,7 +41,7 @@ function Datos({ datos }: { datos: Record<string, unknown> | null }) {
   return (
     <Box
       component="pre"
-      sx={{ m: 0, p: 1, bgcolor: 'grey.100', borderRadius: 1, fontSize: 13, overflowX: 'auto' }}
+      sx={{ m: 0, p: 1, bgcolor: 'background.paper', borderRadius: 1, fontSize: 13, overflowX: 'auto' }}
     >
       {formatearDatos(datos)}
     </Box>

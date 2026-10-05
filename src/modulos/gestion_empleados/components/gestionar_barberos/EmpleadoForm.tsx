@@ -74,7 +74,7 @@ export default function EmpleadoForm({ valoresIniciales, registrar, onGuardar, o
   }
 
   return (
-    <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: 3, maxWidth: 760 }}>
+    <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: { xs: 2, sm: 3 }, maxWidth: 760 }}>
       <Stack spacing={2}>
         {errorGeneral && <Alert severity="error">{errorGeneral}</Alert>}
 
@@ -232,7 +232,7 @@ export default function EmpleadoForm({ valoresIniciales, registrar, onGuardar, o
           <Button onClick={onCancelar} disabled={enviando}>
             Cancelar
           </Button>
-          <Button type="submit" variant="contained" disabled={enviando}>
+          <Button type="submit" variant="contained" loading={enviando}>
             {enviando ? 'Guardando...' : registrar ? 'Registrar' : 'Guardar'}
           </Button>
         </Box>

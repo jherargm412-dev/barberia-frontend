@@ -11,6 +11,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import PeopleIcon from '@mui/icons-material/People';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
+import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 import Drawer from '@mui/material/Drawer';
@@ -24,6 +25,7 @@ import Typography from '@mui/material/Typography';
 import { useState, type ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../modulos/seguridad_usuarios';
+import ThemeModeButton from '../components/ThemeModeButton';
 
 const ANCHO_MENU = 240;
 
@@ -99,6 +101,7 @@ export default function MainLayout() {
       <ListItemButton
         key={opcion.ruta}
         selected={rutaSeleccionada(opcion.ruta, pathname)}
+        aria-current={rutaSeleccionada(opcion.ruta, pathname) ? 'page' : undefined}
         onClick={() => irA(opcion)}
         sx={anidada ? { pl: 4 } : undefined}
       >
@@ -111,7 +114,10 @@ export default function MainLayout() {
   const menu = (
     <>
       <Toolbar />
-      <List>
+      <Typography variant="overline" color="text.secondary" sx={{ display: 'block', px: 3, pt: 2, letterSpacing: 2 }}>
+        Navegación
+      </Typography>
+      <List sx={{ px: 1.5 }}>
         {opcionMenu(INICIO)}
         {gruposVisibles.map((grupo) => (
           <Box key={grupo.titulo}>
@@ -139,22 +145,28 @@ export default function MainLayout() {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <IconButton
             color="inherit"
             edge="start"
+            aria-label="Abrir menú de navegación"
             onClick={() => setMenuMovilAbierto(true)}
-            sx={{ mr: 2, display: { md: 'none' } }}
+            sx={{ mr: { xs: 0.5, sm: 2 }, display: { md: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Barbería
+          <Typography noWrap variant="h6" sx={{ flexGrow: 1, minWidth: 0, fontSize: { xs: 15, sm: 18 }, letterSpacing: 1 }}>
+            HOUSE of CUT
           </Typography>
-          <Typography sx={{ mr: 2, display: { xs: 'none', sm: 'block' } }}>{usuario?.nombre}</Typography>
-          <Button color="inherit" startIcon={<LogoutIcon />} onClick={salir}>
+          {/* Iniciales para identificar la sesión sin depender de fotografías. */}
+          <Avatar sx={{ width: 30, height: 30, mr: 1, fontSize: 12, bgcolor: 'text.primary', color: 'background.default', display: { xs: 'none', sm: 'flex' } }}>
+            {usuario?.nombre.trim().split(/\s+/).slice(0, 2).map((parte) => parte[0]).join('').toUpperCase()}
+          </Avatar>
+          <Typography variant="body2" sx={{ mr: 1, display: { xs: 'none', sm: 'block' }, maxWidth: 180 }} noWrap>{usuario?.nombre}</Typography>
+          <ThemeModeButton />
+          <Button color="inherit" startIcon={<LogoutIcon />} onClick={salir} sx={{ flexShrink: 0 }}>
             Salir
           </Button>
         </Toolbar>
@@ -183,10 +195,10 @@ export default function MainLayout() {
         {menu}
       </Drawer>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3, minWidth: 0 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 4 }, minWidth: 0 }}>
         <Toolbar />
         {/* Aquí React Router pinta la página de la ruta actual. */}
-        <Outlet />
+        <Box sx={{ maxWidth: 1440, mx: 'auto' }}><Outlet /></Box>
       </Box>
     </Box>
   );

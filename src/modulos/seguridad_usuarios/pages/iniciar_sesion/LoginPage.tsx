@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import { useState, type FormEvent } from 'react';
 import { Navigate, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
+import ThemeModeButton from '../../../../shared/components/ThemeModeButton';
 import { useAuth } from '../../context/iniciar_sesion/useAuth';
 
 /** CU02 Iniciar sesión. */
@@ -59,14 +60,17 @@ export default function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: 'grey.100',
-        p: 2,
+        bgcolor: 'background.default',
+        px: 2, py: 9,
       }}
     >
+      {/* Permite elegir el tema antes de iniciar sesión. */}
+      <Box sx={{ position: 'fixed', top: 16, right: 16 }}><ThemeModeButton /></Box>
       <Card sx={{ width: '100%', maxWidth: 400 }}>
-        <CardContent sx={{ p: 4 }}>
+        <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
+          <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: 2 }}>Gestión de barbería</Typography>
           <Typography variant="h5" sx={{ mb: 1, fontWeight: 600 }}>
-            Barbería
+            HOUSE of CUT
           </Typography>
           <Typography color="text.secondary" sx={{ mb: 3 }}>
             Inicia sesión para continuar
@@ -84,6 +88,7 @@ export default function LoginPage() {
                 autoComplete="email"
                 autoFocus
                 fullWidth
+                disabled={enviando}
               />
               <TextField
                 label="Contraseña"
@@ -92,8 +97,9 @@ export default function LoginPage() {
                 onChange={(e) => setContrasena(e.target.value)}
                 autoComplete="current-password"
                 fullWidth
+                disabled={enviando}
               />
-              <Button type="submit" variant="contained" size="large" disabled={enviando}>
+              <Button type="submit" variant="contained" size="large" loading={enviando}>
                 {enviando ? 'Ingresando...' : 'Ingresar'}
               </Button>
               <Link component={RouterLink} to="/recuperar" variant="body2" sx={{ textAlign: 'center' }}>

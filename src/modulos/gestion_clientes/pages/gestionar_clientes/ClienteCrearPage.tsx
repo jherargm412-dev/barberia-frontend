@@ -1,4 +1,5 @@
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
+
 import { useNavigate } from 'react-router-dom';
 import { registrarCliente } from '../../api/gestionar_clientes/clientesApi';
 import ClienteForm from '../../components/gestionar_clientes/ClienteForm';
@@ -7,7 +8,7 @@ import ClienteForm from '../../components/gestionar_clientes/ClienteForm';
 export default function ClienteCrearPage() {
   const navigate = useNavigate();
   return <>
-    <Typography variant="h5" sx={{ mb: 2 }}>Nuevo cliente</Typography>
+    <PageHeader title="Nuevo cliente" />
     <ClienteForm guardar={async (datos) => {
       const respuesta = await registrarCliente(datos);
       navigate('/clientes', { state: { mensaje: respuesta.mensaje } });

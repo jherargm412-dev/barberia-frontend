@@ -1,4 +1,5 @@
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
+
 import { useNavigate } from 'react-router-dom';
 import { registrarServicio } from '../../api/gestionar_catalogo_servicios/serviciosApi';
 import ServicioForm from '../../components/gestionar_catalogo_servicios/ServicioForm';
@@ -20,9 +21,7 @@ export default function ServicioCrearPage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        Registrar servicio
-      </Typography>
+      <PageHeader title="Registrar servicio" />
       <ServicioForm
         valoresIniciales={VALORES_VACIOS}
         textoBoton="Guardar"
