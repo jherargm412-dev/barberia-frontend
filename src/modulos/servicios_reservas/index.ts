@@ -9,3 +9,8 @@ export { PERMISOS as PERMISOS_SERVICIOS } from './constants/gestionar_catalogo_s
 // Para reservas y ventas: servicios habilitados (sin porcentaje de comisión).
 export { listarServiciosHabilitados } from './api/gestionar_catalogo_servicios/serviciosApi';
 export type { ServicioResumen } from './types/gestionar_catalogo_servicios';
+
+// CU11 Gestionar Cita (Recepcionista)
+export { default as CitasListPage } from './pages/gestionar_citas/CitasListPage';
+export { default as CitaCrearPage } from './pages/gestionar_citas/CitaCrearPage';
+export { PERMISOS as PERMISOS_CITAS } from './constants/gestionar_citas';
