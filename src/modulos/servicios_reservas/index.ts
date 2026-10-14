@@ -14,3 +14,7 @@ export type { ServicioResumen } from './types/gestionar_catalogo_servicios';
 export { default as CitasListPage } from './pages/gestionar_citas/CitasListPage';
 export { default as CitaCrearPage } from './pages/gestionar_citas/CitaCrearPage';
 export { PERMISOS as PERMISOS_CITAS } from './constants/gestionar_citas';
+
+// CU16 Consultar Agenda de Citas (Barbero, Recepcionista, Administrador)
+export { default as AgendaPage } from './pages/consultar_agenda/AgendaPage';
+export { PERMISOS_AGENDA } from './constants/consultar_agenda';
