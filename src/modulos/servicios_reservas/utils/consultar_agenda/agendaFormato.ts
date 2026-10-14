@@ -23,6 +23,38 @@ export function esFechaValida(fecha: string) {
   return f.getFullYear() === a && f.getMonth() === m - 1 && f.getDate() === d;
 }
 
+function aFecha(fecha: string) {
+  const [a, m, d] = fecha.split('-').map(Number);
+  return new Date(a, m - 1, d);
+}
+
+/** Lunes de la semana que contiene la fecha (misma regla que el backend). "2026-10-15" → "2026-10-12". */
+export function inicioSemana(fecha: string) {
+  const f = aFecha(fecha);
+  const desdeLunes = (f.getDay() + 6) % 7; // getDay(): domingo = 0
+  return sumarDias(fecha, -desdeLunes);
+}
+
+/** Los siete días, de lunes a domingo, de la semana que contiene la fecha. */
+export function diasDeLaSemana(fecha: string) {
+  const lunes = inicioSemana(fecha);
+  return Array.from({ length: 7 }, (_, i) => sumarDias(lunes, i));
+}
+
+/** "2026-10-15" → "del 12 de octubre al 18 de octubre de 2026" */
+export function formatearRangoSemana(fecha: string) {
+  const lunes = aFecha(inicioSemana(fecha));
+  const domingo = aFecha(sumarDias(inicioSemana(fecha), 6));
+  const inicio = lunes.toLocaleDateString('es-BO', { day: 'numeric', month: 'long' });
+  const fin = domingo.toLocaleDateString('es-BO', { day: 'numeric', month: 'long', year: 'numeric' });
+  return `del ${inicio} al ${fin}`;
+}
+
+/** "2026-10-12" → "lunes, 12 de octubre" */
+export function formatearDiaSemana(fecha: string) {
+  return aFecha(fecha).toLocaleDateString('es-BO', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
 /** "2026-10-13" → "13/10/2026" */
 export function formatearFecha(fecha: string) {
   const [a, m, d] = fecha.split('-');
@@ -38,6 +70,11 @@ export function formatearFechaLarga(fecha: string) {
     month: 'long',
     year: 'numeric',
   });
+}
+
+/** "miércoles, 14 de octubre" → "Miércoles, 14 de octubre" (solo la primera letra; CSS capitalize pondría "De"). */
+export function capitalizar(texto: string) {
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
 /** 6 → "Bs 6.00" */

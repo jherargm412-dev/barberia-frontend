@@ -6,8 +6,6 @@ export const PERMISOS_AGENDA = {
   TODAS: 'AGENDA_CONSULTAR',
   /** Barbero: solo sus citas. */
   PROPIA: 'AGENDA_CONSULTAR_PROPIA',
-  /** Recepcionista y Administrador: pueden pasar de la agenda a la gestión de la cita (CU11). */
-  CREAR_CITA: 'RESERVA_CREAR',
 };
 
 /**
@@ -25,6 +23,17 @@ export const ESTADOS_AGENDA: {
   { valor: 'NO_ASISTIO', etiqueta: 'No asistió', color: 'default' },
 ];
 
+/** Columnas de tarjetas de citas: una en celular, dos en tablet (desde 600 px) y tres en computadora. */
+export const GRILLA_TARJETAS = {
+  display: 'grid',
+  gap: 1.5,
+  gridTemplateColumns: {
+    xs: 'minmax(0, 1fr)',
+    sm: 'repeat(2, minmax(0, 1fr))',
+    lg: 'repeat(3, minmax(0, 1fr))',
+  },
+} as const;
+
 export const ETIQUETAS_CANAL: Record<CanalAgenda, string> = {
   PRESENCIAL: 'Presencial',
   TELEFONO: 'Teléfono',
@@ -32,9 +41,14 @@ export const ETIQUETAS_CANAL: Record<CanalAgenda, string> = {
   WEB: 'Web',
 };
 
-/** Textos fijos del flujo de CU16 (flujos 2a, 3a y 5a). */
+/** Textos fijos del flujo de CU16 (flujos 2a, 3a y 5a) y de las dependencias pendientes. */
 export const MENSAJES_AGENDA = {
   SIN_PERMISO: 'No tiene permisos para acceder a la agenda',
   SIN_CITAS: 'No hay citas programadas para esta fecha',
+  SIN_CITAS_SEMANA: 'No hay citas programadas para esta semana',
   FECHA_INVALIDA: 'La fecha ingresada no es válida',
+  /** Sin CU14 no hay registro de pagos: se muestra el monto, nunca "pagado". */
+  PAGO_NO_DISPONIBLE: 'Estado del pago no disponible',
+  PAGO_DETALLE: 'El registro de pagos de anticipo llegará con CU14 (Registrar Pago de Anticipo).',
+  ANTICIPO_NO_DISPONIBLE: 'Disponible cuando se implemente CU14 (Registrar Pago de Anticipo)',
 };

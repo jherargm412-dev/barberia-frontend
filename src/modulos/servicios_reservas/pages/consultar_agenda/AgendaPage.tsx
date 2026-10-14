@@ -11,13 +11,25 @@ import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarAgenda, listarBarberosAgenda } from '../../api/consultar_agenda/agendaApi';
 import AgendaFiltros from '../../components/consultar_agenda/AgendaFiltros';
 import AgendaLista from '../../components/consultar_agenda/AgendaLista';
+import AgendaSemana from '../../components/consultar_agenda/AgendaSemana';
 import CitaDetalleDialog from '../../components/consultar_agenda/CitaDetalleDialog';
 import { MENSAJES_AGENDA, PERMISOS_AGENDA } from '../../constants/consultar_agenda';
 import type { BarberoAgenda, CitaAgenda, FiltrosAgenda } from '../../types/consultar_agenda';
-import { formatearFechaLarga, hoy } from '../../utils/consultar_agenda/agendaFormato';
+import {
+  capitalizar,
+  formatearFechaLarga,
+  formatearRangoSemana,
+  hoy,
+} from '../../utils/consultar_agenda/agendaFormato';
+
+/** Lo que se muestra: las citas y los filtros con los que se obtuvieron. */
+interface Resultado {
+  filtros: FiltrosAgenda;
+  citas: CitaAgenda[];
+}
 
 /**
- * CU16: agenda del día (hoy por defecto) según el permiso del usuario. Solo lectura:
+ * CU16: agenda diaria (hoy por defecto) o semanal según el permiso del usuario. Solo lectura:
  * las citas se cambian desde CU11.
  */
 export default function AgendaPage() {
@@ -26,12 +38,11 @@ export default function AgendaPage() {
   const verTodas = tienePermiso(PERMISOS_AGENDA.TODAS);
   const puedeVer = verTodas || tienePermiso(PERMISOS_AGENDA.PROPIA);
 
-  const [filtros, setFiltros] = useState<FiltrosAgenda>({ fecha: hoy(), estado: '', barberoId: '' });
-  const [citas, setCitas] = useState<CitaAgenda[]>([]);
+  const [filtros, setFiltros] = useState<FiltrosAgenda>({ fecha: hoy(), vista: 'DIA', estado: '', barberoId: '' });
+  const [resultado, setResultado] = useState<Resultado | null>(null);
   const [barberos, setBarberos] = useState<BarberoAgenda[]>([]);
   const [cargando, setCargando] = useState(puedeVer);
   const [error, setError] = useState('');
-  const [consultada, setConsultada] = useState(false);
   const [seleccionada, setSeleccionada] = useState<number | null>(null);
 
   useEffect(() => {
@@ -45,11 +56,10 @@ export default function AgendaPage() {
     if (!puedeVer) return;
     let vigente = true;
     listarAgenda(filtros)
-      .then((lista) => {
+      .then((citas) => {
         if (!vigente) return;
-        setCitas(lista);
+        setResultado({ filtros, citas });
         setError('');
-        setConsultada(true);
       })
       .catch((err) => {
         // Si falla (por ejemplo, una fecha que el backend rechaza), se conserva la última consulta.
@@ -80,12 +90,16 @@ export default function AgendaPage() {
     );
   }
 
+  const mostrada = resultado?.filtros ?? filtros;
+  const semana = mostrada.vista === 'SEMANA';
+  const citas = resultado?.citas ?? [];
+
   return (
     <Stack spacing={2}>
       <Box>
         <Typography variant="h5">Agenda de citas</Typography>
-        <Typography color="text.secondary" sx={{ textTransform: 'capitalize' }}>
-          {formatearFechaLarga(filtros.fecha)}
+        <Typography color="text.secondary">
+          {semana ? `Semana ${formatearRangoSemana(mostrada.fecha)}` : capitalizar(formatearFechaLarga(mostrada.fecha))}
         </Typography>
       </Box>
 
@@ -98,12 +112,15 @@ export default function AgendaPage() {
 
       {cargando && <LinearProgress />}
       {error && <Alert severity="error">{error}</Alert>}
-      {!cargando && !error && consultada && citas.length === 0 && (
-        <Alert severity="info">{MENSAJES_AGENDA.SIN_CITAS}</Alert>
+      {resultado && !cargando && !error && citas.length === 0 && (
+        <Alert severity="info">{semana ? MENSAJES_AGENDA.SIN_CITAS_SEMANA : MENSAJES_AGENDA.SIN_CITAS}</Alert>
       )}
-      {citas.length > 0 && (
-        <AgendaLista citas={citas} agrupar={verTodas} onSeleccionar={setSeleccionada} />
-      )}
+      {citas.length > 0 &&
+        (semana ? (
+          <AgendaSemana citas={citas} fecha={mostrada.fecha} mostrarBarbero={verTodas} onSeleccionar={setSeleccionada} />
+        ) : (
+          <AgendaLista citas={citas} agrupar={verTodas} onSeleccionar={setSeleccionada} />
+        ))}
 
       {seleccionada !== null && (
         <CitaDetalleDialog

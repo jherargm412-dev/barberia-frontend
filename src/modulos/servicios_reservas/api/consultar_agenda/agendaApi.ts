@@ -3,11 +3,12 @@ import type { BarberoAgenda, CitaAgenda, CitaAgendaDetalle, FiltrosAgenda } from
 
 // Endpoints de /api/v1/agenda (AgendaController.java). Solo lectura.
 
-/** Citas de un día; el barbero lo fuerza el backend según el permiso del usuario. */
+/** Citas de un día o de su semana; el barbero lo fuerza el backend según el permiso del usuario. */
 export async function listarAgenda(filtros: FiltrosAgenda) {
   const respuesta = await http.get<CitaAgenda[]>('/agenda', {
     params: {
       fecha: filtros.fecha,
+      vista: filtros.vista,
       estado: filtros.estado || undefined,
       barberoId: filtros.barberoId === '' ? undefined : filtros.barberoId,
     },

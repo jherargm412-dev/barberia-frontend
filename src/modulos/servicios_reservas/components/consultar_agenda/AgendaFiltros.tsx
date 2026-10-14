@@ -1,15 +1,19 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SearchIcon from '@mui/icons-material/Search';
+import ViewDayIcon from '@mui/icons-material/ViewDay';
+import ViewWeekIcon from '@mui/icons-material/ViewWeek';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Tooltip from '@mui/material/Tooltip';
 import { useState, type FormEvent } from 'react';
 import { ESTADOS_AGENDA, MENSAJES_AGENDA } from '../../constants/consultar_agenda';
-import type { BarberoAgenda, EstadoAgenda, FiltrosAgenda } from '../../types/consultar_agenda';
+import type { BarberoAgenda, EstadoAgenda, FiltrosAgenda, VistaAgenda } from '../../types/consultar_agenda';
 import { esFechaValida, hoy, sumarDias } from '../../utils/consultar_agenda/agendaFormato';
 
 interface Props {
@@ -21,22 +25,37 @@ interface Props {
   onBuscar: (filtros: FiltrosAgenda) => void;
 }
 
-/** Fecha (con flechas y "Hoy"), estado y barbero. Con una fecha inválida no se consulta nada. */
+/**
+ * Vista (día o semana), fecha con flechas y "Hoy", estado y barbero. La vista, las flechas y "Hoy"
+ * consultan al instante; el resto, con "Buscar". Con una fecha inválida no se consulta nada (5a).
+ */
 export default function AgendaFiltros({ valores, barberos, puedeFiltrarBarbero, onBuscar }: Props) {
   const [fecha, setFecha] = useState(valores.fecha);
+  const [vista, setVista] = useState<VistaAgenda>(valores.vista);
   const [estado, setEstado] = useState<EstadoAgenda | ''>(valores.estado);
   const [barberoId, setBarberoId] = useState<number | ''>(valores.barberoId);
   const [errorFecha, setErrorFecha] = useState('');
 
-  function filtrosActuales(f: string): FiltrosAgenda {
-    return { fecha: f, estado, barberoId: puedeFiltrarBarbero ? barberoId : '' };
+  const semana = vista === 'SEMANA';
+  const paso = semana ? 7 : 1;
+  const base = esFechaValida(fecha) ? fecha : valores.fecha;
+
+  function armar(f: string, v: VistaAgenda): FiltrosAgenda {
+    return { fecha: f, vista: v, estado, barberoId: puedeFiltrarBarbero ? barberoId : '' };
   }
 
-  /** Flechas y "Hoy": cambian el día y consultan de inmediato. */
+  /** Flechas y "Hoy": cambian la fecha y consultan de inmediato. */
   function irAFecha(nueva: string) {
     setFecha(nueva);
     setErrorFecha('');
-    onBuscar(filtrosActuales(nueva));
+    onBuscar(armar(nueva, vista));
+  }
+
+  function cambiarVista(nueva: VistaAgenda) {
+    setVista(nueva);
+    setFecha(base);
+    setErrorFecha('');
+    onBuscar(armar(base, nueva));
   }
 
   function buscar(e: FormEvent) {
@@ -46,37 +65,53 @@ export default function AgendaFiltros({ valores, barberos, puedeFiltrarBarbero, 
       return;
     }
     setErrorFecha('');
-    onBuscar(filtrosActuales(fecha));
+    onBuscar(armar(fecha, vista));
   }
-
-  const base = esFechaValida(fecha) ? fecha : valores.fecha;
 
   return (
     <Stack component="form" onSubmit={buscar} spacing={2}>
-      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 1 }}>
-        <Tooltip title="Día anterior">
-          <IconButton aria-label="Día anterior" onClick={() => irAFecha(sumarDias(base, -1))}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </Tooltip>
-        <TextField
-          type="date"
-          label="Fecha"
+      {/* En celular: la vista arriba y la navegación de fechas completa debajo; en pantallas anchas, en una fila. */}
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { xs: 'flex-start', sm: 'center' } }}>
+        <ToggleButtonGroup
+          exclusive
           size="small"
-          value={fecha}
-          onChange={(e) => setFecha(e.target.value)}
-          error={!!errorFecha}
-          helperText={errorFecha || ' '}
-          slotProps={{ inputLabel: { shrink: true } }}
-        />
-        <Tooltip title="Día siguiente">
-          <IconButton aria-label="Día siguiente" onClick={() => irAFecha(sumarDias(base, 1))}>
-            <ChevronRightIcon />
-          </IconButton>
-        </Tooltip>
-        <Button size="small" onClick={() => irAFecha(hoy())} disabled={fecha === hoy()}>
-          Hoy
-        </Button>
+          value={vista}
+          onChange={(_, nueva: VistaAgenda | null) => nueva && cambiarVista(nueva)}
+          aria-label="Vista de la agenda"
+        >
+          <ToggleButton value="DIA" aria-label="Vista diaria">
+            <ViewDayIcon fontSize="small" sx={{ mr: 0.5 }} /> Día
+          </ToggleButton>
+          <ToggleButton value="SEMANA" aria-label="Vista semanal">
+            <ViewWeekIcon fontSize="small" sx={{ mr: 0.5 }} /> Semana
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <Tooltip title={semana ? 'Semana anterior' : 'Día anterior'}>
+            <IconButton aria-label={semana ? 'Semana anterior' : 'Día anterior'} onClick={() => irAFecha(sumarDias(base, -paso))}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </Tooltip>
+          <TextField
+            type="date"
+            label="Fecha"
+            size="small"
+            value={fecha}
+            onChange={(e) => setFecha(e.target.value)}
+            error={!!errorFecha}
+            helperText={errorFecha || ' '}
+            slotProps={{ inputLabel: { shrink: true } }}
+            sx={{ width: { xs: 150, sm: 'auto' } }}
+          />
+          <Tooltip title={semana ? 'Semana siguiente' : 'Día siguiente'}>
+            <IconButton aria-label={semana ? 'Semana siguiente' : 'Día siguiente'} onClick={() => irAFecha(sumarDias(base, paso))}>
+              <ChevronRightIcon />
+            </IconButton>
+          </Tooltip>
+          <Button size="small" onClick={() => irAFecha(hoy())} disabled={fecha === hoy()}>
+            Hoy
+          </Button>
+        </Stack>
       </Stack>
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { sm: 'center' } }}>

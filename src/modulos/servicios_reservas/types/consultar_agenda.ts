@@ -40,9 +40,13 @@ export interface BarberoAgenda {
   nombre: string;
 }
 
+/** DIA: la fecha elegida. SEMANA: de lunes a domingo de la semana que contiene la fecha. */
+export type VistaAgenda = 'DIA' | 'SEMANA';
+
 /** Filtros aplicados. Vacío = sin filtro (barberoId solo lo usa Recepcionista y Administrador). */
 export interface FiltrosAgenda {
   fecha: string;
+  vista: VistaAgenda;
   estado: EstadoAgenda | '';
   barberoId: number | '';
 }

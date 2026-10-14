@@ -8,14 +8,20 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import LinearProgress from '@mui/material/LinearProgress';
 import Stack from '@mui/material/Stack';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { obtenerCitaAgenda } from '../../api/consultar_agenda/agendaApi';
-import { ETIQUETAS_CANAL } from '../../constants/consultar_agenda';
+import { ETIQUETAS_CANAL, MENSAJES_AGENDA } from '../../constants/consultar_agenda';
 import type { CitaAgendaDetalle } from '../../types/consultar_agenda';
-import { formatearFecha, formatearFechaLarga, formatearMonto } from '../../utils/consultar_agenda/agendaFormato';
+import {
+  capitalizar,
+  formatearFecha,
+  formatearFechaLarga,
+  formatearMonto,
+} from '../../utils/consultar_agenda/agendaFormato';
 import EstadoAgendaChip from './EstadoAgendaChip';
 
 interface Props {
@@ -59,13 +65,6 @@ export default function CitaDetalleDialog({ idReserva, puedeGestionar, onCerrar 
     navigate('/citas', { state: { fecha: cita.fecha } });
   }
 
-  /** CU14 todavía no existe: la ruta queda preparada y mostrará "no encontrado" hasta que se implemente. */
-  function registrarAnticipo() {
-    if (!cita) return;
-    onCerrar();
-    navigate(`/reservas/${cita.idReserva}/anticipo`);
-  }
-
   return (
     <Dialog open onClose={onCerrar} fullWidth maxWidth="sm">
       <DialogTitle>Detalle de la cita</DialogTitle>
@@ -81,11 +80,7 @@ export default function CitaDetalleDialog({ idReserva, puedeGestionar, onCerrar 
                 {cita.servicio.nombre} ({formatearMonto(cita.servicio.precio)})
               </Fila>
               <Fila etiqueta="Barbero">{cita.barbero?.nombre ?? 'Sin asignar'}</Fila>
-              <Fila etiqueta="Fecha">
-                <Box component="span" sx={{ textTransform: 'capitalize' }}>
-                  {formatearFechaLarga(cita.fecha)}
-                </Box>
-              </Fila>
+              <Fila etiqueta="Fecha">{capitalizar(formatearFechaLarga(cita.fecha))}</Fila>
               <Fila etiqueta="Horario">
                 {cita.horaInicio} – {cita.horaFin}
               </Fila>
@@ -93,7 +88,12 @@ export default function CitaDetalleDialog({ idReserva, puedeGestionar, onCerrar 
               <Fila etiqueta="Estado">
                 <EstadoAgendaChip estado={cita.estado} />
               </Fila>
-              <Fila etiqueta="Anticipo">{formatearMonto(cita.montoAnticipo)}</Fila>
+              <Fila etiqueta="Anticipo">
+                {formatearMonto(cita.montoAnticipo)}
+                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 400 }}>
+                  {MENSAJES_AGENDA.PAGO_NO_DISPONIBLE}. {MENSAJES_AGENDA.PAGO_DETALLE}
+                </Typography>
+              </Fila>
             </Stack>
 
             <Divider />
@@ -126,8 +126,13 @@ export default function CitaDetalleDialog({ idReserva, puedeGestionar, onCerrar 
         )}
       </DialogContent>
       <DialogActions sx={{ flexWrap: 'wrap', gap: 1, px: 3, pb: 2 }}>
+        {/* Flujo 8a: queda visible pero deshabilitado hasta que exista CU14. */}
         {puedeGestionar && cita?.estado === 'PENDIENTE' && (
-          <Button onClick={registrarAnticipo}>Registrar anticipo</Button>
+          <Tooltip title={MENSAJES_AGENDA.ANTICIPO_NO_DISPONIBLE}>
+            <span>
+              <Button disabled>Registrar anticipo</Button>
+            </span>
+          </Tooltip>
         )}
         {puedeGestionar && cita && <Button onClick={gestionarCita}>Gestionar cita</Button>}
         <Button onClick={onCerrar}>Cerrar</Button>
