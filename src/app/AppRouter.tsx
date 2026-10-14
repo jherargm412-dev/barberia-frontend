@@ -21,6 +21,9 @@ import {
   UsuariosListPage,
 } from '../modulos/seguridad_usuarios';
 import {
+  CitaCrearPage,
+  CitasListPage,
+  PERMISOS_CITAS,
   HorarioDetallePage,
   HorarioEditarPage,
   HorariosListPage,
@@ -112,6 +115,14 @@ export default function AppRouter() {
             <Route path="/servicios" element={<ServiciosListPage />} />
             <Route path="/servicios/nuevo" element={<ServicioCrearPage />} />
             <Route path="/servicios/:id/editar" element={<ServicioEditarPage />} />
+          </Route>
+
+          {/* CU11 Gestionar Cita: la agenda exige AGENDA_CONSULTAR y agendar, RESERVA_CREAR. */}
+          <Route element={<RequierePermiso permiso={PERMISOS_CITAS.AGENDA} />}>
+            <Route path="/citas" element={<CitasListPage />} />
+          </Route>
+          <Route element={<RequierePermiso permiso={PERMISOS_CITAS.CREAR} />}>
+            <Route path="/citas/nueva" element={<CitaCrearPage />} />
           </Route>
 
           {/* CU09 Horarios de disponibilidad: USUARIO_GESTIONAR (igual que CU17), con el mensaje de 2a. */}
