@@ -6,7 +6,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
+import RequisitosContrasena from '../../../../shared/components/RequisitosContrasena';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
+import { cumplePoliticaContrasena } from '../../../../shared/utils/politicaContrasena';
 import { cambiarContrasena } from '../../api/gestionar_usuarios/usuariosApi';
 
 interface Props {
@@ -16,7 +18,7 @@ interface Props {
   onExito: () => void;
 }
 
-/** CU01 3b: el administrador restablece la contraseña de un usuario. */
+/** CU01 3b: el administrador restablece la contraseña de un usuario (y así levanta un bloqueo por intentos). */
 export default function CambiarContrasenaDialog({ abierto, idUsuario, onCerrar, onExito }: Props) {
   const [contrasena, setContrasena] = useState('');
   const [error, setError] = useState('');
@@ -31,6 +33,10 @@ export default function CambiarContrasenaDialog({ abierto, idUsuario, onCerrar, 
   async function guardar() {
     if (!contrasena) {
       setError('Ingresa la nueva contraseña');
+      return;
+    }
+    if (!cumplePoliticaContrasena(contrasena)) {
+      setError('La contraseña no cumple los requisitos de seguridad');
       return;
     }
     setEnviando(true);
@@ -65,6 +71,7 @@ export default function CambiarContrasenaDialog({ abierto, idUsuario, onCerrar, 
           autoFocus
           sx={{ mt: 1 }}
         />
+        <RequisitosContrasena contrasena={contrasena} />
       </DialogContent>
       <DialogActions>
         <Button onClick={cerrar} disabled={enviando}>

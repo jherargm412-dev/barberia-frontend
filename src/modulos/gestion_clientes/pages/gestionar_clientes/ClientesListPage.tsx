@@ -18,7 +18,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { useAuth } from '../../../seguridad_usuarios';
-import { desactivarCliente, listarClientes } from '../../api/gestionar_clientes/clientesApi';
+import { activarCliente, desactivarCliente, listarClientes } from '../../api/gestionar_clientes/clientesApi';
 import { PERMISOS_CLIENTES } from '../../constants/gestionar_clientes';
 import type { Cliente, FiltrosClientes } from '../../types/gestionar_clientes';
 
@@ -35,7 +35,8 @@ export default function ClientesListPage() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [mensaje, setMensaje] = useState((ubicacion.state as { mensaje?: string } | null)?.mensaje ?? '');
-  const [porDesactivar, setPorDesactivar] = useState<Cliente | null>(null);
+  // Cliente al que se le cambiará el estado: si está activo se desactiva y si no, se activa.
+  const [porCambiar, setPorCambiar] = useState<Cliente | null>(null);
   const [procesando, setProcesando] = useState(false);
 
   /** Actualiza el listado cuando cambian los filtros o la página. */
@@ -58,15 +59,17 @@ export default function ClientesListPage() {
     actualizar({ q: busqueda.trim(), activo: estado, page: 0 });
   }
   /** Ejecuta el cambio de estado después de la confirmación. */
-  async function confirmarDesactivacion() {
-    if (!porDesactivar) return;
+  async function confirmarCambioEstado() {
+    if (!porCambiar) return;
     setProcesando(true);
     try {
-      const respuesta = await desactivarCliente(porDesactivar.idCliente);
+      const respuesta = porCambiar.activo
+        ? await desactivarCliente(porCambiar.idCliente)
+        : await activarCliente(porCambiar.idCliente);
       setMensaje(respuesta.mensaje);
       actualizar({});
     } catch (err) { setError(obtenerError(err).mensaje); }
-    finally { setProcesando(false); setPorDesactivar(null); }
+    finally { setProcesando(false); setPorCambiar(null); }
   }
 
   return <>
@@ -96,7 +99,9 @@ export default function ClientesListPage() {
           <TableCell>
             <Button size="small" onClick={() => navigate(`/clientes/${cliente.idCliente}`)}>Consultar</Button>
             {tienePermiso(PERMISOS_CLIENTES.EDITAR) && <Button size="small" onClick={() => navigate(`/clientes/${cliente.idCliente}/editar`)}>Modificar</Button>}
-            {cliente.activo && tienePermiso(PERMISOS_CLIENTES.EDITAR) && <Button size="small" color="error" onClick={() => setPorDesactivar(cliente)}>Desactivar</Button>}
+            {tienePermiso(PERMISOS_CLIENTES.EDITAR) && (cliente.activo
+              ? <Button size="small" color="error" onClick={() => setPorCambiar(cliente)}>Desactivar</Button>
+              : <Button size="small" color="success" onClick={() => setPorCambiar(cliente)}>Activar</Button>)}
           </TableCell>
         </TableRow>)}
       </TableBody></Table>
@@ -105,9 +110,12 @@ export default function ClientesListPage() {
         onRowsPerPageChange={(e) => actualizar({ size: Number(e.target.value), page: 0 })}
         rowsPerPageOptions={[10, 20, 50]} labelRowsPerPage="Clientes por página" />
     </TableContainer>
-    <ConfirmDialog abierto={porDesactivar !== null} titulo="Desactivar cliente"
-      mensaje={`¿Desactivar a ${porDesactivar?.nombre}? Su historial se conservará.`}
-      textoConfirmar="Desactivar" cargando={procesando}
-      onConfirmar={confirmarDesactivacion} onCancelar={() => setPorDesactivar(null)} />
+    <ConfirmDialog abierto={porCambiar !== null}
+      titulo={porCambiar?.activo ? 'Desactivar cliente' : 'Activar cliente'}
+      mensaje={porCambiar?.activo
+        ? `¿Desactivar a ${porCambiar?.nombre}? Su historial se conservará.`
+        : `¿Activar a ${porCambiar?.nombre}? Volverá a figurar como cliente activo.`}
+      textoConfirmar={porCambiar?.activo ? 'Desactivar' : 'Activar'} cargando={procesando}
+      onConfirmar={confirmarCambioEstado} onCancelar={() => setPorCambiar(null)} />
   </>;
 }

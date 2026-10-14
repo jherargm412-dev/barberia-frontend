@@ -9,6 +9,8 @@ export interface AuthContextValue {
   iniciarSesion: (datos: LoginRequest) => Promise<void>;
   cerrarSesion: () => Promise<void>;
   tienePermiso: (permiso: string) => boolean;
+  /** Vuelve a pedir /auth/me (ej. tras editar el perfil, para actualizar el nombre de la barra). */
+  refrescarSesion: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

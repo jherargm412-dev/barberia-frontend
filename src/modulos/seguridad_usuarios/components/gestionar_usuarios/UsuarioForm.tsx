@@ -14,6 +14,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState, type FormEvent } from 'react';
+import RequisitosContrasena from '../../../../shared/components/RequisitosContrasena';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarRoles } from '../../api/gestionar_usuarios/rolesApi';
 import { TIPOS_CONTRATO, TURNOS } from '../../constants/gestionar_usuarios';
@@ -92,6 +93,11 @@ export default function UsuarioForm({
 
   const mostrarEmpleado = esEmpleado(valores.roles);
 
+  // Roles que el usuario ya tenía y que ya no vienen en la lista de activos (desactivados en CU03).
+  // Se calculan desde los valores iniciales para que la casilla no desaparezca al desmarcarla.
+  const rolesInactivos =
+    roles.length === 0 ? [] : valoresIniciales.roles.filter((nombre) => !roles.some((r) => r.nombre === nombre));
+
   return (
     <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: 3 }}>
       <Stack spacing={2}>
@@ -116,16 +122,31 @@ export default function UsuarioForm({
           helperText={errores.correo}
         />
         {pedirContrasena && (
-          <TextField
-            label="Contraseña"
-            type="password"
-            required
-            autoComplete="new-password"
-            value={valores.contrasena}
-            onChange={(e) => cambiar('contrasena', e.target.value)}
-            error={!!errores.contrasena}
-            helperText={errores.contrasena}
+          <FormControlLabel
+            label="Enviar invitación por correo (el usuario elige su propia contraseña)"
+            control={
+              <Checkbox
+                checked={valores.enviarInvitacion}
+                onChange={(e) => cambiar('enviarInvitacion', e.target.checked)}
+              />
+            }
           />
+        )}
+        {pedirContrasena && !valores.enviarInvitacion && (
+          <Box>
+            <TextField
+              label="Contraseña"
+              type="password"
+              required
+              fullWidth
+              autoComplete="new-password"
+              value={valores.contrasena}
+              onChange={(e) => cambiar('contrasena', e.target.value)}
+              error={!!errores.contrasena}
+              helperText={errores.contrasena}
+            />
+            <RequisitosContrasena contrasena={valores.contrasena} />
+          </Box>
         )}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <TextField
@@ -165,7 +186,22 @@ export default function UsuarioForm({
                 }
               />
             ))}
+            {rolesInactivos.map((nombre) => (
+              <FormControlLabel
+                key={nombre}
+                label={`${nombre} (inactivo)`}
+                control={
+                  <Checkbox checked={valores.roles.includes(nombre)} onChange={() => alternarRol(nombre)} />
+                }
+              />
+            ))}
           </FormGroup>
+          {rolesInactivos.length > 0 && (
+            <FormHelperText>
+              Un rol inactivo no otorga permisos. Se puede conservar o quitar, pero no volver a asignar una vez
+              guardado.
+            </FormHelperText>
+          )}
           {errores.roles && <FormHelperText>{errores.roles}</FormHelperText>}
         </FormControl>
 

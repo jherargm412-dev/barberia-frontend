@@ -1,3 +1,4 @@
+import { cumplePoliticaContrasena, MENSAJE_POLITICA_CONTRASENA } from '../../../../shared/utils/politicaContrasena';
 import { ROLES_EMPLEADO } from '../../constants/gestionar_usuarios';
 import type { ActualizarUsuarioRequest, TipoContrato, UsuarioDetalle } from '../../types/gestionar_usuarios';
 
@@ -6,6 +7,8 @@ export interface UsuarioFormValores {
   nombre: string;
   correo: string;
   contrasena: string;
+  /** Solo al registrar: true = sin contraseña, le llega un correo para elegirla. */
+  enviarInvitacion: boolean;
   telefono: string;
   fechaNacimiento: string;
   roles: string[];
@@ -34,7 +37,10 @@ export function validarUsuario(v: UsuarioFormValores, pedirContrasena: boolean):
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.correo)) errores.correo = 'Formato de correo no válido';
   else if (v.correo.length > 100) errores.correo = 'Máximo 100 caracteres';
 
-  if (pedirContrasena && !v.contrasena) errores.contrasena = 'La contraseña es obligatoria';
+  if (pedirContrasena && !v.enviarInvitacion) {
+    if (!v.contrasena) errores.contrasena = 'La contraseña es obligatoria';
+    else if (!cumplePoliticaContrasena(v.contrasena)) errores.contrasena = MENSAJE_POLITICA_CONTRASENA;
+  }
 
   if (!/^[0-9+\s-]{0,15}$/.test(v.telefono)) {
     errores.telefono = 'Solo dígitos, +, espacios y guiones (máximo 15)';
@@ -71,6 +77,7 @@ export const VALORES_VACIOS: UsuarioFormValores = {
   nombre: '',
   correo: '',
   contrasena: '',
+  enviarInvitacion: true,
   telefono: '',
   fechaNacimiento: '',
   roles: [],
@@ -85,6 +92,7 @@ export function valoresDesdeUsuario(u: UsuarioDetalle): UsuarioFormValores {
     nombre: u.nombre,
     correo: u.correo,
     contrasena: '',
+    enviarInvitacion: false,
     telefono: u.telefono ?? '',
     fechaNacimiento: u.fechaNacimiento ?? '',
     roles: u.roles.map((r) => r.nombre),
