@@ -6,3 +6,5 @@ export { default as EmpleadosListPage } from './pages/gestionar_barberos/Emplead
 export { default as EmpleadoCrearPage } from './pages/gestionar_barberos/EmpleadoCrearPage';
 export { default as EmpleadoEditarPage } from './pages/gestionar_barberos/EmpleadoEditarPage';
 export { PERMISOS_EMPLEADOS } from './constants/gestionar_barberos';
+// Para CU09 (horarios): catálogo de turnos del selector del formulario.
+export { listarTurnos } from './api/gestionar_barberos/empleadosApi';

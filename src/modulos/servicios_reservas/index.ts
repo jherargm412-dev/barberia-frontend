@@ -9,3 +9,9 @@ export { PERMISOS as PERMISOS_SERVICIOS } from './constants/gestionar_catalogo_s
 // Para reservas y ventas: servicios habilitados (sin porcentaje de comisión).
 export { listarServiciosHabilitados } from './api/gestionar_catalogo_servicios/serviciosApi';
 export type { ServicioResumen } from './types/gestionar_catalogo_servicios';
+
+// CU09 Gestionar Horarios de Disponibilidad
+export { default as HorariosListPage } from './pages/gestionar_horarios/HorariosListPage';
+export { default as HorarioDetallePage } from './pages/gestionar_horarios/HorarioDetallePage';
+export { default as HorarioEditarPage } from './pages/gestionar_horarios/HorarioEditarPage';
+export { PERMISOS as PERMISOS_HORARIOS, MENSAJES as MENSAJES_HORARIOS } from './constants/gestionar_horarios';

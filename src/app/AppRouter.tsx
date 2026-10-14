@@ -21,6 +21,11 @@ import {
   UsuariosListPage,
 } from '../modulos/seguridad_usuarios';
 import {
+  HorarioDetallePage,
+  HorarioEditarPage,
+  HorariosListPage,
+  MENSAJES_HORARIOS,
+  PERMISOS_HORARIOS,
   PERMISOS_SERVICIOS,
   ServicioCrearPage,
   ServicioEditarPage,
@@ -107,6 +112,15 @@ export default function AppRouter() {
             <Route path="/servicios" element={<ServiciosListPage />} />
             <Route path="/servicios/nuevo" element={<ServicioCrearPage />} />
             <Route path="/servicios/:id/editar" element={<ServicioEditarPage />} />
+          </Route>
+
+          {/* CU09 Horarios de disponibilidad: USUARIO_GESTIONAR (igual que CU17), con el mensaje de 2a. */}
+          <Route
+            element={<RequierePermiso permiso={PERMISOS_HORARIOS.GESTIONAR} mensaje={MENSAJES_HORARIOS.SIN_PERMISO} />}
+          >
+            <Route path="/horarios" element={<HorariosListPage />} />
+            <Route path="/horarios/:id" element={<HorarioDetallePage />} />
+            <Route path="/horarios/:id/editar" element={<HorarioEditarPage />} />
           </Route>
         </Route>
       </Route>
