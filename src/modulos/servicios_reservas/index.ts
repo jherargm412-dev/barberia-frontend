@@ -14,3 +14,9 @@ export type { ServicioResumen } from './types/gestionar_catalogo_servicios';
 export { default as CitasListPage } from './pages/gestionar_citas/CitasListPage';
 export { default as CitaCrearPage } from './pages/gestionar_citas/CitaCrearPage';
 export { PERMISOS as PERMISOS_CITAS } from './constants/gestionar_citas';
+
+// CU09 Gestionar Horarios de Disponibilidad
+export { default as HorariosListPage } from './pages/gestionar_horarios/HorariosListPage';
+export { default as HorarioDetallePage } from './pages/gestionar_horarios/HorarioDetallePage';
+export { default as HorarioEditarPage } from './pages/gestionar_horarios/HorarioEditarPage';
+export { PERMISOS as PERMISOS_HORARIOS, MENSAJES as MENSAJES_HORARIOS } from './constants/gestionar_horarios';

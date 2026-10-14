@@ -24,6 +24,11 @@ import {
   CitaCrearPage,
   CitasListPage,
   PERMISOS_CITAS,
+  HorarioDetallePage,
+  HorarioEditarPage,
+  HorariosListPage,
+  MENSAJES_HORARIOS,
+  PERMISOS_HORARIOS,
   PERMISOS_SERVICIOS,
   ServicioCrearPage,
   ServicioEditarPage,
@@ -118,6 +123,15 @@ export default function AppRouter() {
           </Route>
           <Route element={<RequierePermiso permiso={PERMISOS_CITAS.CREAR} />}>
             <Route path="/citas/nueva" element={<CitaCrearPage />} />
+          </Route>
+
+          {/* CU09 Horarios de disponibilidad: USUARIO_GESTIONAR (igual que CU17), con el mensaje de 2a. */}
+          <Route
+            element={<RequierePermiso permiso={PERMISOS_HORARIOS.GESTIONAR} mensaje={MENSAJES_HORARIOS.SIN_PERMISO} />}
+          >
+            <Route path="/horarios" element={<HorariosListPage />} />
+            <Route path="/horarios/:id" element={<HorarioDetallePage />} />
+            <Route path="/horarios/:id/editar" element={<HorarioEditarPage />} />
           </Route>
         </Route>
       </Route>
