@@ -8,3 +8,5 @@ export { default as EmpleadoEditarPage } from './pages/gestionar_barberos/Emplea
 export { PERMISOS_EMPLEADOS } from './constants/gestionar_barberos';
 // Para CU09 (horarios): catálogo de turnos del selector del formulario.
 export { listarTurnos } from './api/gestionar_barberos/empleadosApi';
+// Para CU01 (usuarios): especialidades del barbero = servicios del catálogo que realiza.
+export { default as EspecialidadesSelector } from './components/gestionar_barberos/EspecialidadesSelector';

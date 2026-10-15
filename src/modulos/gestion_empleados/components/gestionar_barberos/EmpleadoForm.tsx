@@ -21,17 +21,20 @@ import {
   type EmpleadoFormValores,
   type ErroresFormulario,
 } from '../../utils/gestionar_barberos/empleadoForm';
+import EspecialidadesSelector from './EspecialidadesSelector';
 
 interface Props {
   valoresIniciales: EmpleadoFormValores;
   /** true = "Registrar" (pide contraseña y rol); false = "Editar". */
   registrar: boolean;
+  /** Al editar: servicios que el barbero ya tiene (sus especialidades actuales). */
+  serviciosAsignados?: { idServicio: number; nombre: string }[];
   onGuardar: (valores: EmpleadoFormValores) => Promise<void>;
   onCancelar: () => void;
 }
 
 /** Formulario integrado de CU17: datos de la cuenta + datos laborales. */
-export default function EmpleadoForm({ valoresIniciales, registrar, onGuardar, onCancelar }: Props) {
+export default function EmpleadoForm({ valoresIniciales, registrar, serviciosAsignados, onGuardar, onCancelar }: Props) {
   const [valores, setValores] = useState<EmpleadoFormValores>(valoresIniciales);
   const [errores, setErrores] = useState<ErroresFormulario>({});
   const [errorGeneral, setErrorGeneral] = useState('');
@@ -195,16 +198,16 @@ export default function EmpleadoForm({ valoresIniciales, registrar, onGuardar, o
             ))}
           </TextField>
         </Stack>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <TextField
-            label="Especialidad"
-            value={valores.especialidad}
-            onChange={(e) => cambiar('especialidad', e.target.value)}
-            error={!!errores.especialidad}
-            helperText={errores.especialidad ?? 'Opcional. Ej: Degradados, barba clásica'}
-            sx={{ flex: 1 }}
-            slotProps={{ htmlInput: { maxLength: 80 } }}
+        {/* Solo el barbero tiene especialidades: son los servicios del catálogo que realiza. */}
+        {valores.rol === 'Barbero' && (
+          <EspecialidadesSelector
+            seleccionados={valores.servicios}
+            onChange={(ids) => cambiar('servicios', ids)}
+            asignados={serviciosAsignados}
+            error={errores.servicios}
           />
+        )}
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <TextField
             select
             label="Turno"

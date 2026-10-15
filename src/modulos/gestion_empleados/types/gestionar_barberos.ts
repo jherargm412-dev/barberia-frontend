@@ -57,9 +57,13 @@ export interface ActualizarEmpleadoRequest {
   correo: string;
   telefono: string | null;
   fechaNacimiento: string | null;
-  especialidad: string | null;
   tipoContrato: TipoContrato;
   turnoId: number | null;
+  /**
+   * Especialidades = ids de los servicios que realiza (solo Barbero). Quedan habilitados para citas
+   * y la especialidad que se muestra se arma con sus nombres. null = no cambiar.
+   */
+  servicios: number[] | null;
 }
 
 /** Body de POST /empleados: igual que actualizar, más contraseña y rol. */
