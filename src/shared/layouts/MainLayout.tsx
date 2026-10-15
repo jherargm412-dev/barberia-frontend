@@ -14,6 +14,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
 import PeopleIcon from '@mui/icons-material/PeopleOutlined';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -61,6 +62,8 @@ const GRUPOS: GrupoMenu[] = [
     titulo: 'Citas y horarios', icono: <CalendarMonthIcon />, opciones: [
       { texto: 'Citas', ruta: '/citas', icono: <EventIcon />, permiso: 'AGENDA_CONSULTAR' },
       { texto: 'Agenda de Citas', ruta: '/agenda', icono: <CalendarMonthIcon />, permiso: ['AGENDA_CONSULTAR', 'AGENDA_CONSULTAR_PROPIA'] },
+      // CU10: horas libres por servicio y barbero, para agendar.
+      { texto: 'Disponibilidad', ruta: '/disponibilidad', icono: <ScheduleIcon />, permiso: 'RESERVA_CREAR' },
       { texto: 'Horarios', ruta: '/horarios', icono: <EventAvailableIcon />, permiso: 'USUARIO_GESTIONAR' },
     ],
   },
