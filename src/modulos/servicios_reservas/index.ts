@@ -20,3 +20,12 @@ export { default as HorariosListPage } from './pages/gestionar_horarios/Horarios
 export { default as HorarioDetallePage } from './pages/gestionar_horarios/HorarioDetallePage';
 export { default as HorarioEditarPage } from './pages/gestionar_horarios/HorarioEditarPage';
 export { PERMISOS as PERMISOS_HORARIOS, MENSAJES as MENSAJES_HORARIOS } from './constants/gestionar_horarios';
+
+
+// CU12 Solicitar Cita (Cliente)
+export { default as SolicitarCitaPage } from './pages/solicitar_cita/SolicitarCitaPage';
+export { PERMISOS_SOLICITUD } from './constants/solicitar_cita';
+
+// CU14 Registrar Pago de Anticipo (flujo web del Cliente)
+export { default as PagoAnticipoPage } from './pages/registrar_pago_anticipo/PagoAnticipoPage';
+export { PERMISOS_ANTICIPO } from './constants/registrar_pago_anticipo';

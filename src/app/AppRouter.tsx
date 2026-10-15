@@ -129,6 +129,11 @@ export default function AppRouter() {
           <Route element={<RequierePermiso permiso={PERMISOS_CITAS.CREAR} />}>
             <Route path="/citas/nueva" element={<CitaCrearPage />} />
           </Route>
+          
+          {/* CU12 Solicitar Cita: solo el cliente (RESERVA_SOLICITAR, migración V14). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_SOLICITUD.SOLICITAR} />}>
+            <Route path="/solicitar-cita" element={<SolicitarCitaPage />} />
+          </Route>
 
           {/* CU09 Horarios de disponibilidad: USUARIO_GESTIONAR (igual que CU17), con el mensaje de 2a. */}
           <Route
