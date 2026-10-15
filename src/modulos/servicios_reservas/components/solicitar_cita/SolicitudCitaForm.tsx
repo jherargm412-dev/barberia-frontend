@@ -1,18 +1,22 @@
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { useEffect, useState, type FormEvent } from 'react';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarServiciosHabilitados } from '../../api/gestionar_catalogo_servicios/serviciosApi';
 import { listarBarberosDelServicio } from '../../api/solicitar_cita/solicitudesApi';
+import { DURACION_DEFECTO } from '../../constants/consultar_disponibilidad';
 import { MENSAJES_SOLICITUD } from '../../constants/solicitar_cita';
 import type { ServicioResumen } from '../../types/gestionar_catalogo_servicios';
 import type { BarberoDisponible } from '../../types/gestionar_citas';
 import type { SolicitarCitaRequest } from '../../types/solicitar_cita';
-import { calcularAnticipo, formatearMonto, horaFinSugerida, hoy } from '../../utils/gestionar_citas/citaForm';
+import { useDisponibilidad } from '../../utils/consultar_disponibilidad/useDisponibilidad';
+import { calcularAnticipo, formatearMonto, hoy } from '../../utils/gestionar_citas/citaForm';
 import {
   aPedido,
   validarSolicitud,
@@ -20,6 +24,7 @@ import {
   type ErroresSolicitud,
   type SolicitudValores,
 } from '../../utils/solicitar_cita/solicitudForm';
+import HorasLibresGrid from '../consultar_disponibilidad/HorasLibresGrid';
 
 interface Props {
   /** Envía la solicitud al backend. Si lanza un error, el formulario lo muestra y conserva lo escrito. */
@@ -27,7 +32,10 @@ interface Props {
   onCancelar: () => void;
 }
 
-/** CU12: formulario con el que el cliente elige servicio, barbero, fecha y hora de su cita. */
+/**
+ * CU12: el cliente elige servicio, barbero y fecha, y después una de las horas libres del barbero (CU10).
+ * No escribe horas a mano: así solo puede pedir horarios que de verdad están disponibles.
+ */
 export default function SolicitudCitaForm({ onGuardar, onCancelar }: Props) {
   const [valores, setValores] = useState<SolicitudValores>(valoresInicialesSolicitud);
   const [servicios, setServicios] = useState<ServicioResumen[]>([]);
@@ -52,6 +60,7 @@ export default function SolicitudCitaForm({ onGuardar, onCancelar }: Props) {
   function cambiarServicio(servicioId: string) {
     cambiar('servicioId', servicioId);
     cambiar('empleadoId', '');
+    elegirHora('', '');
     setBarberos(null);
     if (!servicioId) return;
     listarBarberosDelServicio(Number(servicioId))
@@ -59,12 +68,28 @@ export default function SolicitudCitaForm({ onGuardar, onCancelar }: Props) {
       .catch((err) => setErrorGeneral(obtenerError(err).mensaje));
   }
 
-  /** Propone la hora de fin (inicio + 30 min) mientras el cliente no la haya cambiado a mano. */
-  function cambiarHoraInicio(horaInicio: string) {
-    const finEraSugerido = !valores.horaFin || valores.horaFin === horaFinSugerida(valores.horaInicio || '00:00');
+  /** La hora sale de la grilla de horas libres; al cambiar barbero o fecha se vuelve a elegir. */
+  function elegirHora(horaInicio: string, horaFin: string) {
     cambiar('horaInicio', horaInicio);
-    if (horaInicio && finEraSugerido) cambiar('horaFin', horaFinSugerida(horaInicio));
+    cambiar('horaFin', horaFin);
   }
+
+  // CU10: horas libres del barbero ese día para una cita de 30 minutos.
+  const {
+    disponibilidad,
+    error: errorDisponibilidad,
+    cargando: buscandoHoras,
+  } = useDisponibilidad(
+    valores.servicioId && valores.empleadoId && valores.fecha && valores.fecha >= hoy()
+      ? {
+          servicioId: Number(valores.servicioId),
+          empleadoId: Number(valores.empleadoId),
+          fecha: valores.fecha,
+          duracion: DURACION_DEFECTO,
+        }
+      : null,
+  );
+  const agendaBarbero = disponibilidad?.barberos[0];
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -89,11 +114,9 @@ export default function SolicitudCitaForm({ onGuardar, onCancelar }: Props) {
   }
 
   const servicio = servicios.find((s) => String(s.idServicio) === valores.servicioId);
-  const barbero = barberos?.find((b) => String(b.idEmpleado) === valores.empleadoId);
 
   let ayudaBarbero = 'Primero elija el servicio';
   if (barberos && barberos.length === 0) ayudaBarbero = MENSAJES_SOLICITUD.SIN_BARBEROS;
-  else if (barbero?.turno) ayudaBarbero = `Turno ${barbero.turno}: ${barbero.horaEntrada}–${barbero.horaSalida}`;
   else if (barberos) ayudaBarbero = '';
 
   return (
@@ -128,7 +151,10 @@ export default function SolicitudCitaForm({ onGuardar, onCancelar }: Props) {
             label="Barbero"
             required
             value={valores.empleadoId}
-            onChange={(e) => cambiar('empleadoId', e.target.value)}
+            onChange={(e) => {
+              cambiar('empleadoId', e.target.value);
+              elegirHora('', '');
+            }}
             disabled={!barberos || barberos.length === 0}
             error={!!errores.empleadoId}
             helperText={errores.empleadoId ?? (ayudaBarbero || ' ')}
@@ -142,41 +168,56 @@ export default function SolicitudCitaForm({ onGuardar, onCancelar }: Props) {
           </TextField>
         </Stack>
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <TextField
-            type="date"
-            label="Fecha"
-            required
-            value={valores.fecha}
-            onChange={(e) => cambiar('fecha', e.target.value)}
-            error={!!errores.fecha}
-            helperText={errores.fecha ?? ' '}
-            sx={{ flex: 1 }}
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: hoy() } }}
-          />
-          <TextField
-            type="time"
-            label="Hora de inicio"
-            required
-            value={valores.horaInicio}
-            onChange={(e) => cambiarHoraInicio(e.target.value)}
-            error={!!errores.horaInicio}
-            helperText={errores.horaInicio ?? ' '}
-            sx={{ flex: 1 }}
-            slotProps={{ inputLabel: { shrink: true } }}
-          />
-          <TextField
-            type="time"
-            label="Hora de fin"
-            required
-            value={valores.horaFin}
-            onChange={(e) => cambiar('horaFin', e.target.value)}
-            error={!!errores.horaFin}
-            helperText={errores.horaFin ?? ' '}
-            sx={{ flex: 1 }}
-            slotProps={{ inputLabel: { shrink: true } }}
-          />
-        </Stack>
+        <TextField
+          type="date"
+          label="Fecha"
+          required
+          value={valores.fecha}
+          onChange={(e) => {
+            cambiar('fecha', e.target.value);
+            elegirHora('', '');
+          }}
+          error={!!errores.fecha}
+          helperText={errores.fecha ?? ' '}
+          sx={{ maxWidth: 240 }}
+          slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: hoy() } }}
+        />
+
+        <Box>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Horas libres ({DURACION_DEFECTO} min)
+          </Typography>
+          {!agendaBarbero && !buscandoHoras && !errorDisponibilidad && (
+            <Typography variant="body2" color="text.secondary">
+              Elija servicio, barbero y fecha para ver las horas libres
+            </Typography>
+          )}
+          {buscandoHoras && <Typography variant="body2">Buscando horas libres...</Typography>}
+          {errorDisponibilidad && <Alert severity="warning">{errorDisponibilidad}</Alert>}
+          {agendaBarbero && !agendaBarbero.motivo && (
+            <HorasLibresGrid
+              horas={agendaBarbero.horasLibres}
+              seleccionada={valores.horaInicio}
+              textoVacio="El barbero no tiene horas libres este día. Pruebe otra fecha"
+              onSeleccionar={(h) => elegirHora(h.horaInicio, h.horaFin)}
+            />
+          )}
+          {agendaBarbero?.motivo && (
+            <Typography variant="body2" color="text.secondary">
+              {agendaBarbero.motivo}
+            </Typography>
+          )}
+          {(errores.horaInicio || errores.horaFin) && (
+            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+              {errores.horaInicio ?? errores.horaFin}
+            </Typography>
+          )}
+          {valores.horaInicio && (
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              Hora elegida: <strong>{valores.horaInicio}–{valores.horaFin}</strong>
+            </Typography>
+          )}
+        </Box>
 
         <Alert severity="info">{MENSAJES_SOLICITUD.ANTICIPO}</Alert>
 

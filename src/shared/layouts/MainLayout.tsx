@@ -61,6 +61,8 @@ const GRUPOS: GrupoMenu[] = [
   {
     // Agrupa las nuevas pantallas de reservas conservando sus permisos.
     titulo: 'Citas y horarios', icono: <CalendarMonthIcon />, opciones: [
+      // CU12: el cliente solicita su cita en línea.
+      { texto: 'Solicitar cita', ruta: '/solicitar-cita', icono: <EventNoteIcon />, permiso: 'RESERVA_SOLICITAR' },
       { texto: 'Citas', ruta: '/citas', icono: <EventIcon />, permiso: 'AGENDA_CONSULTAR' },
       { texto: 'Agenda de Citas', ruta: '/agenda', icono: <CalendarMonthIcon />, permiso: ['AGENDA_CONSULTAR', 'AGENDA_CONSULTAR_PROPIA'] },
       // CU10: horas libres por servicio y barbero, para agendar.
@@ -77,7 +79,6 @@ const GRUPOS: GrupoMenu[] = [
   },
   {
     titulo: 'Usuarios y permisos', icono: <AdminPanelSettingsIcon />, opciones: [
-  { texto: 'Solicitar cita', ruta: '/solicitar-cita', icono: <EventNoteIcon />, permiso: 'RESERVA_SOLICITAR' },
       { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
       { texto: 'Roles y permisos', ruta: '/roles', icono: <AdminPanelSettingsIcon />, permiso: 'ROL_ASIGNAR' },
       { texto: 'Bitácora', ruta: '/bitacora', icono: <HistoryIcon />, permiso: 'BITACORA_CONSULTAR' },
