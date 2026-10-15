@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import Divider from '@mui/material/Divider';   // <-- NUEVA
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -95,6 +96,21 @@ export default function LoginPage() {
               />
               <Button type="submit" variant="contained" size="large" disabled={enviando}>
                 {enviando ? 'Ingresando...' : 'Ingresar'}
+              </Button>
+
+              {/* CU13: acceso público al catálogo de servicios */}
+              <Divider>
+                <Typography variant="caption" color="text.secondary">
+                o
+                </Typography>
+              </Divider>
+
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => navigate('/catalogo')}
+              >
+                Ver servicios
               </Button>
               <Link component={RouterLink} to="/recuperar" variant="body2" sx={{ textAlign: 'center' }}>
                 ¿Olvidaste tu contraseña?
