@@ -33,6 +33,10 @@ import {
   ServicioCrearPage,
   ServicioEditarPage,
   ServiciosListPage,
+  PERMISOS_SOLICITUD,
+  SolicitarCitaPage,
+  PagoAnticipoPage,
+  PERMISOS_ANTICIPO,
 } from '../modulos/servicios_reservas';
 import {
   EmpleadoCrearPage,
@@ -138,6 +142,11 @@ export default function AppRouter() {
           {/* CU21 exige consulta para abrir la pantalla; la API valida cada acción. */}
           <Route element={<RequierePermiso permiso={PERMISOS_CAJA.CONSULTAR} />}>
             <Route path="/caja" element={<CajaPage />} />
+          </Route>
+
+          {/* CU14 Pago web del anticipo: solo el cliente (ANTICIPO_PAGAR_PROPIO, migración V15). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_ANTICIPO.PAGAR_PROPIO} />}>
+            <Route path="/pagar-anticipo/:id" element={<PagoAnticipoPage />} />
           </Route>
         </Route>
       </Route>

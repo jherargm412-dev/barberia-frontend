@@ -5,6 +5,7 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import EventIcon from '@mui/icons-material/Event';
+import EventNoteIcon from '@mui/icons-material/EventNote';
 import HistoryIcon from '@mui/icons-material/History';
 import HomeIcon from '@mui/icons-material/Home';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -41,6 +42,7 @@ const OPCIONES: OpcionMenu[] = [
   { texto: 'Clientes', ruta: '/clientes', icono: <PeopleIcon />, permiso: 'CLIENTE_CONSULTAR' },
   // CU11: agenda de citas para Recepcionista y Administrador.
   { texto: 'Citas', ruta: '/citas', icono: <EventIcon />, permiso: 'AGENDA_CONSULTAR' },
+  { texto: 'Solicitar cita', ruta: '/solicitar-cita', icono: <EventNoteIcon />, permiso: 'RESERVA_SOLICITAR' },
   { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
   { texto: 'Barberos', ruta: '/empleados', icono: <BadgeIcon />, permiso: 'USUARIO_GESTIONAR' },
   { texto: 'Horarios', ruta: '/horarios', icono: <EventAvailableIcon />, permiso: 'USUARIO_GESTIONAR' },
