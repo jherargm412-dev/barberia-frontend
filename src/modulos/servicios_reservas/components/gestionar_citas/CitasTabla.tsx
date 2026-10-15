@@ -5,6 +5,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PaymentsIcon from '@mui/icons-material/Payments';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import IconButton from '@mui/material/IconButton';
@@ -24,6 +25,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useState, type ReactNode } from 'react';
 import { ETIQUETAS_CANAL, PERMISOS, TOLERANCIA_MINUTOS } from '../../constants/gestionar_citas';
+import { PERMISOS_ANTICIPO } from '../../constants/registrar_pago_anticipo';
 import type { AccionEstado, Cita } from '../../types/gestionar_citas';
 import {
   enlaceWhatsApp,
@@ -45,6 +47,8 @@ interface Props {
   onCambiarPagina: (pagina: number) => void;
   onCambiarTamano: (tamano: number) => void;
   onReprogramar: (cita: Cita) => void;
+    /** La página abre el diálogo de cobro del anticipo (CU14). */
+  onCobrarAnticipo: (cita: Cita) => void;
   /** La página pide confirmación y llama al backend. */
   onCambiarEstado: (cita: Cita, accion: AccionEstado) => void;
 }
@@ -69,6 +73,7 @@ export default function CitasTabla({
   onCambiarPagina,
   onCambiarTamano,
   onReprogramar,
+  onCobrarAnticipo,
   onCambiarEstado,
 }: Props) {
   // Menú de estados abierto: la cita y el botón donde se ancla.
@@ -165,6 +170,13 @@ export default function CitasTabla({
                           sx={{ color: '#25D366' }}
                         >
                           <WhatsAppIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {c.estado === 'PENDIENTE' && c.montoAnticipo > 0 && tienePermiso(PERMISOS_ANTICIPO.COBRAR) && (
+                      <Tooltip title="Cobrar anticipo">
+                        <IconButton color="success" onClick={() => onCobrarAnticipo(c)}>
+                          <PaymentsIcon />
                         </IconButton>
                       </Tooltip>
                     )}

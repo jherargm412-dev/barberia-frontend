@@ -7,6 +7,7 @@ import ContentCutIcon from '@mui/icons-material/ContentCutOutlined';
 import EventAvailableIcon from '@mui/icons-material/EventAvailableOutlined';
 import EventIcon from '@mui/icons-material/EventOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import EventNoteIcon from '@mui/icons-material/EventNote';
 import HistoryIcon from '@mui/icons-material/HistoryOutlined';
 import HomeIcon from '@mui/icons-material/HomeOutlined';
 import LogoutIcon from '@mui/icons-material/LogoutOutlined';
@@ -76,6 +77,7 @@ const GRUPOS: GrupoMenu[] = [
   },
   {
     titulo: 'Usuarios y permisos', icono: <AdminPanelSettingsIcon />, opciones: [
+  { texto: 'Solicitar cita', ruta: '/solicitar-cita', icono: <EventNoteIcon />, permiso: 'RESERVA_SOLICITAR' },
       { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
       { texto: 'Roles y permisos', ruta: '/roles', icono: <AdminPanelSettingsIcon />, permiso: 'ROL_ASIGNAR' },
       { texto: 'Bitácora', ruta: '/bitacora', icono: <HistoryIcon />, permiso: 'BITACORA_CONSULTAR' },

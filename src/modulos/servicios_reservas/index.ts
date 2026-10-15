@@ -35,3 +35,12 @@ export { PERMISOS_AGENDA } from './constants/consultar_agenda';
 
 // CU13 Consultar Servicios (catálogo público, sin sesión)
 export { default as ConsultarServiciosPage } from './pages/consultar_servicios/ConsultarServiciosPage';
+
+
+// CU12 Solicitar Cita (Cliente)
+export { default as SolicitarCitaPage } from './pages/solicitar_cita/SolicitarCitaPage';
+export { PERMISOS_SOLICITUD } from './constants/solicitar_cita';
+
+// CU14 Registrar Pago de Anticipo (flujo web del Cliente)
+export { default as PagoAnticipoPage } from './pages/registrar_pago_anticipo/PagoAnticipoPage';
+export { PERMISOS_ANTICIPO } from './constants/registrar_pago_anticipo';

@@ -37,6 +37,10 @@ import {
   ServicioCrearPage,
   ServicioEditarPage,
   ServiciosListPage,
+  PERMISOS_SOLICITUD,
+  SolicitarCitaPage,
+  PagoAnticipoPage,
+  PERMISOS_ANTICIPO,
 } from '../modulos/servicios_reservas';
 import {
   EmpleadoCrearPage,
@@ -131,6 +135,11 @@ export default function AppRouter() {
           <Route element={<RequierePermiso permiso={PERMISOS_CITAS.CREAR} />}>
             <Route path="/citas/nueva" element={<CitaCrearPage />} />
           </Route>
+          
+          {/* CU12 Solicitar Cita: solo el cliente (RESERVA_SOLICITAR, migración V14). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_SOLICITUD.SOLICITAR} />}>
+            <Route path="/solicitar-cita" element={<SolicitarCitaPage />} />
+          </Route>
 
           {/* CU10 Consultar Disponibilidad: para quien agenda (RESERVA_CREAR). */}
           <Route element={<RequierePermiso permiso={PERMISOS_DISPONIBILIDAD.CONSULTAR} />}>
@@ -149,6 +158,11 @@ export default function AppRouter() {
           {/* CU21 exige consulta para abrir la pantalla; la API valida cada acción. */}
           <Route element={<RequierePermiso permiso={PERMISOS_CAJA.CONSULTAR} />}>
             <Route path="/caja" element={<CajaPage />} />
+          </Route>
+
+          {/* CU14 Pago web del anticipo: solo el cliente (ANTICIPO_PAGAR_PROPIO, migración V15). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_ANTICIPO.PAGAR_PROPIO} />}>
+            <Route path="/pagar-anticipo/:id" element={<PagoAnticipoPage />} />
           </Route>
 
           {/* CU16 Consultar Agenda: AGENDA_CONSULTAR o AGENDA_CONSULTAR_PROPIA; la página valida y muestra el mensaje 2a. */}
