@@ -99,7 +99,7 @@ export default function UsuarioForm({
     roles.length === 0 ? [] : valoresIniciales.roles.filter((nombre) => !roles.some((r) => r.nombre === nombre));
 
   return (
-    <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: 3 }}>
+    <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: { xs: 2, sm: 3 } }}>
       <Stack spacing={2}>
         {errorGeneral && <Alert severity="error">{errorGeneral}</Alert>}
 
@@ -261,7 +261,7 @@ export default function UsuarioForm({
           <Button onClick={onCancelar} disabled={enviando}>
             Cancelar
           </Button>
-          <Button type="submit" variant="contained" disabled={enviando}>
+          <Button type="submit" variant="contained" loading={enviando}>
             {enviando ? 'Guardando...' : textoBoton}
           </Button>
         </Box>

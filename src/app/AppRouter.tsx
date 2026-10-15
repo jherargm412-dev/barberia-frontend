@@ -21,8 +21,10 @@ import {
   UsuariosListPage,
 } from '../modulos/seguridad_usuarios';
 import {
+  AgendaPage,
   CitaCrearPage,
   CitasListPage,
+  ConsultarServiciosPage,
   PERMISOS_CITAS,
   DisponibilidadPage,
   PERMISOS_DISPONIBILIDAD,
@@ -35,6 +37,10 @@ import {
   ServicioCrearPage,
   ServicioEditarPage,
   ServiciosListPage,
+  PERMISOS_SOLICITUD,
+  SolicitarCitaPage,
+  PagoAnticipoPage,
+  PERMISOS_ANTICIPO,
 } from '../modulos/servicios_reservas';
 import {
   EmpleadoCrearPage,
@@ -56,6 +62,8 @@ export default function AppRouter() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/recuperar" element={<RecuperarContrasenaPage />} />
       <Route path="/activar" element={<ActivarCuentaPage />} />
+      {/* CU13 Consultar Servicios: catálogo público, se abre desde el login sin iniciar sesión. */}
+      <Route path="/catalogo" element={<ConsultarServiciosPage />} />
 
       {/* Privadas: requieren sesión y usan el layout con menú */}
       <Route element={<RutaProtegida />}>
@@ -127,6 +135,11 @@ export default function AppRouter() {
           <Route element={<RequierePermiso permiso={PERMISOS_CITAS.CREAR} />}>
             <Route path="/citas/nueva" element={<CitaCrearPage />} />
           </Route>
+          
+          {/* CU12 Solicitar Cita: solo el cliente (RESERVA_SOLICITAR, migración V14). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_SOLICITUD.SOLICITAR} />}>
+            <Route path="/solicitar-cita" element={<SolicitarCitaPage />} />
+          </Route>
 
           {/* CU10 Consultar Disponibilidad: para quien agenda (RESERVA_CREAR). */}
           <Route element={<RequierePermiso permiso={PERMISOS_DISPONIBILIDAD.CONSULTAR} />}>
@@ -146,6 +159,14 @@ export default function AppRouter() {
           <Route element={<RequierePermiso permiso={PERMISOS_CAJA.CONSULTAR} />}>
             <Route path="/caja" element={<CajaPage />} />
           </Route>
+
+          {/* CU14 Pago web del anticipo: solo el cliente (ANTICIPO_PAGAR_PROPIO, migración V15). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_ANTICIPO.PAGAR_PROPIO} />}>
+            <Route path="/pagar-anticipo/:id" element={<PagoAnticipoPage />} />
+          </Route>
+
+          {/* CU16 Consultar Agenda: AGENDA_CONSULTAR o AGENDA_CONSULTAR_PROPIA; la página valida y muestra el mensaje 2a. */}
+          <Route path="/agenda" element={<AgendaPage />} />
         </Route>
       </Route>
 

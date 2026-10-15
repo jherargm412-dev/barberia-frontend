@@ -1,3 +1,4 @@
+// La superficie común distingue los filtros del listado sin alterar su comportamiento.
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SearchIcon from '@mui/icons-material/Search';
@@ -29,7 +30,7 @@ export default function CitasFiltros({ filtros, barberos, onCambiar }: Props) {
   }
 
   return (
-    <Stack component="form" onSubmit={buscar} spacing={2} sx={{ mb: 2 }}>
+    <Stack component="form" onSubmit={buscar} spacing={2} sx={{ mb: 2, p: { xs: 2, sm: 2.5 }, bgcolor: 'background.paper', border: 1, borderColor: 'divider', borderRadius: 3 }}>
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', rowGap: 1 }}>
         <Tooltip title="Día anterior">
           <IconButton onClick={() => onCambiar({ fecha: sumarDias(filtros.fecha || hoy(), -1) })}>

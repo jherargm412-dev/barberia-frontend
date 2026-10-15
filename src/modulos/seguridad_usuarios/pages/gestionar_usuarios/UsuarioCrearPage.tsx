@@ -1,4 +1,5 @@
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
+
 import { useNavigate } from 'react-router-dom';
 import { registrarUsuario } from '../../api/gestionar_usuarios/usuariosApi';
 import UsuarioForm from '../../components/gestionar_usuarios/UsuarioForm';
@@ -22,9 +23,7 @@ export default function UsuarioCrearPage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        Registrar usuario
-      </Typography>
+      <PageHeader title="Registrar usuario" />
       <UsuarioForm
         valoresIniciales={VALORES_VACIOS}
         pedirContrasena

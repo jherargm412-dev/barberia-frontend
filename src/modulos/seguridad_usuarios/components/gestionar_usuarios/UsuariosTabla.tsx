@@ -1,10 +1,12 @@
+import InboxIcon from '@mui/icons-material/InboxOutlined';
+import EmptyState from '../../../../shared/components/EmptyState';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Table from '@mui/material/Table';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -15,8 +17,11 @@ import Tooltip from '@mui/material/Tooltip';
 import { useNavigate } from 'react-router-dom';
 import type { UsuarioResumen } from '../../types/gestionar_usuarios';
 import EstadoChip from './EstadoChip';
+import PersonIdentity from '../../../../shared/components/PersonIdentity';
 
 interface Props {
+  /** Oculta el estado vacío mientras carga o se muestra un error. */
+  mostrarVacio?: boolean;
   usuarios: UsuarioResumen[];
   total: number;
   pagina: number;
@@ -27,6 +32,7 @@ interface Props {
 }
 
 export default function UsuariosTabla({
+  mostrarVacio = true,
   usuarios,
   total,
   pagina,
@@ -38,9 +44,9 @@ export default function UsuariosTabla({
   const navigate = useNavigate();
 
   return (
-    <Paper>
+    <Paper elevation={0}>
       <TableContainer>
-        <Table>
+        <Table columns={["Nombre", "Correo", "Roles", "Estado", "Acciones"]} sx={{ minWidth: 720 }}>
           <TableHead>
             <TableRow>
               <TableCell>Nombre</TableCell>
@@ -51,16 +57,14 @@ export default function UsuariosTabla({
             </TableRow>
           </TableHead>
           <TableBody>
-            {usuarios.length === 0 && (
+            {usuarios.length === 0 && mostrarVacio && (
               <TableRow>
-                <TableCell colSpan={5} align="center">
-                  No se encontraron usuarios
-                </TableCell>
+                <TableCell colSpan={5} align="center"><EmptyState icon={<InboxIcon />} title="No se encontraron usuarios" description="Prueba con otros filtros o vuelve a consultar más tarde." /></TableCell>
               </TableRow>
             )}
             {usuarios.map((u) => (
               <TableRow key={u.idUsuario} hover>
-                <TableCell>{u.nombre}</TableCell>
+                <TableCell><PersonIdentity name={u.nombre} /></TableCell>
                 <TableCell>{u.correo}</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap' }}>

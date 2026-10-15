@@ -1,5 +1,8 @@
+import InboxIcon from '@mui/icons-material/InboxOutlined';
+import EmptyState from '../../../../shared/components/EmptyState';
 import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
+import Button from '@mui/material/Button';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -11,6 +14,8 @@ import type { BitacoraResumen } from '../../types/consultar_bitacora';
 import { formatearFechaHora } from '../../utils/consultar_bitacora/formatoBitacora';
 
 interface Props {
+  /** Oculta el estado vacío mientras carga o se muestra un error. */
+  mostrarVacio?: boolean;
   registros: BitacoraResumen[];
   total: number;
   pagina: number;
@@ -23,6 +28,7 @@ interface Props {
 
 /** CU05 paso 8: fecha y hora, usuario, acción, detalle y tabla afectada. */
 export default function BitacoraTabla({
+  mostrarVacio = true,
   registros,
   total,
   pagina,
@@ -32,9 +38,10 @@ export default function BitacoraTabla({
   onVerDetalle,
 }: Props) {
   return (
-    <Paper>
+    <Paper elevation={0}>
       <TableContainer>
-        <Table size="small">
+        {/* Conserva la legibilidad de las columnas; el contenedor permite deslizar. */}
+        <Table columns={["Fecha y hora", "Usuario", "Acción", "Detalle", "Tabla afectada", "Consulta"]} size="small" sx={{ minWidth: 850 }}>
           <TableHead>
             <TableRow>
               <TableCell>Fecha y hora</TableCell>
@@ -42,14 +49,13 @@ export default function BitacoraTabla({
               <TableCell>Acción</TableCell>
               <TableCell>Detalle</TableCell>
               <TableCell>Tabla afectada</TableCell>
+              <TableCell>Consulta</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {registros.length === 0 && (
+            {registros.length === 0 && mostrarVacio && (
               <TableRow>
-                <TableCell colSpan={5} align="center">
-                  No se encontraron registros
-                </TableCell>
+                <TableCell colSpan={6} align="center" sx={{ py: 5, color: 'text.secondary' }}><EmptyState icon={<InboxIcon />} title="No se encontraron registros" description="Prueba con otros filtros o vuelve a consultar más tarde." /></TableCell>
               </TableRow>
             )}
             {registros.map((r) => (
@@ -65,6 +71,9 @@ export default function BitacoraTabla({
                 <TableCell sx={{ whiteSpace: 'nowrap' }}>{r.accion}</TableCell>
                 <TableCell>{r.detalle || '—'}</TableCell>
                 <TableCell>{r.tablaAfectada}</TableCell>
+                {/* El botón permite abrir el mismo detalle usando teclado. */}
+                <TableCell><Button size="small" aria-label={`Ver detalle del registro ${r.idBitacora}`}
+                  onClick={(event) => { event.stopPropagation(); onVerDetalle(r.idBitacora); }}>Ver detalle</Button></TableCell>
               </TableRow>
             ))}
           </TableBody>

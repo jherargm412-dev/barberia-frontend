@@ -27,7 +27,7 @@ export default function EmpleadosFiltros({ iniciales, onBuscar }: Props) {
   }
 
   return (
-    <Stack component="form" onSubmit={handleSubmit} direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 2 }}>
+    <Stack component="form" onSubmit={handleSubmit} direction={{ xs: 'column', md: 'row' }} useFlexGap spacing={2} sx={{ mb: 2, flexWrap: 'wrap' }}>
       <TextField
         label="Buscar por nombre, correo, teléfono o especialidad"
         value={filtros.q}

@@ -1,4 +1,5 @@
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
+
 import { useNavigate } from 'react-router-dom';
 import { registrarEmpleado } from '../../api/gestionar_barberos/empleadosApi';
 import EmpleadoForm from '../../components/gestionar_barberos/EmpleadoForm';
@@ -19,9 +20,7 @@ export default function EmpleadoCrearPage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        Registrar empleado
-      </Typography>
+      <PageHeader title="Registrar empleado" />
       <EmpleadoForm
         valoresIniciales={VALORES_VACIOS}
         registrar

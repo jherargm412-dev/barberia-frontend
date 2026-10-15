@@ -1,3 +1,4 @@
+// Los filtros se apilan en móvil y comparten la superficie del sistema.
 import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
@@ -21,7 +22,7 @@ export default function HorariosFiltros({ onBuscar }: Props) {
   }
 
   return (
-    <Stack component="form" onSubmit={handleSubmit} direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 2 }}>
+    <Stack component="form" onSubmit={handleSubmit} direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 2, p: { xs: 2, sm: 2.5 }, bgcolor: 'background.paper', border: 1, borderColor: 'divider', borderRadius: 3 }}>
       <TextField
         label="Buscar barbero"
         value={filtros.q}

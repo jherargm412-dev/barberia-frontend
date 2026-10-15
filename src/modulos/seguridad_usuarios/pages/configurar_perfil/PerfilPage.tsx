@@ -1,11 +1,13 @@
+import PersonIdentity from '../../../../shared/components/PersonIdentity';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
+
 import { useEffect, useState } from 'react';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { consultarPerfil } from '../../api/configurar_perfil/perfilApi';
 import CambiarContrasenaForm from '../../components/configurar_perfil/CambiarContrasenaForm';
 import DatosPersonalesForm from '../../components/configurar_perfil/DatosPersonalesForm';
@@ -37,15 +39,15 @@ export default function PerfilPage() {
 
   return (
     <>
-      <Typography variant="h5">Mi perfil</Typography>
-      <Stack direction="row" spacing={1} sx={{ mt: 1, mb: 3, alignItems: 'center', flexWrap: 'wrap' }}>
-        <Typography color="text.secondary">{perfil.correo}</Typography>
+      <PageHeader title="Mi perfil" description="Actualiza tus datos personales y revisa la seguridad de tu cuenta." />
+      <Stack direction="row" useFlexGap spacing={1} sx={{ mb: 3, alignItems: 'center', flexWrap: 'wrap', overflowWrap: 'anywhere' }}>
+        <PersonIdentity name={perfil.nombre} secondary={perfil.correo} />
         {perfil.roles.map((rol) => (
           <Chip key={rol} label={rol} size="small" color="primary" variant="outlined" />
         ))}
       </Stack>
 
-      <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, alignItems: 'start' }}>
+      <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(0, 1fr)' }, alignItems: 'start' }}>
         <Stack spacing={3}>
           <DatosPersonalesForm perfil={perfil} onGuardado={alGuardar} />
           {perfil.empleado && <InformacionLaboral empleado={perfil.empleado} />}

@@ -63,7 +63,7 @@ export default function DatosPersonalesForm({ perfil, onGuardado }: Props) {
   }
 
   return (
-    <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: 3 }}>
+    <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: { xs: 2, sm: 3 } }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
         Datos personales
       </Typography>
@@ -101,7 +101,7 @@ export default function DatosPersonalesForm({ perfil, onGuardado }: Props) {
         />
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button type="submit" variant="contained" disabled={enviando}>
+          <Button type="submit" variant="contained" loading={enviando}>
             {enviando ? 'Guardando...' : 'Guardar cambios'}
           </Button>
         </Box>

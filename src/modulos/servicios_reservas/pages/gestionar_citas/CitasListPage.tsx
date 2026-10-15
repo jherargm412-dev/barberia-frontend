@@ -1,9 +1,8 @@
+import PageHeader from '../../../../shared/components/PageHeader';
 import AddIcon from '@mui/icons-material/Add';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
-import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../seguridad_usuarios';
@@ -13,8 +12,11 @@ import { cambiarEstadoCita, listarBarberos, listarCitas } from '../../api/gestio
 import CitasFiltros from '../../components/gestionar_citas/CitasFiltros';
 import CitasTabla from '../../components/gestionar_citas/CitasTabla';
 import ReprogramarDialog from '../../components/gestionar_citas/ReprogramarDialog';
+import ComprobanteAnticipo from '../../components/registrar_pago_anticipo/ComprobanteAnticipo';
+import RegistrarAnticipoDialog from '../../components/registrar_pago_anticipo/RegistrarAnticipoDialog';
 import { ACCIONES_ESTADO, PERMISOS } from '../../constants/gestionar_citas';
 import type { AccionEstado, BarberoDisponible, Cita, FiltrosCitas } from '../../types/gestionar_citas';
+import type { PagoAnticipo } from '../../types/registrar_pago_anticipo';
 import { formatearFechaLarga, hoy } from '../../utils/gestionar_citas/citaForm';
 
 /** CU11: agenda del día con alta, reprogramación y cambio de estado de las citas. */
@@ -42,6 +44,8 @@ export default function CitasListPage() {
   const [mensaje, setMensaje] = useState(estadoNavegacion?.mensaje ?? '');
   const [porCambiar, setPorCambiar] = useState<{ cita: Cita; accion: AccionEstado } | null>(null);
   const [reprogramando, setReprogramando] = useState<Cita | null>(null);
+    const [cobrando, setCobrando] = useState<Cita | null>(null);
+  const [comprobante, setComprobante] = useState<PagoAnticipo | null>(null);
   const [procesando, setProcesando] = useState(false);
 
   useEffect(() => {
@@ -94,21 +98,8 @@ export default function CitasListPage() {
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, gap: 2 }}>
-        <Box>
-          <Typography variant="h5">Agenda de citas</Typography>
-          {filtros.fecha && (
-            <Typography color="text.secondary" sx={{ textTransform: 'capitalize' }}>
-              {formatearFechaLarga(filtros.fecha)}
-            </Typography>
-          )}
-        </Box>
-        {tienePermiso(PERMISOS.CREAR) && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/citas/nueva')}>
-            Nueva cita
-          </Button>
-        )}
-      </Box>
+      <PageHeader title="Citas" description={filtros.fecha ? formatearFechaLarga(filtros.fecha) : 'Consulta y gestiona las reservas.'}
+        action={tienePermiso(PERMISOS.CREAR) && <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/citas/nueva')}>Nueva cita</Button>} />
 
       {pendientesHoy > 0 && !verPendientesDeHoy && (
         <Alert
@@ -143,6 +134,7 @@ export default function CitasListPage() {
 
       <CitasTabla
         citas={citas}
+        mostrarVacio={!cargando && !error}
         total={total}
         pagina={filtros.page}
         tamano={filtros.size}
@@ -150,6 +142,7 @@ export default function CitasListPage() {
         onCambiarPagina={(page) => cambiarFiltros({ page })}
         onCambiarTamano={(size) => cambiarFiltros({ size, page: 0 })}
         onReprogramar={setReprogramando}
+        onCobrarAnticipo={setCobrando}
         onCambiarEstado={(cita, accionElegida) => setPorCambiar({ cita, accion: accionElegida })}
       />
 
@@ -178,6 +171,21 @@ export default function CitasListPage() {
           }}
         />
       )}
+
+      {cobrando && (
+        <RegistrarAnticipoDialog
+          cita={cobrando}
+          onCerrar={() => setCobrando(null)}
+          onCobrado={(respuesta) => {
+            setCobrando(null);
+            setMensaje(respuesta.mensaje);
+            setComprobante(respuesta.pago);
+            cambiarFiltros({});
+          }}
+        />
+      )}
+
+      {comprobante && <ComprobanteAnticipo pago={comprobante} onCerrar={() => setComprobante(null)} />}
     </>
   );
 }

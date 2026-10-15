@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -78,7 +78,7 @@ export default function HorarioSemanalForm({
     <Box component="form" onSubmit={handleSubmit}>
       <Paper>
         <TableContainer>
-          <Table size="small">
+          <Table columns={["Día", "Trabaja", "Turno", "Entrada", "Salida", "Atención de la barbería"]} size="small" sx={{ minWidth: 780 }}>
             <TableHead>
               <TableRow>
                 <TableCell>Día</TableCell>
@@ -97,6 +97,7 @@ export default function HorarioSemanalForm({
                     <TableCell>{etiquetaDia(d.diaSemana)}</TableCell>
                     <TableCell padding="checkbox">
                       <Checkbox
+                        slotProps={{ input: { 'aria-label': `Trabaja el ${etiquetaDia(d.diaSemana)}` } }}
                         checked={d.trabaja}
                         onChange={(e) => cambiar(d.diaSemana, { trabaja: e.target.checked })}
                       />
@@ -125,6 +126,7 @@ export default function HorarioSemanalForm({
                       <TextField
                         type="time"
                         size="small"
+                        slotProps={{ htmlInput: { 'aria-label': `Entrada del ${etiquetaDia(d.diaSemana)}` } }}
                         value={d.horaEntrada ?? ''}
                         onChange={(e) => cambiar(d.diaSemana, { horaEntrada: e.target.value })}
                         disabled={!d.trabaja}
@@ -135,6 +137,7 @@ export default function HorarioSemanalForm({
                       <TextField
                         type="time"
                         size="small"
+                        slotProps={{ htmlInput: { 'aria-label': `Salida del ${etiquetaDia(d.diaSemana)}` } }}
                         value={d.horaSalida ?? ''}
                         onChange={(e) => cambiar(d.diaSemana, { horaSalida: e.target.value })}
                         disabled={!d.trabaja}
@@ -158,7 +161,7 @@ export default function HorarioSemanalForm({
       </Paper>
 
       <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-        <Button type="submit" variant="contained" disabled={guardando}>
+        <Button type="submit" variant="contained" loading={guardando}>
           {guardando ? 'Guardando...' : 'Guardar'}
         </Button>
         {/* 6a: descarta los cambios y vuelve al listado. */}

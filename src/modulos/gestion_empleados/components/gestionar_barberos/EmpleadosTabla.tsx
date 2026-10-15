@@ -1,10 +1,12 @@
+import InboxIcon from '@mui/icons-material/InboxOutlined';
+import EmptyState from '../../../../shared/components/EmptyState';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import EditIcon from '@mui/icons-material/Edit';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import RestoreIcon from '@mui/icons-material/Restore';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -12,13 +14,15 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
+import PersonIdentity from '../../../../shared/components/PersonIdentity';
 import { useNavigate } from 'react-router-dom';
 import { ROL_BARBERO, TIPOS_CONTRATO } from '../../constants/gestionar_barberos';
 import type { EmpleadoResumen } from '../../types/gestionar_barberos';
 import EstadoEmpleadoChip from './EstadoEmpleadoChip';
 
 interface Props {
+  /** Oculta el estado vacío mientras carga o se muestra un error. */
+  mostrarVacio?: boolean;
   empleados: EmpleadoResumen[];
   total: number;
   pagina: number;
@@ -32,6 +36,7 @@ interface Props {
 
 /** CU17 paso 1: datos de empleado combinados con los de su cuenta de usuario. */
 export default function EmpleadosTabla({
+  mostrarVacio = true,
   empleados,
   total,
   pagina,
@@ -44,9 +49,9 @@ export default function EmpleadosTabla({
   const navigate = useNavigate();
 
   return (
-    <Paper>
+    <Paper elevation={0}>
       <TableContainer>
-        <Table>
+        <Table columns={["Empleado", "Teléfono", "Rol", "Especialidad", "Contrato", "Turno", "Servicios", "Estado", "Acciones"]} sx={{ minWidth: 1000 }}>
           <TableHead>
             <TableRow>
               <TableCell>Empleado</TableCell>
@@ -61,11 +66,9 @@ export default function EmpleadosTabla({
             </TableRow>
           </TableHead>
           <TableBody>
-            {empleados.length === 0 && (
+            {empleados.length === 0 && mostrarVacio && (
               <TableRow>
-                <TableCell colSpan={9} align="center">
-                  No se encontraron empleados
-                </TableCell>
+                <TableCell colSpan={9} align="center"><EmptyState icon={<InboxIcon />} title="No se encontraron empleados" description="Prueba con otros filtros o vuelve a consultar más tarde." /></TableCell>
               </TableRow>
             )}
             {empleados.map((e) => {
@@ -74,10 +77,7 @@ export default function EmpleadosTabla({
               return (
                 <TableRow key={e.idEmpleado} hover>
                   <TableCell>
-                    {e.nombre}
-                    <Typography variant="body2" color="text.secondary">
-                      {e.correo}
-                    </Typography>
+                    <PersonIdentity name={e.nombre} secondary={e.correo} />
                   </TableCell>
                   <TableCell sx={{ whiteSpace: 'nowrap' }}>{e.telefono ?? '—'}</TableCell>
                   <TableCell>{e.roles.join(', ')}</TableCell>

@@ -1,7 +1,7 @@
 import Alert from '@mui/material/Alert';
 import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
@@ -40,10 +40,7 @@ export default function RolEditarPage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-        Editar rol
-        <Chip label={rol.activo ? 'Activo' : 'Inactivo'} color={rol.activo ? 'success' : 'default'} size="small" />
-      </Typography>
+      <PageHeader title="Editar rol" action={<Chip label={rol.activo ? 'Activo' : 'Inactivo'} color={rol.activo ? 'success' : 'default'} size="small" />} />
       {rol.cantidadUsuarios > 0 && (
         <Alert severity="warning" sx={{ mb: 2, maxWidth: 960 }}>
           {rol.cantidadUsuarios} usuario(s) tienen este rol: los cambios de permisos les aplican de inmediato.

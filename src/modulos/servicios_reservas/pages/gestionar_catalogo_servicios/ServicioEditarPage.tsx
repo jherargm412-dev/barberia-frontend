@@ -1,6 +1,6 @@
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
@@ -39,9 +39,7 @@ export default function ServicioEditarPage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-        Modificar servicio <EstadoServicioChip estado={servicio.estado} />
-      </Typography>
+      <PageHeader title="Modificar servicio" action={<EstadoServicioChip estado={servicio.estado} />} />
       {/* El estado no se cambia aquí: se hace desde el listado (flujo 4a). */}
       <ServicioForm
         valoresIniciales={valoresDesdeServicio(servicio)}

@@ -1,8 +1,11 @@
+import InboxIcon from '@mui/icons-material/InboxOutlined';
+import EmptyState from '../../../../shared/components/EmptyState';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PaymentsIcon from '@mui/icons-material/Payments';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import IconButton from '@mui/material/IconButton';
@@ -11,7 +14,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -22,6 +25,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useState, type ReactNode } from 'react';
 import { ETIQUETAS_CANAL, PERMISOS, TOLERANCIA_MINUTOS } from '../../constants/gestionar_citas';
+import { PERMISOS_ANTICIPO } from '../../constants/registrar_pago_anticipo';
 import type { AccionEstado, Cita } from '../../types/gestionar_citas';
 import {
   enlaceWhatsApp,
@@ -33,6 +37,8 @@ import {
 import EstadoCitaChip from './EstadoCitaChip';
 
 interface Props {
+  /** Evita confundir carga o error con un resultado vacío. */
+  mostrarVacio?: boolean;
   citas: Cita[];
   total: number;
   pagina: number;
@@ -41,6 +47,8 @@ interface Props {
   onCambiarPagina: (pagina: number) => void;
   onCambiarTamano: (tamano: number) => void;
   onReprogramar: (cita: Cita) => void;
+    /** La página abre el diálogo de cobro del anticipo (CU14). */
+  onCobrarAnticipo: (cita: Cita) => void;
   /** La página pide confirmación y llama al backend. */
   onCambiarEstado: (cita: Cita, accion: AccionEstado) => void;
 }
@@ -57,6 +65,7 @@ interface OpcionEstado {
 /** Agenda del día en orden cronológico, con WhatsApp, reprogramar y cambio de estado por cita. */
 export default function CitasTabla({
   citas,
+  mostrarVacio = true,
   total,
   pagina,
   tamano,
@@ -64,6 +73,7 @@ export default function CitasTabla({
   onCambiarPagina,
   onCambiarTamano,
   onReprogramar,
+  onCobrarAnticipo,
   onCambiarEstado,
 }: Props) {
   // Menú de estados abierto: la cita y el botón donde se ancla.
@@ -105,7 +115,7 @@ export default function CitasTabla({
   return (
     <Paper>
       <TableContainer>
-        <Table size="small">
+        <Table columns={["Hora", "Cliente", "Servicio", "Barbero", "Canal", "Anticipo", "Estado", "Acciones"]} size="small" sx={{ minWidth: 940 }}>
           <TableHead>
             <TableRow>
               <TableCell>Hora</TableCell>
@@ -119,11 +129,9 @@ export default function CitasTabla({
             </TableRow>
           </TableHead>
           <TableBody>
-            {citas.length === 0 && (
+            {mostrarVacio && citas.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                  No hay citas para este día
-                </TableCell>
+                <TableCell colSpan={8} align="center" sx={{ py: 4 }}><EmptyState icon={<InboxIcon />} title="No hay citas para este día" description="Prueba con otros filtros o vuelve a consultar más tarde." /></TableCell>
               </TableRow>
             )}
             {citas.map((c) => {
@@ -162,6 +170,13 @@ export default function CitasTabla({
                           sx={{ color: '#25D366' }}
                         >
                           <WhatsAppIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {c.estado === 'PENDIENTE' && c.montoAnticipo > 0 && tienePermiso(PERMISOS_ANTICIPO.COBRAR) && (
+                      <Tooltip title="Cobrar anticipo">
+                        <IconButton color="success" onClick={() => onCobrarAnticipo(c)}>
+                          <PaymentsIcon />
                         </IconButton>
                       </Tooltip>
                     )}

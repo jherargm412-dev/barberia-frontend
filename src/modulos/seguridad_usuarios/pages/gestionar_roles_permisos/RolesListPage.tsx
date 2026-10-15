@@ -1,11 +1,10 @@
 import AddIcon from '@mui/icons-material/Add';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
@@ -67,12 +66,11 @@ export default function RolesListPage() {
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, gap: 2 }}>
-        <Typography variant="h5">Roles y permisos</Typography>
+      <PageHeader title="Roles y permisos" description="Define qué funciones puede utilizar cada rol del sistema." action={
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/roles/nuevo')}>
           Nuevo rol
         </Button>
-      </Box>
+      } />
 
       <ToggleButtonGroup
         exclusive
@@ -98,7 +96,7 @@ export default function RolesListPage() {
       )}
       {cargando && <LinearProgress />}
 
-      <RolesTabla roles={visibles} onCambiarEstado={setPorCambiar} />
+      <RolesTabla mostrarVacio={!cargando && !error} roles={visibles} onCambiarEstado={setPorCambiar} />
 
       <ConfirmDialog
         abierto={porCambiar !== null}

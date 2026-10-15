@@ -1,9 +1,8 @@
 import AddIcon from '@mui/icons-material/Add';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
@@ -76,14 +75,11 @@ export default function EmpleadosListPage() {
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, gap: 2 }}>
-        <Typography variant="h5">Barberos y empleados</Typography>
-        {puedeRegistrar && (
+      <PageHeader title="Barberos y empleados" description="Consulta al equipo, sus contratos y los servicios asignados." action={puedeRegistrar && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/empleados/nuevo')}>
             Nuevo empleado
           </Button>
-        )}
-      </Box>
+        )} />
 
       <EmpleadosFiltros iniciales={FILTROS_INICIALES} onBuscar={(f) => cambiarFiltros({ ...f, page: 0 })} />
 
@@ -99,7 +95,7 @@ export default function EmpleadosListPage() {
       )}
       {cargando && <LinearProgress />}
 
-      <EmpleadosTabla
+      <EmpleadosTabla mostrarVacio={!cargando && !error}
         empleados={empleados}
         total={total}
         pagina={filtros.page}
