@@ -2,6 +2,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import BadgeIcon from '@mui/icons-material/Badge';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import EventIcon from '@mui/icons-material/Event';
@@ -31,8 +32,11 @@ interface OpcionMenu {
   texto: string;
   ruta: string;
   icono: ReactNode;
-  /** Si se indica, la opción solo aparece para usuarios con ese permiso. */
-  permiso?: string;
+  /**
+   * Si se indica, la opción solo aparece para usuarios con ese permiso.
+   * Con una lista basta con tener cualquiera de ellos (ej. CU16: agenda completa o propia).
+   */
+  permiso?: string | string[];
 }
 
 const OPCIONES: OpcionMenu[] = [
@@ -41,6 +45,13 @@ const OPCIONES: OpcionMenu[] = [
   { texto: 'Clientes', ruta: '/clientes', icono: <PeopleIcon />, permiso: 'CLIENTE_CONSULTAR' },
   // CU11: agenda de citas para Recepcionista y Administrador.
   { texto: 'Citas', ruta: '/citas', icono: <EventIcon />, permiso: 'AGENDA_CONSULTAR' },
+  // CU16: consulta de la agenda; el Barbero solo ve sus citas (lo controla el backend).
+  {
+    texto: 'Agenda de Citas',
+    ruta: '/agenda',
+    icono: <CalendarMonthIcon />,
+    permiso: ['AGENDA_CONSULTAR', 'AGENDA_CONSULTAR_PROPIA'],
+  },
   { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
   { texto: 'Barberos', ruta: '/empleados', icono: <BadgeIcon />, permiso: 'USUARIO_GESTIONAR' },
   { texto: 'Horarios', ruta: '/horarios', icono: <EventAvailableIcon />, permiso: 'USUARIO_GESTIONAR' },
@@ -59,7 +70,10 @@ export default function MainLayout() {
   const { pathname } = useLocation();
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
 
-  const opcionesVisibles = OPCIONES.filter((o) => !o.permiso || tienePermiso(o.permiso));
+  const opcionesVisibles = OPCIONES.filter((o) => {
+    if (!o.permiso) return true;
+    return Array.isArray(o.permiso) ? o.permiso.some((p) => tienePermiso(p)) : tienePermiso(o.permiso);
+  });
 
   async function salir() {
     await cerrarSesion();

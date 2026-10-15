@@ -21,6 +21,7 @@ import {
   UsuariosListPage,
 } from '../modulos/seguridad_usuarios';
 import {
+  AgendaPage,
   CitaCrearPage,
   CitasListPage,
   PERMISOS_CITAS,
@@ -139,6 +140,9 @@ export default function AppRouter() {
           <Route element={<RequierePermiso permiso={PERMISOS_CAJA.CONSULTAR} />}>
             <Route path="/caja" element={<CajaPage />} />
           </Route>
+
+          {/* CU16 Consultar Agenda: AGENDA_CONSULTAR o AGENDA_CONSULTAR_PROPIA; la página valida y muestra el mensaje 2a. */}
+          <Route path="/agenda" element={<AgendaPage />} />
         </Route>
       </Route>
 

@@ -20,3 +20,7 @@ export { default as HorariosListPage } from './pages/gestionar_horarios/Horarios
 export { default as HorarioDetallePage } from './pages/gestionar_horarios/HorarioDetallePage';
 export { default as HorarioEditarPage } from './pages/gestionar_horarios/HorarioEditarPage';
 export { PERMISOS as PERMISOS_HORARIOS, MENSAJES as MENSAJES_HORARIOS } from './constants/gestionar_horarios';
+
+// CU16 Consultar Agenda de Citas (Barbero, Recepcionista, Administrador)
+export { default as AgendaPage } from './pages/consultar_agenda/AgendaPage';
+export { PERMISOS_AGENDA } from './constants/consultar_agenda';
