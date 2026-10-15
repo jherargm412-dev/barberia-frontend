@@ -8,11 +8,14 @@ import DialogTitle from '@mui/material/DialogTitle';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { useEffect, useState, type FormEvent } from 'react';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarBarberos, reprogramarCita } from '../../api/gestionar_citas/citasApi';
+import { DURACION_DEFECTO } from '../../constants/consultar_disponibilidad';
 import { MENSAJES } from '../../constants/gestionar_citas';
 import type { BarberoDisponible, Cita } from '../../types/gestionar_citas';
+import { useDisponibilidad } from '../../utils/consultar_disponibilidad/useDisponibilidad';
 import {
   formatearMonto,
   hoy,
@@ -20,6 +23,7 @@ import {
   sumarMinutos,
   validarHorario,
 } from '../../utils/gestionar_citas/citaForm';
+import HorasLibresGrid from '../consultar_disponibilidad/HorasLibresGrid';
 
 interface Props {
   /** La página monta el diálogo solo mientras está abierto. */
@@ -84,7 +88,22 @@ export default function ReprogramarDialog({ cita, onCerrar, onGuardado }: Props)
     }
   }
 
-  const barbero = barberos.find((b) => String(b.idEmpleado) === empleadoId);
+  // CU10: horas libres del barbero ese día con la duración original de la cita; la propia cita no cuenta.
+  const duracionCita = minutosEntre(cita.horaInicio, cita.horaFin);
+  const duracion =
+    duracionCita >= 15 && duracionCita <= 240 && duracionCita % 5 === 0 ? duracionCita : DURACION_DEFECTO;
+  const { disponibilidad, error: errorDisponibilidad, cargando: buscandoHoras } = useDisponibilidad(
+    empleadoId && fecha && fecha >= hoy()
+      ? {
+          servicioId: cita.servicio.idServicio,
+          empleadoId: Number(empleadoId),
+          fecha,
+          duracion,
+          excluirReserva: cita.idReserva,
+        }
+      : null,
+  );
+  const agenda = disponibilidad?.barberos[0];
 
   return (
     <Dialog open onClose={onCerrar} fullWidth maxWidth="sm">
@@ -109,7 +128,7 @@ export default function ReprogramarDialog({ cita, onCerrar, onGuardado }: Props)
               error={!!errores.empleadoId}
               helperText={
                 errores.empleadoId ??
-                (barbero?.turno ? `Turno ${barbero.turno}: ${barbero.horaEntrada}–${barbero.horaSalida}` : ' ')
+                (agenda?.motivo ?? (agenda ? `Atiende ${agenda.jornadaInicio}–${agenda.jornadaFin} este día` : ' '))
               }
             >
               {barberos.map((b) => (
@@ -159,6 +178,27 @@ export default function ReprogramarDialog({ cita, onCerrar, onGuardado }: Props)
                 slotProps={{ inputLabel: { shrink: true } }}
               />
             </Stack>
+            {empleadoId && (
+              <div>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Horas libres ({duracion} min)
+                </Typography>
+                {buscandoHoras && <Typography variant="body2">Buscando horas libres...</Typography>}
+                {errorDisponibilidad && <Alert severity="warning">{errorDisponibilidad}</Alert>}
+                {agenda && !agenda.motivo && (
+                  <HorasLibresGrid
+                    horas={agenda.horasLibres}
+                    seleccionada={horaInicio}
+                    textoVacio="El barbero no tiene horas libres este día"
+                    onSeleccionar={(h) => {
+                      setHoraInicio(h.horaInicio);
+                      setHoraFin(h.horaFin);
+                      setErrores((x) => ({ ...x, horaInicio: undefined, horaFin: undefined }));
+                    }}
+                  />
+                )}
+              </div>
+            )}
           </Stack>
         </DialogContent>
         <DialogActions>

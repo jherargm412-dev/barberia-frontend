@@ -1,4 +1,5 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import BadgeIcon from '@mui/icons-material/Badge';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
@@ -9,6 +10,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import PeopleIcon from '@mui/icons-material/People';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -40,11 +42,15 @@ const OPCIONES: OpcionMenu[] = [
   { texto: 'Clientes', ruta: '/clientes', icono: <PeopleIcon />, permiso: 'CLIENTE_CONSULTAR' },
   // CU11: agenda de citas para Recepcionista y Administrador.
   { texto: 'Citas', ruta: '/citas', icono: <EventIcon />, permiso: 'AGENDA_CONSULTAR' },
+  // CU10: horas libres por servicio y barbero, para agendar.
+  { texto: 'Disponibilidad', ruta: '/disponibilidad', icono: <ScheduleIcon />, permiso: 'RESERVA_CREAR' },
   { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
   { texto: 'Barberos', ruta: '/empleados', icono: <BadgeIcon />, permiso: 'USUARIO_GESTIONAR' },
   { texto: 'Horarios', ruta: '/horarios', icono: <EventAvailableIcon />, permiso: 'USUARIO_GESTIONAR' },
   { texto: 'Roles y permisos', ruta: '/roles', icono: <AdminPanelSettingsIcon />, permiso: 'ROL_ASIGNAR' },
   { texto: 'Servicios', ruta: '/servicios', icono: <ContentCutIcon />, permiso: 'SERVICIO_GESTIONAR' },
+  // CU21 solo se muestra a quien puede consultar la caja.
+  { texto: 'Caja', ruta: '/caja', icono: <AccountBalanceWalletIcon />, permiso: 'CAJA_CONSULTAR' },
   { texto: 'Bitácora', ruta: '/bitacora', icono: <HistoryIcon />, permiso: 'BITACORA_CONSULTAR' },
   { texto: 'Mi perfil', ruta: '/perfil', icono: <AccountCircleIcon />, permiso: 'PERFIL_EDITAR' },
 ];

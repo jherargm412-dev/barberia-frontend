@@ -15,6 +15,14 @@ export { default as CitasListPage } from './pages/gestionar_citas/CitasListPage'
 export { default as CitaCrearPage } from './pages/gestionar_citas/CitaCrearPage';
 export { PERMISOS as PERMISOS_CITAS } from './constants/gestionar_citas';
 
+// CU10 Consultar Disponibilidad
+export { default as DisponibilidadPage } from './pages/consultar_disponibilidad/DisponibilidadPage';
+export { PERMISOS as PERMISOS_DISPONIBILIDAD } from './constants/consultar_disponibilidad';
+// Para CU12 (Solicitar Cita): la misma consulta y la grilla de horas libres.
+export { consultarDisponibilidad } from './api/consultar_disponibilidad/disponibilidadApi';
+export { default as HorasLibresGrid } from './components/consultar_disponibilidad/HorasLibresGrid';
+export type { Disponibilidad, HoraLibre, HorarioDisponible } from './types/consultar_disponibilidad';
+
 // CU09 Gestionar Horarios de Disponibilidad
 export { default as HorariosListPage } from './pages/gestionar_horarios/HorariosListPage';
 export { default as HorarioDetallePage } from './pages/gestionar_horarios/HorarioDetallePage';

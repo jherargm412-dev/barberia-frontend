@@ -24,6 +24,8 @@ import {
   CitaCrearPage,
   CitasListPage,
   PERMISOS_CITAS,
+  DisponibilidadPage,
+  PERMISOS_DISPONIBILIDAD,
   HorarioDetallePage,
   HorarioEditarPage,
   HorariosListPage,
@@ -42,6 +44,7 @@ import {
 } from '../modulos/gestion_empleados';
 import MainLayout from '../shared/layouts/MainLayout';
 import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
+import { CajaPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
 import InicioPage from '../shared/pages/InicioPage';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 
@@ -125,6 +128,11 @@ export default function AppRouter() {
             <Route path="/citas/nueva" element={<CitaCrearPage />} />
           </Route>
 
+          {/* CU10 Consultar Disponibilidad: para quien agenda (RESERVA_CREAR). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_DISPONIBILIDAD.CONSULTAR} />}>
+            <Route path="/disponibilidad" element={<DisponibilidadPage />} />
+          </Route>
+
           {/* CU09 Horarios de disponibilidad: USUARIO_GESTIONAR (igual que CU17), con el mensaje de 2a. */}
           <Route
             element={<RequierePermiso permiso={PERMISOS_HORARIOS.GESTIONAR} mensaje={MENSAJES_HORARIOS.SIN_PERMISO} />}
@@ -132,6 +140,11 @@ export default function AppRouter() {
             <Route path="/horarios" element={<HorariosListPage />} />
             <Route path="/horarios/:id" element={<HorarioDetallePage />} />
             <Route path="/horarios/:id/editar" element={<HorarioEditarPage />} />
+          </Route>
+
+          {/* CU21 exige consulta para abrir la pantalla; la API valida cada acción. */}
+          <Route element={<RequierePermiso permiso={PERMISOS_CAJA.CONSULTAR} />}>
+            <Route path="/caja" element={<CajaPage />} />
           </Route>
         </Route>
       </Route>
