@@ -1,7 +1,7 @@
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import type { ServicioResumen } from '../../../types/gestionar_catalogo_servicios';
+import type { ServicioResumen } from '../../types/gestionar_catalogo_servicios';
 
 interface ServicioCardProps {
   /** Servicio a mostrar (viene del endpoint público). */
@@ -29,7 +29,7 @@ export default function ServicioCard({ servicio }: ServicioCardProps) {
       }}
     >
       <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="h6" component="h3" gutterBottom fontWeight="bold">
+        <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: 'bold' }}>
           {servicio.nombre}
         </Typography>
 
@@ -41,7 +41,7 @@ export default function ServicioCard({ servicio }: ServicioCardProps) {
           {servicio.descripcion?.trim() || 'Sin descripción disponible.'}
         </Typography>
 
-        <Typography variant="h6" color="primary.main" fontWeight="bold">
+        <Typography variant="h6" color="primary.main" sx={{ fontWeight: 'bold' }}>
           Bs. {servicio.precio.toFixed(2)}
         </Typography>
       </CardContent>

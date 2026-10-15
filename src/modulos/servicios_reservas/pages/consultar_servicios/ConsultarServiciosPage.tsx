@@ -42,7 +42,7 @@ export default function ConsultarServiciosPage() {
         >
           Volver al inicio
         </Button>
-        <Typography variant="h4" component="h1" fontWeight="bold">
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
           Nuestros Servicios
         </Typography>
       </Box>
