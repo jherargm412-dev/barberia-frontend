@@ -10,7 +10,6 @@ export interface CitaFormValores {
   horaInicio: string;
   horaFin: string;
   canal: CanalCita;
-  anticipoPagado: boolean;
 }
 
 export type ErroresCita = Partial<Record<keyof CitaFormValores, string>>;
@@ -62,7 +61,6 @@ export function valoresIniciales(prellenado?: PrellenadoCita): CitaFormValores {
     horaInicio: prellenado?.horaInicio ?? '',
     horaFin: prellenado?.horaFin ?? '',
     canal: 'PRESENCIAL',
-    anticipoPagado: false,
   };
 }
 

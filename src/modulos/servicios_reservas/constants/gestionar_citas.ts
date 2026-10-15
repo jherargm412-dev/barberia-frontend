@@ -48,7 +48,7 @@ export const ACCIONES_ESTADO: Record<AccionEstado, { titulo: string; boton: stri
     titulo: 'Confirmar cita',
     boton: 'Confirmar',
     permiso: PERMISOS.EDITAR,
-    mensaje: 'La cita pasará a Confirmada.',
+    mensaje: 'La cita pasará a Confirmada al cobrar su anticipo.',
   },
   atender: {
     titulo: 'Marcar como atendida',

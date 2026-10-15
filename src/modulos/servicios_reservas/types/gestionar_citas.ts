@@ -14,6 +14,8 @@ export interface Cita {
   canal: CanalCita;
   estado: EstadoCita;
   montoAnticipo: number;
+  /** Si ya se cobró el anticipo (CU14). Solo así la cita queda Confirmada. */
+  anticipoPagado: boolean;
   cliente: { idCliente: number; nombre: string; telefono: string | null };
   servicio: { idServicio: number; nombre: string; precio: number };
   /** Null si la cita no tiene barbero (posible en CU12). */
@@ -29,7 +31,7 @@ export interface BarberoDisponible {
   horaSalida: string | null;
 }
 
-/** Body de POST /reservas (ReservaRequest.java). El anticipo lo calcula el backend. */
+/** Body de POST /reservas (ReservaRequest.java). El anticipo lo calcula el backend; la cita nace Pendiente. */
 export interface CitaRequest {
   clienteId: number;
   servicioId: number;
@@ -38,7 +40,6 @@ export interface CitaRequest {
   horaInicio: string;
   horaFin: string;
   canal: CanalCita;
-  estado: 'PENDIENTE' | 'CONFIRMADA';
 }
 
 /** Datos con los que CU10 abre "Nueva cita" al elegir una hora libre (se pasan en el state de la ruta). */

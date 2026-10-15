@@ -83,10 +83,11 @@ export default function CitasTabla({
     const abierta = !esFinal(cita);
     const opciones: OpcionEstado[] = [
       {
+        // Confirmar = cobrar: abre el cobro del anticipo (CU14), que es lo que confirma la cita.
         accion: 'confirmar',
-        texto: 'Confirmar',
+        texto: 'Confirmar (cobrar anticipo)',
         icono: <CheckCircleIcon fontSize="small" color="success" />,
-        visible: cita.estado === 'PENDIENTE' && tienePermiso(PERMISOS.EDITAR),
+        visible: cita.estado === 'PENDIENTE' && !cita.anticipoPagado && tienePermiso(PERMISOS_ANTICIPO.COBRAR),
       },
       {
         accion: 'atender',
@@ -173,7 +174,7 @@ export default function CitasTabla({
                         </IconButton>
                       </Tooltip>
                     )}
-                    {c.estado === 'PENDIENTE' && c.montoAnticipo > 0 && tienePermiso(PERMISOS_ANTICIPO.COBRAR) && (
+                    {c.estado === 'PENDIENTE' && !c.anticipoPagado && c.montoAnticipo > 0 && tienePermiso(PERMISOS_ANTICIPO.COBRAR) && (
                       <Tooltip title="Cobrar anticipo">
                         <IconButton color="success" onClick={() => onCobrarAnticipo(c)}>
                           <PaymentsIcon />
@@ -219,7 +220,8 @@ export default function CitasTabla({
               key={o.accion}
               disabled={!!o.motivo}
               onClick={() => {
-                onCambiarEstado(menu.cita, o.accion);
+                if (o.accion === 'confirmar') onCobrarAnticipo(menu.cita);
+                else onCambiarEstado(menu.cita, o.accion);
                 setMenu(null);
               }}
             >

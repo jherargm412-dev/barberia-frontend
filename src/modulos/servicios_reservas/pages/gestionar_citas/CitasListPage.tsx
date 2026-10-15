@@ -15,6 +15,7 @@ import ReprogramarDialog from '../../components/gestionar_citas/ReprogramarDialo
 import ComprobanteAnticipo from '../../components/registrar_pago_anticipo/ComprobanteAnticipo';
 import RegistrarAnticipoDialog from '../../components/registrar_pago_anticipo/RegistrarAnticipoDialog';
 import { ACCIONES_ESTADO, PERMISOS } from '../../constants/gestionar_citas';
+import { PERMISOS_ANTICIPO } from '../../constants/registrar_pago_anticipo';
 import type { AccionEstado, BarberoDisponible, Cita, FiltrosCitas } from '../../types/gestionar_citas';
 import type { PagoAnticipo } from '../../types/registrar_pago_anticipo';
 import { formatearFechaLarga, hoy } from '../../utils/gestionar_citas/citaForm';
@@ -24,7 +25,7 @@ export default function CitasListPage() {
   const navigate = useNavigate();
   const ubicacion = useLocation();
   const { tienePermiso } = useAuth();
-  const estadoNavegacion = ubicacion.state as { mensaje?: string; fecha?: string } | null;
+  const estadoNavegacion = ubicacion.state as { mensaje?: string; fecha?: string; nueva?: Cita } | null;
 
   // Al volver de "Nueva cita" se abre el día de la cita recién creada.
   const [filtros, setFiltros] = useState<FiltrosCitas>({
@@ -42,9 +43,11 @@ export default function CitasListPage() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [mensaje, setMensaje] = useState(estadoNavegacion?.mensaje ?? '');
+  // Cita recién creada: queda Pendiente hasta cobrar su anticipo (Confirmar = cobrar).
+  const [recienCreada, setRecienCreada] = useState<Cita | null>(estadoNavegacion?.nueva ?? null);
   const [porCambiar, setPorCambiar] = useState<{ cita: Cita; accion: AccionEstado } | null>(null);
   const [reprogramando, setReprogramando] = useState<Cita | null>(null);
-    const [cobrando, setCobrando] = useState<Cita | null>(null);
+  const [cobrando, setCobrando] = useState<Cita | null>(null);
   const [comprobante, setComprobante] = useState<PagoAnticipo | null>(null);
   const [procesando, setProcesando] = useState(false);
 
@@ -121,8 +124,30 @@ export default function CitasListPage() {
       <CitasFiltros filtros={filtros} barberos={barberos} onCambiar={(f) => cambiarFiltros({ ...f, page: 0 })} />
 
       {mensaje && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setMensaje('')}>
+        <Alert
+          severity="success"
+          sx={{ mb: 2 }}
+          onClose={() => {
+            setMensaje('');
+            setRecienCreada(null);
+          }}
+          action={
+            recienCreada && tienePermiso(PERMISOS_ANTICIPO.COBRAR) ? (
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  setCobrando(recienCreada);
+                  setRecienCreada(null);
+                }}
+              >
+                Cobrar anticipo ahora
+              </Button>
+            ) : undefined
+          }
+        >
           {mensaje}
+          {recienCreada && ' La cita queda Pendiente hasta cobrar el anticipo.'}
         </Alert>
       )}
       {error && (
@@ -178,6 +203,7 @@ export default function CitasListPage() {
           onCerrar={() => setCobrando(null)}
           onCobrado={(respuesta) => {
             setCobrando(null);
+            setRecienCreada(null);
             setMensaje(respuesta.mensaje);
             setComprobante(respuesta.pago);
             cambiarFiltros({});

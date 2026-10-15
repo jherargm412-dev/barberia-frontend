@@ -16,7 +16,8 @@ export default function CitaCrearPage() {
   async function guardar(datos: CitaRequest) {
     const respuesta = await registrarCita(datos);
     // Volvemos a la agenda, en el día de la cita, con el mensaje del backend.
-    navigate('/citas', { state: { mensaje: respuesta.mensaje, fecha: respuesta.reserva.fecha } });
+    // Se pasa la cita para ofrecer "Cobrar anticipo ahora": así se confirma (CU14).
+    navigate('/citas', { state: { mensaje: respuesta.mensaje, fecha: respuesta.reserva.fecha, nueva: respuesta.reserva } });
   }
 
   return (
