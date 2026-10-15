@@ -1,9 +1,8 @@
+import PageHeader from '../../../../shared/components/PageHeader';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../seguridad_usuarios';
@@ -96,12 +95,8 @@ export default function AgendaPage() {
 
   return (
     <Stack spacing={2}>
-      <Box>
-        <Typography variant="h5">Agenda de citas</Typography>
-        <Typography color="text.secondary">
-          {semana ? `Semana ${formatearRangoSemana(mostrada.fecha)}` : capitalizar(formatearFechaLarga(mostrada.fecha))}
-        </Typography>
-      </Box>
+      <PageHeader title="Agenda de Citas"
+        description={semana ? `Semana ${formatearRangoSemana(mostrada.fecha)}` : capitalizar(formatearFechaLarga(mostrada.fecha))} />
 
       <AgendaFiltros
         valores={filtros}

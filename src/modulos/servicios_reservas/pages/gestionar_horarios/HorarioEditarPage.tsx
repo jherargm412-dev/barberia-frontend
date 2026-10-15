@@ -1,6 +1,6 @@
+import PageHeader from '../../../../shared/components/PageHeader';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { listarTurnos } from '../../../gestion_empleados';
@@ -76,9 +76,7 @@ export default function HorarioEditarPage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        {horario.estadoHorario === 'ASIGNADO' ? 'Modificar horario' : 'Asignar horario'} — {horario.nombre}
-      </Typography>
+      <PageHeader title={`${horario.estadoHorario === 'ASIGNADO' ? 'Modificar horario' : 'Asignar horario'} — ${horario.nombre}`} description="Configura los días y las horas de disponibilidad." />
 
       {/* Paso 5: la sugerencia del turno base no se guarda hasta presionar "Guardar". */}
       {horario.sugerido && (

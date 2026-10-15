@@ -1,3 +1,5 @@
+import InboxIcon from '@mui/icons-material/InboxOutlined';
+import EmptyState from '../../../../shared/components/EmptyState';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
@@ -11,7 +13,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -33,6 +35,8 @@ import {
 import EstadoCitaChip from './EstadoCitaChip';
 
 interface Props {
+  /** Evita confundir carga o error con un resultado vacío. */
+  mostrarVacio?: boolean;
   citas: Cita[];
   total: number;
   pagina: number;
@@ -57,6 +61,7 @@ interface OpcionEstado {
 /** Agenda del día en orden cronológico, con WhatsApp, reprogramar y cambio de estado por cita. */
 export default function CitasTabla({
   citas,
+  mostrarVacio = true,
   total,
   pagina,
   tamano,
@@ -105,7 +110,7 @@ export default function CitasTabla({
   return (
     <Paper>
       <TableContainer>
-        <Table size="small">
+        <Table columns={["Hora", "Cliente", "Servicio", "Barbero", "Canal", "Anticipo", "Estado", "Acciones"]} size="small" sx={{ minWidth: 940 }}>
           <TableHead>
             <TableRow>
               <TableCell>Hora</TableCell>
@@ -119,11 +124,9 @@ export default function CitasTabla({
             </TableRow>
           </TableHead>
           <TableBody>
-            {citas.length === 0 && (
+            {mostrarVacio && citas.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                  No hay citas para este día
-                </TableCell>
+                <TableCell colSpan={8} align="center" sx={{ py: 4 }}><EmptyState icon={<InboxIcon />} title="No hay citas para este día" description="Prueba con otros filtros o vuelve a consultar más tarde." /></TableCell>
               </TableRow>
             )}
             {citas.map((c) => {

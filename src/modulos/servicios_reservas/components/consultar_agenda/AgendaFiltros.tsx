@@ -1,3 +1,4 @@
+// La presentación sigue el tema; se conservan las vistas y validaciones de fecha.
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SearchIcon from '@mui/icons-material/Search';
@@ -69,7 +70,7 @@ export default function AgendaFiltros({ valores, barberos, puedeFiltrarBarbero, 
   }
 
   return (
-    <Stack component="form" onSubmit={buscar} spacing={2}>
+    <Stack component="form" onSubmit={buscar} spacing={2} sx={{ p: { xs: 2, sm: 2.5 }, bgcolor: 'background.paper', border: 1, borderColor: 'divider', borderRadius: 3 }}>
       {/* En celular: la vista arriba y la navegación de fechas completa debajo; en pantallas anchas, en una fila. */}
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { xs: 'flex-start', sm: 'center' } }}>
         <ToggleButtonGroup

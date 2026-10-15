@@ -1,3 +1,4 @@
+import PageHeader from '../../../../shared/components/PageHeader';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import Alert from '@mui/material/Alert';
@@ -68,9 +69,7 @@ export default function HorarioDetallePage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-        Horario de {horario.nombre} <EstadoHorarioChip estado={horario.estadoHorario} />
-      </Typography>
+      <PageHeader title={`Horario de ${horario.nombre}`} action={<EstadoHorarioChip estado={horario.estadoHorario} />} />
       <Typography color="text.secondary" sx={{ mb: 2 }}>
         Turno base:{' '}
         {horario.turnoBase

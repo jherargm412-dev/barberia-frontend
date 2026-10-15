@@ -1,3 +1,5 @@
+import InboxIcon from '@mui/icons-material/InboxOutlined';
+import EmptyState from '../../../../shared/components/EmptyState';
 import BlockIcon from '@mui/icons-material/Block';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -5,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -18,19 +20,22 @@ import { ROL_ADMINISTRADOR } from '../../constants/gestionar_roles_permisos';
 import type { Rol } from '../../types/gestionar_roles_permisos';
 
 interface Props {
+  /** Oculta el estado vacío mientras carga o se muestra un error. */
+  mostrarVacio?: boolean;
   roles: Rol[];
   /** Paso 4: la página pide confirmación y llama al backend. */
   onCambiarEstado: (rol: Rol) => void;
 }
 
 /** CU03 paso 1: nombre, descripción, estado, permisos y usuarios de cada rol. */
-export default function RolesTabla({ roles, onCambiarEstado }: Props) {
+export default function RolesTabla({
+  mostrarVacio = true, roles, onCambiarEstado }: Props) {
   const navigate = useNavigate();
 
   return (
-    <Paper>
+    <Paper elevation={0}>
       <TableContainer>
-        <Table>
+        <Table columns={["Rol", "Permisos", "Usuarios", "Estado", "Acciones"]} sx={{ minWidth: 640 }}>
           <TableHead>
             <TableRow>
               <TableCell>Rol</TableCell>
@@ -41,11 +46,9 @@ export default function RolesTabla({ roles, onCambiarEstado }: Props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {roles.length === 0 && (
+            {roles.length === 0 && mostrarVacio && (
               <TableRow>
-                <TableCell colSpan={5} align="center">
-                  No se encontraron roles
-                </TableCell>
+                <TableCell colSpan={5} align="center"><EmptyState icon={<InboxIcon />} title="No se encontraron roles" description="Prueba con otros filtros o vuelve a consultar más tarde." /></TableCell>
               </TableRow>
             )}
             {roles.map((r) => {

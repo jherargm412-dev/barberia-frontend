@@ -1,7 +1,7 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -25,7 +25,7 @@ export default function ExcepcionesTabla({ excepciones, onEliminar }: Props) {
   return (
     <Paper>
       <TableContainer>
-        <Table size="small">
+        <Table columns={["Desde", "Hasta", "Tipo", "Horas", "Motivo", "Acciones"]} size="small">
           <TableHead>
             <TableRow>
               <TableCell>Desde</TableCell>

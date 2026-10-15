@@ -36,9 +36,10 @@ export default function CitaTarjeta({ cita, mostrarBarbero, onClick }: Props) {
       onKeyDown={alTeclear}
       aria-label={`Ver cita de ${cita.cliente.nombre} a las ${cita.horaInicio}`}
       sx={{
-        p: 1.5,
+        p: 2.5,
+        transition: 'border-color 150ms ease-out, background-color 150ms ease-out',
         cursor: 'pointer',
-        '&:hover, &:focus-visible': { borderColor: 'primary.main', outline: 'none', boxShadow: 1 },
+        '&:hover, &:focus-visible': { borderColor: 'primary.main', outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 2 },
       }}
     >
       <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>

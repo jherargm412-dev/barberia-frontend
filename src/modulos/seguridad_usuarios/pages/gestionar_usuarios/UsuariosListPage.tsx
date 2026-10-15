@@ -1,9 +1,8 @@
 import AddIcon from '@mui/icons-material/Add';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/iniciar_sesion/useAuth';
@@ -59,14 +58,11 @@ export default function UsuariosListPage() {
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h5">Usuarios</Typography>
-        {puedeAsignarRoles && (
+      <PageHeader title="Usuarios" description="Administra las cuentas, sus roles y el acceso al sistema." action={puedeAsignarRoles && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/usuarios/nuevo')}>
             Nuevo usuario
           </Button>
-        )}
-      </Box>
+        )} />
 
       {/* Al buscar volvemos a la primera página. */}
       <UsuariosFiltros roles={roles} onBuscar={(f) => cambiarFiltros({ ...f, page: 0 })} />
@@ -78,7 +74,7 @@ export default function UsuariosListPage() {
       )}
       {cargando && <LinearProgress />}
 
-      <UsuariosTabla
+      <UsuariosTabla mostrarVacio={!cargando && !error}
         usuarios={usuarios}
         total={total}
         pagina={filtros.page}

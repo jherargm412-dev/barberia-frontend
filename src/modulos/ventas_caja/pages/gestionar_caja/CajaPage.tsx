@@ -1,3 +1,4 @@
+import PageHeader from '../../../../shared/components/PageHeader';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AddIcon from '@mui/icons-material/Add';
 import LockIcon from '@mui/icons-material/Lock';
@@ -12,7 +13,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import LinearProgress from '@mui/material/LinearProgress';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Table from '@mui/material/Table';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -121,8 +122,7 @@ export default function CajaPage() {
   }
 
   return <>
-    <Typography variant="h5" sx={{ mb: 1 }}>Caja</Typography>
-    <Typography color="text.secondary" sx={{ mb: 2 }}>Controla la apertura, los egresos y el arqueo de la jornada.</Typography>
+    <PageHeader title="Caja" description="Controla la apertura, los egresos y el arqueo de la jornada." />
     {mensaje && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setMensaje('')}>{mensaje}</Alert>}
     {error && !dialogo && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
     {cargando && <LinearProgress />}
@@ -140,7 +140,7 @@ export default function CajaPage() {
           </Box>
           <Chip label={caja.estado === 'ABIERTA' ? 'Abierta' : 'Cerrada'} color={caja.estado === 'ABIERTA' ? 'success' : 'default'} />
         </Stack>
-        <Stack direction={{ xs: 'column', md: 'row' }} sx={{ gap: 3, flexWrap: 'wrap', mb: 2 }}>
+        <Stack sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(5, minmax(0, 1fr))' }, gap: 2, mb: 3, '& > div': { bgcolor: 'action.hover', p: 2, borderRadius: 2 } }}>
           <Box><Typography color="text.secondary">Monto inicial</Typography><Typography variant="h6">{moneda(caja.montoInicial)}</Typography></Box>
           <Box><Typography color="text.secondary">Ingresos en efectivo</Typography><Typography variant="h6">{moneda(caja.ingresosEfectivo)}</Typography></Box>
           <Box><Typography color="text.secondary">Ingresos QR</Typography><Typography variant="h6">{moneda(caja.ingresosQr)}</Typography></Box>
@@ -161,13 +161,13 @@ export default function CajaPage() {
         </Stack>
       </Paper>
       <Typography variant="h6" sx={{ mb: 1 }}>Movimientos</Typography>
-      <TableContainer component={Paper}><Table sx={{ minWidth: 650 }}><TableHead><TableRow>
+      <TableContainer component={Paper}><Table columns={["Fecha", "Tipo", "Concepto", "Método", "Monto", "Responsable"]} sx={{ minWidth: 650 }}><TableHead><TableRow>
         <TableCell>Fecha</TableCell><TableCell>Tipo</TableCell><TableCell>Concepto</TableCell>
         <TableCell>Método</TableCell><TableCell align="right">Monto</TableCell><TableCell>Responsable</TableCell>
       </TableRow></TableHead><TableBody>
         {movimientos.length === 0 && <TableRow><TableCell colSpan={6} align="center">No hay movimientos registrados</TableCell></TableRow>}
         {movimientos.map((m) => <TableRow key={m.idMovimientoCaja}>
-          <TableCell>{fecha(m.fecha)}</TableCell><TableCell>{m.tipo}</TableCell><TableCell>{m.concepto}</TableCell>
+          <TableCell>{fecha(m.fecha)}</TableCell><TableCell><Chip size="small" variant="outlined" color={m.tipo === 'INGRESO' ? 'success' : 'warning'} label={m.tipo === 'INGRESO' ? 'Ingreso' : 'Egreso'} /></TableCell><TableCell>{m.concepto}</TableCell>
           <TableCell>{m.medioPago}</TableCell><TableCell align="right">{moneda(m.monto)}</TableCell><TableCell>{m.responsable}</TableCell>
         </TableRow>)}
       </TableBody></Table></TableContainer>
@@ -201,7 +201,7 @@ export default function CajaPage() {
           </>}
         </Stack></DialogContent>
         <DialogActions><Button onClick={() => setDialogo(null)} disabled={procesando}>Cancelar</Button>
-          <Button type="submit" variant="contained" disabled={procesando}>Confirmar</Button></DialogActions>
+          <Button type="submit" variant="contained" loading={procesando}>Confirmar</Button></DialogActions>
       </Box>
     </Dialog>
   </>;

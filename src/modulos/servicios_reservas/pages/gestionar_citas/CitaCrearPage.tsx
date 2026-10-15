@@ -1,4 +1,4 @@
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../seguridad_usuarios';
 import { registrarCita } from '../../api/gestionar_citas/citasApi';
@@ -19,9 +19,7 @@ export default function CitaCrearPage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        Nueva cita
-      </Typography>
+      <PageHeader title="Nueva cita" description="Completa los datos de la reserva y consulta la disponibilidad." />
       <CitaForm
         puedeRegistrarCliente={tienePermiso(PERMISOS.CLIENTE_CREAR)}
         onGuardar={guardar}

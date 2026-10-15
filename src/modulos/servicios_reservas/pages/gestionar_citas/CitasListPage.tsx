@@ -1,9 +1,8 @@
+import PageHeader from '../../../../shared/components/PageHeader';
 import AddIcon from '@mui/icons-material/Add';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
-import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../seguridad_usuarios';
@@ -94,21 +93,8 @@ export default function CitasListPage() {
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, gap: 2 }}>
-        <Box>
-          <Typography variant="h5">Agenda de citas</Typography>
-          {filtros.fecha && (
-            <Typography color="text.secondary" sx={{ textTransform: 'capitalize' }}>
-              {formatearFechaLarga(filtros.fecha)}
-            </Typography>
-          )}
-        </Box>
-        {tienePermiso(PERMISOS.CREAR) && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/citas/nueva')}>
-            Nueva cita
-          </Button>
-        )}
-      </Box>
+      <PageHeader title="Citas" description={filtros.fecha ? formatearFechaLarga(filtros.fecha) : 'Consulta y gestiona las reservas.'}
+        action={tienePermiso(PERMISOS.CREAR) && <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/citas/nueva')}>Nueva cita</Button>} />
 
       {pendientesHoy > 0 && !verPendientesDeHoy && (
         <Alert
@@ -143,6 +129,7 @@ export default function CitasListPage() {
 
       <CitasTabla
         citas={citas}
+        mostrarVacio={!cargando && !error}
         total={total}
         pagina={filtros.page}
         tamano={filtros.size}
