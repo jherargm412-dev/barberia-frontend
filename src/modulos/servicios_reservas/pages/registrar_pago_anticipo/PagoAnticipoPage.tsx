@@ -1,6 +1,6 @@
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { confirmarPagoQr, generarQrAnticipo } from '../../api/registrar_pago_anticipo/anticiposApi';
@@ -33,26 +33,29 @@ export default function PagoAnticipoPage() {
   const [confirmando, setConfirmando] = useState(false);
   const [comprobante, setComprobante] = useState<PagoAnticipo | null>(null);
   const [ahora, setAhora] = useState(() => Date.now());
+  // Cada pedido de QR suma 1: al abrir la pantalla (0) y cuando el anterior venció o falló.
+  const [pedido, setPedido] = useState(0);
 
-  /** Pide un QR nuevo. Sirve tanto al abrir la pantalla como cuando el anterior venció. */
-  const generar = useCallback(async () => {
-    setError('');
-    setGenerando(true);
-    setQr(null);
-    try {
-      setQr(await generarQrAnticipo(idReserva));
-    } catch (err) {
-      // Ej.: "El pago en línea no está disponible en este momento" (no hay caja abierta) o la cita no es pendiente.
-      setError(obtenerError(err).mensaje);
-    } finally {
-      setGenerando(false);
-    }
-  }, [idReserva]);
-
-  // Al abrir la pantalla se pide el QR.
+  // Pide el QR. La bandera "vigente" descarta una respuesta vieja (p. ej. el doble montaje de StrictMode).
   useEffect(() => {
-    void generar();
-  }, [generar]);
+    let vigente = true;
+    generarQrAnticipo(idReserva)
+      .then((nuevo) => vigente && setQr(nuevo))
+      // Ej.: "El pago en línea no está disponible en este momento" (no hay caja abierta) o la cita no es pendiente.
+      .catch((err) => vigente && setError(obtenerError(err).mensaje))
+      .finally(() => vigente && setGenerando(false));
+    return () => {
+      vigente = false;
+    };
+  }, [idReserva, pedido]);
+
+  /** Pide un QR nuevo cuando el anterior venció o hubo un error. */
+  function generar() {
+    setError('');
+    setQr(null);
+    setGenerando(true);
+    setPedido((n) => n + 1);
+  }
 
   // Mientras hay un QR vigente, se actualiza el reloj cada segundo para la cuenta regresiva.
   useEffect(() => {
@@ -61,7 +64,10 @@ export default function PagoAnticipoPage() {
     return () => clearInterval(temporizador);
   }, [qr]);
 
-  const segundosRestantes = qr ? Math.max(0, Math.floor((new Date(qr.venceEn).getTime() - ahora) / 1000)) : 0;
+  // venceEn llega en hora de Bolivia sin zona: se le agrega -04:00 para que la cuenta sea correcta en cualquier navegador.
+  const segundosRestantes = qr
+    ? Math.max(0, Math.floor((new Date(`${qr.venceEn}-04:00`).getTime() - ahora) / 1000))
+    : 0;
   const vencido = qr !== null && segundosRestantes === 0;
 
   /** Flujo A, pasos 4 a 7: el cliente dice que pagó; el backend verifica el QR y confirma la cita. */
@@ -94,10 +100,10 @@ export default function PagoAnticipoPage() {
 
       {!generando && !qr && (
         <Stack direction="row" spacing={2}>
-          <Button variant="contained" onClick={() => void generar()}>
+          <Button variant="contained" onClick={generar}>
             Intentar de nuevo
           </Button>
-          <Button onClick={() => navigate('/')}>Volver al inicio</Button>
+          <Button onClick={() => navigate('/mis-citas')}>Volver a mis citas</Button>
         </Stack>
       )}
 
@@ -120,11 +126,11 @@ export default function PagoAnticipoPage() {
               </Typography>
             )}
             <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Button onClick={() => navigate('/')} disabled={confirmando}>
+              <Button onClick={() => navigate('/mis-citas')} disabled={confirmando}>
                 Pagar más tarde
               </Button>
               {vencido ? (
-                <Button variant="contained" onClick={() => void generar()}>
+                <Button variant="contained" onClick={generar}>
                   Generar nuevo QR
                 </Button>
               ) : (
@@ -137,7 +143,7 @@ export default function PagoAnticipoPage() {
         </Paper>
       )}
 
-      {comprobante && <ComprobanteAnticipo pago={comprobante} onCerrar={() => navigate('/')} />}
+      {comprobante && <ComprobanteAnticipo pago={comprobante} onCerrar={() => navigate('/mis-citas')} />}
     </>
   );
 }
