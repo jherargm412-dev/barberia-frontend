@@ -13,6 +13,7 @@ import AgendaLista from '../../components/consultar_agenda/AgendaLista';
 import AgendaSemana from '../../components/consultar_agenda/AgendaSemana';
 import CitaDetalleDialog from '../../components/consultar_agenda/CitaDetalleDialog';
 import { MENSAJES_AGENDA, PERMISOS_AGENDA } from '../../constants/consultar_agenda';
+import { PERMISOS_ANTICIPO } from '../../constants/registrar_pago_anticipo';
 import type { BarberoAgenda, CitaAgenda, FiltrosAgenda } from '../../types/consultar_agenda';
 import {
   capitalizar,
@@ -122,7 +123,9 @@ export default function AgendaPage() {
           key={seleccionada}
           idReserva={seleccionada}
           puedeGestionar={verTodas}
+          puedeCobrar={tienePermiso(PERMISOS_ANTICIPO.COBRAR)}
           onCerrar={() => setSeleccionada(null)}
+          onCambio={() => aplicar({ ...filtros })}
         />
       )}
     </Stack>
