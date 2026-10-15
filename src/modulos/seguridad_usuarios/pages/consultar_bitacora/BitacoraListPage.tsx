@@ -1,7 +1,7 @@
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { useEffect, useState } from 'react';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarBitacora, obtenerOpcionesFiltro } from '../../api/consultar_bitacora/bitacoraApi';
@@ -71,9 +71,7 @@ export default function BitacoraListPage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        Bitácora
-      </Typography>
+      <PageHeader title="Bitácora" description="Revisa las acciones del sistema, sus responsables y los cambios registrados." />
 
       {/* Al buscar volvemos a la primera página. */}
       <BitacoraFiltros opciones={opciones} usuarios={usuarios} onBuscar={(filtros) => consultar({ filtros, page: 0 })} />
@@ -98,7 +96,7 @@ export default function BitacoraListPage() {
       )}
       {cargando && <LinearProgress />}
 
-      <BitacoraTabla
+      <BitacoraTabla mostrarVacio={!cargando && !error}
         registros={registros}
         total={total}
         pagina={consulta.page}

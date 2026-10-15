@@ -1,6 +1,6 @@
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
-import Table from '@mui/material/Table';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
@@ -21,7 +21,7 @@ export default function CitasAfectadasAlert({ mensaje, citas }: Props) {
   return (
     <Alert severity="warning" sx={{ mb: 2 }}>
       <AlertTitle>{mensaje}</AlertTitle>
-      <Table size="small">
+      <Table columns={["Fecha", "Hora", "Cliente", "Servicio", "Estado"]} size="small">
         <TableHead>
           <TableRow>
             <TableCell>Fecha</TableCell>

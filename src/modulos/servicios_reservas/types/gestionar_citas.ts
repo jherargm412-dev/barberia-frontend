@@ -41,6 +41,15 @@ export interface CitaRequest {
   estado: 'PENDIENTE' | 'CONFIRMADA';
 }
 
+/** Datos con los que CU10 abre "Nueva cita" al elegir una hora libre (se pasan en el state de la ruta). */
+export interface PrellenadoCita {
+  servicioId: number;
+  empleadoId: number;
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+}
+
 /** Body de PUT /reservas/{id}/reprogramar (ReprogramarReservaRequest.java). */
 export interface ReprogramarRequest {
   empleadoId: number;

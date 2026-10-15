@@ -1,5 +1,5 @@
 import { DURACION_SUGERIDA_MINUTOS, ESTADOS_FINALES, MENSAJES, TOLERANCIA_MINUTOS } from '../../constants/gestionar_citas';
-import type { CanalCita, Cita } from '../../types/gestionar_citas';
+import type { CanalCita, Cita, PrellenadoCita } from '../../types/gestionar_citas';
 
 /** Valores del formulario de nueva cita tal como los maneja React (ids como texto para los selects). */
 export interface CitaFormValores {
@@ -52,14 +52,15 @@ export function horaFinSugerida(horaInicio: string) {
   return sumarMinutos(horaInicio, DURACION_SUGERIDA_MINUTOS);
 }
 
-export function valoresIniciales(): CitaFormValores {
+/** Formulario vacío, o con la hora elegida en CU10 (servicio, barbero, fecha y horas). */
+export function valoresIniciales(prellenado?: PrellenadoCita): CitaFormValores {
   return {
     clienteId: null,
-    servicioId: '',
-    empleadoId: '',
-    fecha: hoy(),
-    horaInicio: '',
-    horaFin: '',
+    servicioId: prellenado ? String(prellenado.servicioId) : '',
+    empleadoId: prellenado ? String(prellenado.empleadoId) : '',
+    fecha: prellenado?.fecha ?? hoy(),
+    horaInicio: prellenado?.horaInicio ?? '',
+    horaFin: prellenado?.horaFin ?? '',
     canal: 'PRESENCIAL',
     anticipoPagado: false,
   };

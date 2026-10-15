@@ -1,9 +1,11 @@
+import InboxIcon from '@mui/icons-material/InboxOutlined';
+import EmptyState from '../../../../shared/components/EmptyState';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -16,6 +18,7 @@ import { hhmm } from '../../utils/gestionar_horarios/horarioForm';
 import EstadoHorarioChip from './EstadoHorarioChip';
 
 interface Props {
+  mostrarVacio?: boolean;
   barberos: BarberoHorarioResumen[];
   /** 4b: la página abre el diálogo de registrar excepción. */
   onRegistrarExcepcion: (barbero: BarberoHorarioResumen) => void;
@@ -25,13 +28,13 @@ interface Props {
  * CU09 paso 3: barberos activos con el estado de su horario y las opciones del CU.
  * "Eliminar excepción" (4h) está en "Ver horario", porque primero hay que elegir cuál.
  */
-export default function BarberosHorarioTabla({ barberos, onRegistrarExcepcion }: Props) {
+export default function BarberosHorarioTabla({ barberos, onRegistrarExcepcion, mostrarVacio = true }: Props) {
   const navigate = useNavigate();
 
   return (
     <Paper>
       <TableContainer>
-        <Table>
+        <Table columns={["Barbero", "Turno base", "Horario", "Acciones"]} sx={{ minWidth: 700 }}>
           <TableHead>
             <TableRow>
               <TableCell>Barbero</TableCell>
@@ -41,11 +44,9 @@ export default function BarberosHorarioTabla({ barberos, onRegistrarExcepcion }:
             </TableRow>
           </TableHead>
           <TableBody>
-            {barberos.length === 0 && (
+            {mostrarVacio && barberos.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} align="center">
-                  No se encontraron barberos activos
-                </TableCell>
+                <TableCell colSpan={4} align="center"><EmptyState icon={<InboxIcon />} title="No se encontraron barberos activos" description="Prueba con otros filtros o vuelve a consultar más tarde." /></TableCell>
               </TableRow>
             )}
             {barberos.map((b) => {

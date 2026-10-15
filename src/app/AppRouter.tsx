@@ -21,9 +21,13 @@ import {
   UsuariosListPage,
 } from '../modulos/seguridad_usuarios';
 import {
+  AgendaPage,
   CitaCrearPage,
   CitasListPage,
+  ConsultarServiciosPage,
   PERMISOS_CITAS,
+  DisponibilidadPage,
+  PERMISOS_DISPONIBILIDAD,
   HorarioDetallePage,
   HorarioEditarPage,
   HorariosListPage,
@@ -58,6 +62,8 @@ export default function AppRouter() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/recuperar" element={<RecuperarContrasenaPage />} />
       <Route path="/activar" element={<ActivarCuentaPage />} />
+      {/* CU13 Consultar Servicios: catálogo público, se abre desde el login sin iniciar sesión. */}
+      <Route path="/catalogo" element={<ConsultarServiciosPage />} />
 
       {/* Privadas: requieren sesión y usan el layout con menú */}
       <Route element={<RutaProtegida />}>
@@ -135,6 +141,11 @@ export default function AppRouter() {
             <Route path="/solicitar-cita" element={<SolicitarCitaPage />} />
           </Route>
 
+          {/* CU10 Consultar Disponibilidad: para quien agenda (RESERVA_CREAR). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_DISPONIBILIDAD.CONSULTAR} />}>
+            <Route path="/disponibilidad" element={<DisponibilidadPage />} />
+          </Route>
+
           {/* CU09 Horarios de disponibilidad: USUARIO_GESTIONAR (igual que CU17), con el mensaje de 2a. */}
           <Route
             element={<RequierePermiso permiso={PERMISOS_HORARIOS.GESTIONAR} mensaje={MENSAJES_HORARIOS.SIN_PERMISO} />}
@@ -153,6 +164,9 @@ export default function AppRouter() {
           <Route element={<RequierePermiso permiso={PERMISOS_ANTICIPO.PAGAR_PROPIO} />}>
             <Route path="/pagar-anticipo/:id" element={<PagoAnticipoPage />} />
           </Route>
+
+          {/* CU16 Consultar Agenda: AGENDA_CONSULTAR o AGENDA_CONSULTAR_PROPIA; la página valida y muestra el mensaje 2a. */}
+          <Route path="/agenda" element={<AgendaPage />} />
         </Route>
       </Route>
 

@@ -1,6 +1,6 @@
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
+import Table from '../../../../shared/components/ResponsiveTable';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -14,7 +14,7 @@ export default function CalendarioSemanal({ dias }: { dias: DiaHorario[] }) {
   return (
     <Paper>
       <TableContainer>
-        <Table size="small">
+        <Table columns={["Día", "Entrada", "Salida"]} size="small">
           <TableHead>
             <TableRow>
               <TableCell>Día</TableCell>

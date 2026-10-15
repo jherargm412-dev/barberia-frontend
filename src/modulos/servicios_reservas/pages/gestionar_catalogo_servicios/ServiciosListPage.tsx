@@ -1,9 +1,8 @@
 import AddIcon from '@mui/icons-material/Add';
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
-import Typography from '@mui/material/Typography';
+import PageHeader from '../../../../shared/components/PageHeader';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
@@ -72,12 +71,11 @@ export default function ServiciosListPage() {
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, gap: 2 }}>
-        <Typography variant="h5">Catálogo de servicios</Typography>
+      <PageHeader title="Catálogo de servicios" description="Administra los servicios disponibles y sus precios." action={
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/servicios/nuevo')}>
           Nuevo servicio
         </Button>
-      </Box>
+      } />
 
       {/* Al buscar volvemos a la primera página. */}
       <ServiciosFiltros onBuscar={(f) => cambiarFiltros({ ...f, page: 0 })} />
@@ -94,7 +92,7 @@ export default function ServiciosListPage() {
       )}
       {cargando && <LinearProgress />}
 
-      <ServiciosTabla
+      <ServiciosTabla mostrarVacio={!cargando && !error}
         servicios={servicios}
         total={total}
         pagina={filtros.page}

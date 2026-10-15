@@ -1,6 +1,6 @@
+import PageHeader from '../../../../shared/components/PageHeader';
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
-import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
@@ -39,9 +39,7 @@ export default function HorariosListPage() {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        Horarios de disponibilidad
-      </Typography>
+      <PageHeader title="Horarios de disponibilidad" description="Organiza los turnos y las excepciones de cada barbero." />
 
       <HorariosFiltros onBuscar={(f) => cambiarFiltros(f)} />
 
@@ -57,7 +55,7 @@ export default function HorariosListPage() {
       )}
       {cargando && <LinearProgress />}
 
-      <BarberosHorarioTabla barberos={barberos} onRegistrarExcepcion={setExcepcionPara} />
+      <BarberosHorarioTabla mostrarVacio={!cargando && !error} barberos={barberos} onRegistrarExcepcion={setExcepcionPara} />
 
       {/* 4b: al guardar, mensaje de éxito y regresa al listado (paso 3). */}
       {excepcionPara && (

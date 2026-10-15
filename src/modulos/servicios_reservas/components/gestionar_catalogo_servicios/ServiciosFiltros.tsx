@@ -27,7 +27,8 @@ export default function ServiciosFiltros({ onBuscar }: Props) {
       onSubmit={handleSubmit}
       direction={{ xs: 'column', sm: 'row' }}
       spacing={2}
-      sx={{ mb: 2 }}
+      useFlexGap
+      sx={{ mb: 2, flexWrap: 'wrap' }}
     >
       <TextField
         label="Buscar por nombre"
