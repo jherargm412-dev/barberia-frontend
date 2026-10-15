@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import AccountCircleIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
@@ -11,6 +12,13 @@ import EventNoteIcon from '@mui/icons-material/EventNote';
 import HistoryIcon from '@mui/icons-material/HistoryOutlined';
 import HomeIcon from '@mui/icons-material/HomeOutlined';
 import LogoutIcon from '@mui/icons-material/LogoutOutlined';
+=======
+import BadgeIcon from '@mui/icons-material/Badge';
+import ContentCutIcon from '@mui/icons-material/ContentCut';
+import HistoryIcon from '@mui/icons-material/History';
+import HomeIcon from '@mui/icons-material/Home';
+import LogoutIcon from '@mui/icons-material/Logout';
+>>>>>>> origin/bastian
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
@@ -47,6 +55,7 @@ interface OpcionMenu {
   permiso?: string | string[];
 }
 
+<<<<<<< HEAD
 interface GrupoMenu {
   titulo: string;
   icono: ReactNode;
@@ -89,6 +98,17 @@ const GRUPOS: GrupoMenu[] = [
       { texto: 'Caja', ruta: '/caja', icono: <AccountBalanceWalletIcon />, permiso: 'CAJA_CONSULTAR' },
     ],
   },
+=======
+const OPCIONES: OpcionMenu[] = [
+  { texto: 'Inicio', ruta: '/', icono: <HomeIcon /> },
+  // La opción de CU06 solo aparece para usuarios que pueden consultar clientes.
+  { texto: 'Clientes', ruta: '/clientes', icono: <PeopleIcon />, permiso: 'CLIENTE_CONSULTAR' },
+  { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
+  // CU16: mismo permiso que CU01 (solo el Administrador).
+  { texto: 'Barberos', ruta: '/barberos', icono: <BadgeIcon />, permiso: 'USUARIO_GESTIONAR' },
+  { texto: 'Servicios', ruta: '/servicios', icono: <ContentCutIcon />, permiso: 'SERVICIO_GESTIONAR' },
+  { texto: 'Bitácora', ruta: '/bitacora', icono: <HistoryIcon />, permiso: 'BITACORA_CONSULTAR' },
+>>>>>>> origin/bastian
 ];
 
 function rutaSeleccionada(ruta: string, pathname: string) {

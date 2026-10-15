@@ -51,6 +51,7 @@ import {
 import MainLayout from '../shared/layouts/MainLayout';
 import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
 import { CajaPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
+import { BarberoCrearPage, BarberoEditarPage, BarberosListPage, PERMISOS_BARBEROS } from '../modulos/gestion_empleados';
 import InicioPage from '../shared/pages/InicioPage';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 
@@ -127,7 +128,6 @@ export default function AppRouter() {
             <Route path="/servicios/nuevo" element={<ServicioCrearPage />} />
             <Route path="/servicios/:id/editar" element={<ServicioEditarPage />} />
           </Route>
-
           {/* CU11 Gestionar Cita: la agenda exige AGENDA_CONSULTAR y agendar, RESERVA_CREAR. */}
           <Route element={<RequierePermiso permiso={PERMISOS_CITAS.AGENDA} />}>
             <Route path="/citas" element={<CitasListPage />} />
@@ -167,6 +167,16 @@ export default function AppRouter() {
 
           {/* CU16 Consultar Agenda: AGENDA_CONSULTAR o AGENDA_CONSULTAR_PROPIA; la página valida y muestra el mensaje 2a. */}
           <Route path="/agenda" element={<AgendaPage />} />
+          {/* CU16 Gestionar Barberos: USUARIO_GESTIONAR (igual que CU01) */}
+          <Route element={<RequierePermiso permiso={PERMISOS_BARBEROS.GESTIONAR} />}>
+            <Route path="/barberos" element={<BarberosListPage />} />
+            <Route path="/barberos/:id/editar" element={<BarberoEditarPage />} />
+
+            {/* Registrar asigna el rol Barbero: además requiere ROL_ASIGNAR */}
+            <Route element={<RequierePermiso permiso={PERMISOS_BARBEROS.ASIGNAR_ROL} />}>
+              <Route path="/barberos/nuevo" element={<BarberoCrearPage />} />
+            </Route>
+          </Route>
         </Route>
       </Route>
 
