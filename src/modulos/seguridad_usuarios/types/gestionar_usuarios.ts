@@ -44,6 +44,13 @@ export interface UsuarioDetalle {
   roles: RolResumen[];
   empleado: EmpleadoDetalle | null;
   cliente: ClienteDetalle | null;
+  /** Invitación por correo que todavía no aceptó (null si no tiene). */
+  invitacion: InvitacionPendiente | null;
+}
+
+export interface InvitacionPendiente {
+  expiraEn: string;
+  vencida: boolean;
 }
 
 export interface EmpleadoRequest {
@@ -64,7 +71,9 @@ export interface ActualizarUsuarioRequest {
 
 /** Body de POST /usuarios: igual que actualizar, más la contraseña. */
 export interface CrearUsuarioRequest extends ActualizarUsuarioRequest {
-  contrasena: string;
+  /** Se omite cuando enviarInvitacion es true: el usuario la elige desde el correo. */
+  contrasena: string | null;
+  enviarInvitacion: boolean;
 }
 
 export interface RespuestaRegistro {

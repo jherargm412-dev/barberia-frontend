@@ -1,0 +1,8 @@
+# Lo que NO entra a la imagen de Docker. .env queda fuera: VITE_API_URL llega como build arg.
+.git
+node_modules
+dist
+.env
+.env.*
+.vscode
+.idea

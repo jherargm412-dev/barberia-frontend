@@ -39,6 +39,12 @@ export async function actualizarUsuario(id: number, datos: ActualizarUsuarioRequ
   return respuesta.data;
 }
 
+/** Reenvía la invitación por correo (el enlace anterior deja de servir). */
+export async function reenviarInvitacion(id: number) {
+  const respuesta = await http.post<UsuarioDetalle>(`/usuarios/${id}/invitacion`);
+  return respuesta.data;
+}
+
 export async function cambiarContrasena(id: number, contrasenaNueva: string) {
   await http.patch(`/usuarios/${id}/contrasena`, { contrasenaNueva });
 }

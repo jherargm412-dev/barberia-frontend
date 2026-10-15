@@ -11,7 +11,8 @@ export default function UsuarioCrearPage() {
   async function guardar(valores: UsuarioFormValores) {
     const respuesta = await registrarUsuario({
       ...construirRequest(valores),
-      contrasena: valores.contrasena,
+      contrasena: valores.enviarInvitacion ? null : valores.contrasena,
+      enviarInvitacion: valores.enviarInvitacion,
     });
     // Vamos al detalle y le pasamos el mensaje de éxito del backend.
     navigate(`/usuarios/${respuesta.usuario.idUsuario}`, {

@@ -30,3 +30,8 @@ export async function desactivarCliente(id: number) {
   const respuesta = await http.patch<RespuestaCliente>(`/clientes/${id}/desactivar`);
   return respuesta.data;
 }
+/** Vuelve a activar un cliente desactivado. */
+export async function activarCliente(id: number) {
+  const respuesta = await http.patch<RespuestaCliente>(`/clientes/${id}/activar`);
+  return respuesta.data;
+}

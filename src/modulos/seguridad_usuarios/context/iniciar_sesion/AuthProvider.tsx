@@ -40,8 +40,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     return usuario?.permisos.includes(permiso) ?? false;
   }
 
+  async function refrescarSesion() {
+    setUsuario(await authApi.obtenerSesion());
+  }
+
   return (
-    <AuthContext.Provider value={{ usuario, cargando, iniciarSesion, cerrarSesion, tienePermiso }}>
+    <AuthContext.Provider value={{ usuario, cargando, iniciarSesion, cerrarSesion, tienePermiso, refrescarSesion }}>
       {children}
     </AuthContext.Provider>
   );

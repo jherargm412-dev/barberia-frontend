@@ -13,11 +13,17 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { useAuth } from '../../context/iniciar_sesion/useAuth';
-import { activarUsuario, consultarUsuario, deshabilitarUsuario } from '../../api/gestionar_usuarios/usuariosApi';
+import {
+  activarUsuario,
+  consultarUsuario,
+  deshabilitarUsuario,
+  reenviarInvitacion,
+} from '../../api/gestionar_usuarios/usuariosApi';
 import CambiarContrasenaDialog from '../../components/gestionar_usuarios/CambiarContrasenaDialog';
 import EstadoChip from '../../components/gestionar_usuarios/EstadoChip';
 import { PERMISOS, TIPOS_CONTRATO } from '../../constants/gestionar_usuarios';
 import type { UsuarioDetalle } from '../../types/gestionar_usuarios';
+import { formatearFechaHora } from '../../utils/consultar_bitacora/formatoBitacora';
 
 /** Una fila "Etiqueta: valor" del detalle. */
 function Dato({ etiqueta, children }: { etiqueta: string; children: ReactNode }) {
@@ -46,6 +52,7 @@ export default function UsuarioDetallePage() {
   const [confirmando, setConfirmando] = useState(false);
   const [procesando, setProcesando] = useState(false);
   const [dialogoContrasena, setDialogoContrasena] = useState(false);
+  const [reenviando, setReenviando] = useState(false);
 
   useEffect(() => {
     consultarUsuario(idUsuario)
@@ -77,6 +84,20 @@ export default function UsuarioDetallePage() {
     }
   }
 
+  async function reenviar() {
+    setReenviando(true);
+    setError('');
+    setMensaje('');
+    try {
+      setUsuario(await reenviarInvitacion(idUsuario));
+      setMensaje('Invitación reenviada. El enlace anterior ya no sirve');
+    } catch (err) {
+      setError(obtenerError(err).mensaje);
+    } finally {
+      setReenviando(false);
+    }
+  }
+
   const tipoContrato = TIPOS_CONTRATO.find((t) => t.valor === usuario.empleado?.tipoContrato)?.etiqueta;
 
   return (
@@ -94,6 +115,20 @@ export default function UsuarioDetallePage() {
         {error && (
           <Alert severity="error" onClose={() => setError('')}>
             {error}
+          </Alert>
+        )}
+        {usuario.invitacion && (
+          <Alert
+            severity={usuario.invitacion.vencida ? 'warning' : 'info'}
+            action={
+              <Button color="inherit" size="small" onClick={reenviar} disabled={reenviando}>
+                {reenviando ? 'Enviando...' : 'Reenviar invitación'}
+              </Button>
+            }
+          >
+            {usuario.invitacion.vencida
+              ? 'La invitación por correo venció sin que el usuario eligiera su contraseña.'
+              : `Invitación pendiente: el usuario todavía no eligió su contraseña (el enlace vence el ${formatearFechaHora(usuario.invitacion.expiraEn)}).`}
           </Alert>
         )}
       </Stack>
@@ -177,6 +212,8 @@ export default function UsuarioDetallePage() {
         onExito={() => {
           setDialogoContrasena(false);
           setMensaje('Contraseña restablecida correctamente');
+          // Si tenía una invitación pendiente, el backend la anuló: recargamos para ocultar el aviso.
+          consultarUsuario(idUsuario).then(setUsuario).catch(() => undefined);
         }}
       />
     </>

@@ -3,11 +3,12 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState, type FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { useAuth } from '../../context/iniciar_sesion/useAuth';
 
@@ -20,6 +21,8 @@ export default function LoginPage() {
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [error, setError] = useState('');
+  // P. ej. "Contraseña actualizada. Ya puede iniciar sesión" al volver de Recuperar contraseña.
+  const [mensaje, setMensaje] = useState((ubicacion.state as { mensaje?: string } | null)?.mensaje ?? '');
   const [enviando, setEnviando] = useState(false);
 
   // Si ya hay sesión, no tiene sentido mostrar el login.
@@ -30,6 +33,7 @@ export default function LoginPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault(); // evita que el navegador recargue la página
     setError('');
+    setMensaje('');
 
     if (!correo.trim() || !contrasena) {
       setError('Ingresa tu correo y contraseña');
@@ -70,6 +74,7 @@ export default function LoginPage() {
 
           <Box component="form" onSubmit={handleSubmit} noValidate>
             <Stack spacing={2}>
+              {mensaje && <Alert severity="success">{mensaje}</Alert>}
               {error && <Alert severity="error">{error}</Alert>}
               <TextField
                 label="Correo"
@@ -91,6 +96,9 @@ export default function LoginPage() {
               <Button type="submit" variant="contained" size="large" disabled={enviando}>
                 {enviando ? 'Ingresando...' : 'Ingresar'}
               </Button>
+              <Link component={RouterLink} to="/recuperar" variant="body2" sx={{ textAlign: 'center' }}>
+                ¿Olvidaste tu contraseña?
+              </Link>
             </Stack>
           </Box>
         </CardContent>
