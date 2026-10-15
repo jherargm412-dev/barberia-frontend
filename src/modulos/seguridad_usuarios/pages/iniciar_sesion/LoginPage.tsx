@@ -107,6 +107,10 @@ export default function LoginPage() {
               <Link component={RouterLink} to="/recuperar" variant="body2" sx={{ textAlign: 'center' }}>
                 ¿Olvidaste tu contraseña?
               </Link>
+              {/* CU13: catálogo público de servicios, sin iniciar sesión. */}
+              <Link component={RouterLink} to="/catalogo" variant="body2" sx={{ textAlign: 'center' }}>
+                Ver nuestros servicios
+              </Link>
             </Stack>
           </Box>
         </CardContent>

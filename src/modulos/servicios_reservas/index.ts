@@ -32,3 +32,6 @@ export { PERMISOS as PERMISOS_HORARIOS, MENSAJES as MENSAJES_HORARIOS } from './
 // CU16 Consultar Agenda de Citas (Barbero, Recepcionista, Administrador)
 export { default as AgendaPage } from './pages/consultar_agenda/AgendaPage';
 export { PERMISOS_AGENDA } from './constants/consultar_agenda';
+
+// CU13 Consultar Servicios (catálogo público, sin sesión)
+export { default as ConsultarServiciosPage } from './pages/consultar_servicios/ConsultarServiciosPage';

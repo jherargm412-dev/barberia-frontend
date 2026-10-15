@@ -24,6 +24,7 @@ import {
   AgendaPage,
   CitaCrearPage,
   CitasListPage,
+  ConsultarServiciosPage,
   PERMISOS_CITAS,
   DisponibilidadPage,
   PERMISOS_DISPONIBILIDAD,
@@ -57,6 +58,8 @@ export default function AppRouter() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/recuperar" element={<RecuperarContrasenaPage />} />
       <Route path="/activar" element={<ActivarCuentaPage />} />
+      {/* CU13 Consultar Servicios: catálogo público, se abre desde el login sin iniciar sesión. */}
+      <Route path="/catalogo" element={<ConsultarServiciosPage />} />
 
       {/* Privadas: requieren sesión y usan el layout con menú */}
       <Route element={<RutaProtegida />}>
