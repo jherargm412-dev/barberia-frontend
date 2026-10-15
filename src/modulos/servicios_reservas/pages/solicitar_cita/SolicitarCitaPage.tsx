@@ -10,6 +10,7 @@ import EstadoCitaChip from '../../components/gestionar_citas/EstadoCitaChip';
 import SolicitudCitaForm from '../../components/solicitar_cita/SolicitudCitaForm';
 import type { RespuestaSolicitudCita, SolicitarCitaRequest } from '../../types/solicitar_cita';
 import { formatearFecha, formatearMonto } from '../../utils/gestionar_citas/citaForm';
+import { horaDe } from '../../utils/solicitar_cita/solicitudForm';
 
 /** CU12: el cliente solicita su cita desde la web. Queda PENDIENTE hasta pagar el anticipo (CU14). */
 export default function SolicitarCitaPage() {
@@ -44,9 +45,15 @@ export default function SolicitarCitaPage() {
               <EstadoCitaChip estado={reserva.estado} />
             </Stack>
           </Paper>
+          {reserva.pagarAntesDe && (
+            <Alert severity="warning">
+              Tiene hasta las <strong>{horaDe(reserva.pagarAntesDe)}</strong> para pagar el anticipo. Si no lo paga,
+              la cita se cancela automáticamente y el horario queda libre.
+            </Alert>
+          )}
           <Stack direction="row" spacing={2}>
             <Button onClick={() => setSolicitada(null)}>Solicitar otra cita</Button>
-            <Button onClick={() => navigate('/')}>Pagar más tarde</Button>
+            <Button onClick={() => navigate('/mis-citas')}>Pagar más tarde</Button>
             <Button
               variant="contained"
               onClick={() => navigate(`/pagar-anticipo/${reserva.idReserva}`)}

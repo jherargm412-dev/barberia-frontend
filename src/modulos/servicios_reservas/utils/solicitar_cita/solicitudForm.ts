@@ -40,6 +40,11 @@ export function validarSolicitud(v: SolicitudValores): { mensaje: string; errore
   return { mensaje, errores };
 }
 
+/** "AAAA-MM-DDTHH:mm" → "HH:mm" (la hora límite para pagar ya viene en hora de Bolivia). */
+export function horaDe(fechaHora: string) {
+  return fechaHora.slice(11, 16);
+}
+
 /** Convierte lo escrito en el pedido para el backend (los ids pasan de texto a número). */
 export function aPedido(v: SolicitudValores): SolicitarCitaRequest {
   return {

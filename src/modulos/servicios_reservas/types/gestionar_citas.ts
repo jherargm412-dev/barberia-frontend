@@ -16,6 +16,8 @@ export interface Cita {
   montoAnticipo: number;
   /** Si ya se cobró el anticipo (CU14). Solo así la cita queda Confirmada. */
   anticipoPagado: boolean;
+  /** Solo en una cita web pendiente sin pagar: hora límite "AAAA-MM-DDTHH:mm" (Bolivia) para pagar; luego se cancela sola. */
+  pagarAntesDe: string | null;
   cliente: { idCliente: number; nombre: string; telefono: string | null };
   servicio: { idServicio: number; nombre: string; precio: number };
   /** Null si la cita no tiene barbero (posible en CU12). */

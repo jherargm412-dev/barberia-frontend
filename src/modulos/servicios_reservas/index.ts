@@ -39,6 +39,7 @@ export { default as ConsultarServiciosPage } from './pages/consultar_servicios/C
 
 // CU12 Solicitar Cita (Cliente)
 export { default as SolicitarCitaPage } from './pages/solicitar_cita/SolicitarCitaPage';
+export { default as MisCitasPage } from './pages/solicitar_cita/MisCitasPage';
 export { PERMISOS_SOLICITUD } from './constants/solicitar_cita';
 
 // CU14 Registrar Pago de Anticipo (flujo web del Cliente)

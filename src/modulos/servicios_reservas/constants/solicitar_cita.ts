@@ -7,4 +7,5 @@ export const PERMISOS_SOLICITUD = {
 export const MENSAJES_SOLICITUD = {
   SIN_BARBEROS: 'Por ahora ningún barbero atiende este servicio',
   ANTICIPO: 'Para confirmar la cita deberá pagar un anticipo del 20 % del precio del servicio.',
+  SIN_CITAS: 'Todavía no tiene citas. Solicite una desde "Solicitar cita".',
 };

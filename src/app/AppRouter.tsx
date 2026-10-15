@@ -39,6 +39,7 @@ import {
   ServiciosListPage,
   PERMISOS_SOLICITUD,
   SolicitarCitaPage,
+  MisCitasPage,
   PagoAnticipoPage,
   PERMISOS_ANTICIPO,
 } from '../modulos/servicios_reservas';
@@ -139,6 +140,7 @@ export default function AppRouter() {
           {/* CU12 Solicitar Cita: solo el cliente (RESERVA_SOLICITAR, migración V14). */}
           <Route element={<RequierePermiso permiso={PERMISOS_SOLICITUD.SOLICITAR} />}>
             <Route path="/solicitar-cita" element={<SolicitarCitaPage />} />
+            <Route path="/mis-citas" element={<MisCitasPage />} />
           </Route>
 
           {/* CU10 Consultar Disponibilidad: para quien agenda (RESERVA_CREAR). */}
