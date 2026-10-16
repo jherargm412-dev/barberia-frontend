@@ -192,8 +192,17 @@ export default function SolicitudCitaForm({ servicioInicial, invitado = false, o
   // El catálogo público sirve igual con o sin sesión, y dice qué servicios se pueden reservar.
   useEffect(() => {
     listarCatalogo()
-      .then(setServicios)
+      .then((lista) => {
+        setServicios(lista);
+        // Un ?servicio= que no existe o no se puede reservar: se empieza eligiendo el servicio.
+        if (servicioInicial && !lista.some((s) => s.idServicio === servicioInicial && s.reservable)) {
+          setIndice(0);
+          setValores((v) => ({ ...v, servicioId: '' }));
+        }
+      })
       .catch((err) => setErrorGeneral(obtenerError(err).mensaje));
+    // Solo al montar: servicioInicial viene de la URL al abrir la página.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Barberos habilitados para el servicio elegido (CU17).
@@ -203,7 +212,11 @@ export default function SolicitudCitaForm({ servicioInicial, invitado = false, o
     fuentes
       .barberos(Number(valores.servicioId))
       .then((lista) => vigente && setBarberos(lista))
-      .catch((err) => vigente && setErrorGeneral(obtenerError(err).mensaje));
+      .catch((err) => {
+        if (!vigente) return;
+        setBarberos([]);
+        setErrorGeneral(obtenerError(err).mensaje);
+      });
     return () => {
       vigente = false;
     };
@@ -246,6 +259,7 @@ export default function SolicitudCitaForm({ servicioInicial, invitado = false, o
   function moverDias(cantidad: number) {
     const nuevo = sumarDias(desde, cantidad);
     setDesde(nuevo < hoy() ? hoy() : nuevo);
+    cambiar({ fecha: '', horaInicio: '', horaFin: '' });
   }
 
   function puedeContinuar() {
@@ -559,7 +573,8 @@ export default function SolicitudCitaForm({ servicioInicial, invitado = false, o
                 <Alert severity="warning">
                   <AlertTitle>Política de anticipo</AlertTitle>
                   {MENSAJES_SOLICITUD.ANTICIPO} La cita queda <strong>Pendiente</strong> y tienes {MINUTOS_PARA_PAGAR}{' '}
-                  minutos para pagarlo por QR; si no lo pagas a tiempo, se cancela sola y el horario queda libre.
+                  minutos para pagarlo por QR; si no lo pagas a tiempo, se cancela sola y el horario queda libre. Una
+                  vez pagado, <strong>el anticipo no se devuelve</strong> aunque se cancele la cita.
                 </Alert>
                 <FormControlLabel
                   sx={{ mt: 2 }}
@@ -575,7 +590,14 @@ export default function SolicitudCitaForm({ servicioInicial, invitado = false, o
       <Divider />
       <Stack direction="row" sx={{ p: { xs: 2, sm: 3 }, justifyContent: 'space-between' }}>
         {indice > 0 ? (
-          <Button startIcon={<ArrowBackIcon />} onClick={() => setIndice((i) => i - 1)} disabled={enviando}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => {
+              setErrorGeneral('');
+              setIndice((i) => i - 1);
+            }}
+            disabled={enviando}
+          >
             Atrás
           </Button>
         ) : (

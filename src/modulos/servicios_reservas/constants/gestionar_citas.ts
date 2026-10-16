@@ -66,7 +66,7 @@ export const ACCIONES_ESTADO: Record<AccionEstado, { titulo: string; boton: stri
     titulo: 'Cancelar cita',
     boton: 'Cancelar cita',
     permiso: PERMISOS.CANCELAR,
-    mensaje: 'La cita pasará a Cancelada y el horario del barbero quedará libre. Ya no se podrá modificar.',
+    mensaje: 'La cita pasará a Cancelada y el horario del barbero quedará libre. Si ya pagó el anticipo, no se devuelve. Ya no se podrá modificar.',
   },
 };
 

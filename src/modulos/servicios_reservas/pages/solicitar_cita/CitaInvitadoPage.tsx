@@ -101,7 +101,7 @@ export default function CitaInvitadoPage() {
                 <Typography variant="body2">
                   {formatearFecha(cita.fecha)} · {cita.horaInicio}–{cita.horaFin}
                 </Typography>
-                <Typography variant="body2">A nombre de: {cita.cliente.nombre}</Typography>
+                <Typography variant="body2">A nombre de: {cita.cliente.nombre} · tel. {cita.cliente.telefono}</Typography>
                 <Typography variant="body2">
                   Anticipo: <strong>{formatearMonto(cita.montoAnticipo)}</strong> ·{' '}
                   {cita.anticipoPagado ? 'pagado' : 'sin pagar'}

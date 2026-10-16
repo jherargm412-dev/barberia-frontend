@@ -46,7 +46,11 @@ export default function CajaHistorialPage() {
         setCajas(lista);
         setError('');
       })
-      .catch((err) => vigente && setError(obtenerError(err).mensaje))
+      .catch((err) => {
+        if (!vigente) return;
+        setCajas([]); // no dejar a la vista los resultados de la búsqueda anterior
+        setError(obtenerError(err).mensaje);
+      })
       .finally(() => vigente && setCargando(false));
     return () => {
       vigente = false;
