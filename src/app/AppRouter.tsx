@@ -54,7 +54,7 @@ import {
 } from '../modulos/gestion_empleados';
 import MainLayout from '../shared/layouts/MainLayout';
 import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
-import { CajaPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
+import { CajaHistorialPage, CajaPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
 import InicioPage from '../shared/pages/InicioPage';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 
@@ -168,6 +168,7 @@ export default function AppRouter() {
           {/* CU21 exige consulta para abrir la pantalla; la API valida cada acción. */}
           <Route element={<RequierePermiso permiso={PERMISOS_CAJA.CONSULTAR} />}>
             <Route path="/caja" element={<CajaPage />} />
+            <Route path="/caja/historial" element={<CajaHistorialPage />} />
           </Route>
 
           {/* CU14 Pago web del anticipo: solo el cliente (ANTICIPO_PAGAR_PROPIO, migración V15). */}
