@@ -254,6 +254,7 @@ export default function CitaForm({ puedeRegistrarCliente, prellenado, onGuardar,
             {agendaBarbero && !agendaBarbero.motivo && (
               <HorasLibresGrid
                 horas={agendaBarbero.horasLibres}
+                ocupadas={agendaBarbero.horasOcupadas}
                 seleccionada={valores.horaInicio}
                 textoVacio="El barbero no tiene horas libres este día"
                 onSeleccionar={(h) => elegirHora(h.horaInicio, h.horaFin)}

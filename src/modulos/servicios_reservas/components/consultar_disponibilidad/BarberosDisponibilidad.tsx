@@ -41,6 +41,7 @@ export default function BarberosDisponibilidad({ barberos, onSeleccionar }: Prop
           {!b.motivo && (
             <HorasLibresGrid
               horas={b.horasLibres}
+              ocupadas={b.horasOcupadas}
               textoVacio="Agenda llena este día"
               onSeleccionar={onSeleccionar ? (h) => onSeleccionar(b, h) : undefined}
             />

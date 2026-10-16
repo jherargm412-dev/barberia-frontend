@@ -19,6 +19,8 @@ export interface DisponibilidadBarbero {
   jornadaFin: string | null;
   motivo: string | null;
   horasLibres: HoraLibre[];
+  /** Horas de su jornada que ya tienen una cita (se muestran en rojo). */
+  horasOcupadas: HoraLibre[];
 }
 
 /** Respuesta de GET /disponibilidad (DisponibilidadResponse.java). */

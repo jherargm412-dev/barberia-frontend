@@ -273,6 +273,7 @@ export default function SolicitudCitaForm({ servicioInicial, invitado = false, o
           {agendaBarbero && !agendaBarbero.motivo && (
             <HorasLibresGrid
               horas={agendaBarbero.horasLibres}
+              ocupadas={agendaBarbero.horasOcupadas}
               seleccionada={valores.horaInicio}
               textoVacio="El barbero no tiene horas libres este día. Pruebe otra fecha"
               onSeleccionar={(h) => elegirHora(h.horaInicio, h.horaFin)}
