@@ -111,6 +111,10 @@ export default function LoginPage() {
               <Link component={RouterLink} to="/catalogo" variant="body2" sx={{ textAlign: 'center' }}>
                 Ver nuestros servicios
               </Link>
+              {/* CU12 sin cuenta: reservar solo con nombre y teléfono. */}
+              <Link component={RouterLink} to="/reservar-sin-cuenta" variant="body2" sx={{ textAlign: 'center' }}>
+                Reservar una cita sin cuenta
+              </Link>
             </Stack>
           </Box>
         </CardContent>

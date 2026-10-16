@@ -40,6 +40,8 @@ import {
   PERMISOS_SOLICITUD,
   SolicitarCitaPage,
   ReservarServicioPage,
+  ReservaInvitadoPage,
+  CitaInvitadoPage,
   MisCitasPage,
   PagoAnticipoPage,
   PERMISOS_ANTICIPO,
@@ -66,6 +68,9 @@ export default function AppRouter() {
       <Route path="/activar" element={<ActivarCuentaPage />} />
       {/* CU13 Consultar Servicios: catálogo público, se abre desde el login sin iniciar sesión. */}
       <Route path="/catalogo" element={<ConsultarServiciosPage />} />
+      {/* CU12 + CU14 sin cuenta: reservar con nombre y teléfono, y "Mi cita" (enlace secreto) para ver y pagar. */}
+      <Route path="/reservar-sin-cuenta" element={<ReservaInvitadoPage />} />
+      <Route path="/mi-cita/:codigo" element={<CitaInvitadoPage />} />
 
       {/* Privadas: requieren sesión y usan el layout con menú */}
       <Route element={<RutaProtegida />}>

@@ -1,148 +1,31 @@
-import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { confirmarPagoQr, generarQrAnticipo } from '../../api/registrar_pago_anticipo/anticiposApi';
-import type { PagoAnticipo, QrAnticipo } from '../../types/registrar_pago_anticipo';
-import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
-import { QRCodeSVG } from 'qrcode.react';
 import ComprobanteAnticipo from '../../components/registrar_pago_anticipo/ComprobanteAnticipo';
-import { MENSAJES_PAGO_WEB } from '../../constants/registrar_pago_anticipo';
-import { formatearMonto } from '../../utils/gestionar_citas/citaForm';
+import PagoQrAnticipo from '../../components/registrar_pago_anticipo/PagoQrAnticipo';
+import type { PagoAnticipo } from '../../types/registrar_pago_anticipo';
 
-/** "07:05" a partir de 425 segundos. */
-function formatearTiempo(segundos: number) {
-  const m = String(Math.floor(segundos / 60)).padStart(2, '0');
-  const s = String(segundos % 60).padStart(2, '0');
-  return `${m}:${s}`;
-}
-
-/** CU14 flujo A: el cliente paga por la web, con un QR, el anticipo de la cita que acaba de solicitar. */
+/** CU14 flujo A: el cliente (con cuenta) paga por la web, con un QR, el anticipo de su cita. */
 export default function PagoAnticipoPage() {
-  const { id } = useParams();
-  const idReserva = Number(id);
+  const idReserva = Number(useParams().id);
   const navigate = useNavigate();
-
-  const [qr, setQr] = useState<QrAnticipo | null>(null);
-  const [error, setError] = useState('');
-  const [generando, setGenerando] = useState(true);
-  const [confirmando, setConfirmando] = useState(false);
   const [comprobante, setComprobante] = useState<PagoAnticipo | null>(null);
-  const [ahora, setAhora] = useState(() => Date.now());
-  // Cada pedido de QR suma 1: al abrir la pantalla (0) y cuando el anterior venció o falló.
-  const [pedido, setPedido] = useState(0);
-
-  // Pide el QR. La bandera "vigente" descarta una respuesta vieja (p. ej. el doble montaje de StrictMode).
-  useEffect(() => {
-    let vigente = true;
-    generarQrAnticipo(idReserva)
-      .then((nuevo) => vigente && setQr(nuevo))
-      // Ej.: "El pago en línea no está disponible en este momento" (no hay caja abierta) o la cita no es pendiente.
-      .catch((err) => vigente && setError(obtenerError(err).mensaje))
-      .finally(() => vigente && setGenerando(false));
-    return () => {
-      vigente = false;
-    };
-  }, [idReserva, pedido]);
-
-  /** Pide un QR nuevo cuando el anterior venció o hubo un error. */
-  function generar() {
-    setError('');
-    setQr(null);
-    setGenerando(true);
-    setPedido((n) => n + 1);
-  }
-
-  // Mientras hay un QR vigente, se actualiza el reloj cada segundo para la cuenta regresiva.
-  useEffect(() => {
-    if (!qr) return;
-    const temporizador = setInterval(() => setAhora(Date.now()), 1000);
-    return () => clearInterval(temporizador);
-  }, [qr]);
-
-  // venceEn llega en hora de Bolivia sin zona: se le agrega -04:00 para que la cuenta sea correcta en cualquier navegador.
-  const segundosRestantes = qr
-    ? Math.max(0, Math.floor((new Date(`${qr.venceEn}-04:00`).getTime() - ahora) / 1000))
-    : 0;
-  const vencido = qr !== null && segundosRestantes === 0;
-
-  /** Flujo A, pasos 4 a 7: el cliente dice que pagó; el backend verifica el QR y confirma la cita. */
-  async function confirmar() {
-    if (!qr) return;
-    setError('');
-    setConfirmando(true);
-    try {
-      const respuesta = await confirmarPagoQr(idReserva, { referencia: qr.referencia });
-      setComprobante(respuesta.pago);
-    } catch (err) {
-      // Ej.: "El pago no ha sido confirmado. Verifique la transacción e intente nuevamente" (flujo 5a).
-      setError(obtenerError(err).mensaje);
-    } finally {
-      setConfirmando(false);
-    }
-  }
 
   return (
     <>
       <Typography variant="h5" sx={{ mb: 2 }}>
         Pagar anticipo
       </Typography>
-      {error && (
-        <Alert severity="error" sx={{ mb: 2, maxWidth: 720 }}>
-          {error}
-        </Alert>
+      {!comprobante && (
+        <PagoQrAnticipo
+          generar={() => generarQrAnticipo(idReserva)}
+          confirmar={(referencia) => confirmarPagoQr(idReserva, { referencia })}
+          onPagado={setComprobante}
+          onSalir={() => navigate('/mis-citas')}
+          textoSalir="Pagar más tarde"
+        />
       )}
-      {generando && <CircularProgress />}
-
-      {!generando && !qr && (
-        <Stack direction="row" spacing={2}>
-          <Button variant="contained" onClick={generar}>
-            Intentar de nuevo
-          </Button>
-          <Button onClick={() => navigate('/mis-citas')}>Volver a mis citas</Button>
-        </Stack>
-      )}
-
-      {qr && !comprobante && (
-        <Paper sx={{ p: 3, maxWidth: 720 }}>
-          <Stack spacing={2} sx={{ alignItems: 'center' }}>
-            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-              {MENSAJES_PAGO_WEB.INSTRUCCION}
-            </Typography>
-            <Typography variant="h5">Monto a pagar: {formatearMonto(qr.monto)}</Typography>
-            <QRCodeSVG value={qr.contenido} size={220} style={{ opacity: vencido ? 0.2 : 1 }} />
-            <Typography variant="caption" color="text.secondary">
-              Referencia {qr.referencia}
-            </Typography>
-            {vencido ? (
-              <Alert severity="warning">{MENSAJES_PAGO_WEB.QR_VENCIDO}</Alert>
-            ) : (
-              <Typography variant="body2">
-                El código vence en <strong>{formatearTiempo(segundosRestantes)}</strong>
-              </Typography>
-            )}
-            <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Button onClick={() => navigate('/mis-citas')} disabled={confirmando}>
-                Pagar más tarde
-              </Button>
-              {vencido ? (
-                <Button variant="contained" onClick={generar}>
-                  Generar nuevo QR
-                </Button>
-              ) : (
-                <Button variant="contained" onClick={() => void confirmar()} disabled={confirmando}>
-                  {confirmando ? 'Verificando...' : 'Confirmar pago'}
-                </Button>
-              )}
-            </Stack>
-          </Stack>
-        </Paper>
-      )}
-
       {comprobante && <ComprobanteAnticipo pago={comprobante} onCerrar={() => navigate('/mis-citas')} />}
     </>
   );

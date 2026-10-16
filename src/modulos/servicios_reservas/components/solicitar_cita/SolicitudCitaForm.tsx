@@ -9,12 +9,22 @@ import Typography from '@mui/material/Typography';
 import { useEffect, useState, type FormEvent } from 'react';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarServiciosHabilitados } from '../../api/gestionar_catalogo_servicios/serviciosApi';
+import { listarCatalogo } from '../../api/consultar_servicios/catalogoApi';
+import { consultarDisponibilidadPublica, listarBarberosPublico } from '../../api/solicitar_cita/invitadoApi';
 import { listarBarberosDelServicio } from '../../api/solicitar_cita/solicitudesApi';
+import { consultarDisponibilidad } from '../../api/consultar_disponibilidad/disponibilidadApi';
 import { DURACION_DEFECTO } from '../../constants/consultar_disponibilidad';
+import { MENSAJES } from '../../constants/gestionar_citas';
 import { MENSAJES_SOLICITUD } from '../../constants/solicitar_cita';
 import type { ServicioResumen } from '../../types/gestionar_catalogo_servicios';
 import type { BarberoDisponible } from '../../types/gestionar_citas';
 import type { SolicitarCitaRequest } from '../../types/solicitar_cita';
+
+/** Nombre y teléfono de quien reserva sin cuenta (CU12 invitado). */
+export interface ContactoInvitado {
+  nombre: string;
+  telefono: string;
+}
 import { useDisponibilidad } from '../../utils/consultar_disponibilidad/useDisponibilidad';
 import { calcularAnticipo, formatearMonto, hoy } from '../../utils/gestionar_citas/citaForm';
 import {
@@ -26,11 +36,28 @@ import {
 } from '../../utils/solicitar_cita/solicitudForm';
 import HorasLibresGrid from '../consultar_disponibilidad/HorasLibresGrid';
 
+// De dónde salen los datos: rutas públicas para el invitado, las de la sesión para el cliente con cuenta.
+const FUENTES_CON_CUENTA = {
+  servicios: listarServiciosHabilitados,
+  barberos: listarBarberosDelServicio,
+  disponibilidad: consultarDisponibilidad,
+};
+const FUENTES_INVITADO = {
+  servicios: () => listarCatalogo(),
+  barberos: listarBarberosPublico,
+  disponibilidad: consultarDisponibilidadPublica,
+};
+
 interface Props {
   /** Servicio ya elegido en el catálogo (CU13), si viene de ahí. */
   servicioInicial?: number;
+  /**
+   * Sin cuenta: pide nombre y teléfono y usa las rutas públicas (catálogo, barberos y horas libres).
+   * Con cuenta (por defecto) el cliente se toma de la sesión.
+   */
+  invitado?: boolean;
   /** Envía la solicitud al backend. Si lanza un error, el formulario lo muestra y conserva lo escrito. */
-  onGuardar: (datos: SolicitarCitaRequest) => Promise<void>;
+  onGuardar: (datos: SolicitarCitaRequest, contacto?: ContactoInvitado) => Promise<void>;
   onCancelar: () => void;
 }
 
@@ -38,7 +65,10 @@ interface Props {
  * CU12: el cliente elige servicio, barbero y fecha, y después una de las horas libres del barbero (CU10).
  * No escribe horas a mano: así solo puede pedir horarios que de verdad están disponibles.
  */
-export default function SolicitudCitaForm({ servicioInicial, onGuardar, onCancelar }: Props) {
+export default function SolicitudCitaForm({ servicioInicial, invitado = false, onGuardar, onCancelar }: Props) {
+  const fuentes = invitado ? FUENTES_INVITADO : FUENTES_CON_CUENTA;
+  const [contacto, setContacto] = useState<ContactoInvitado>({ nombre: '', telefono: '' });
+  const [erroresContacto, setErroresContacto] = useState<Partial<ContactoInvitado>>({});
   const [valores, setValores] = useState<SolicitudValores>(() => ({
     ...valoresInicialesSolicitud(),
     servicioId: servicioInicial ? String(servicioInicial) : '',
@@ -51,18 +81,19 @@ export default function SolicitudCitaForm({ servicioInicial, onGuardar, onCancel
   const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
-    listarServiciosHabilitados()
+    fuentes
+      .servicios()
       .then(setServicios)
       .catch((err) => setErrorGeneral(obtenerError(err).mensaje));
-  }, []);
+  }, [fuentes]);
 
   // Con el servicio ya elegido en el catálogo se cargan de una vez sus barberos.
   useEffect(() => {
     if (!servicioInicial) return;
-    listarBarberosDelServicio(servicioInicial)
+    fuentes.barberos(servicioInicial)
       .then(setBarberos)
       .catch((err) => setErrorGeneral(obtenerError(err).mensaje));
-  }, [servicioInicial]);
+  }, [servicioInicial, fuentes]);
 
   function cambiar<K extends keyof SolicitudValores>(campo: K, valor: SolicitudValores[K]) {
     setValores((anteriores) => ({ ...anteriores, [campo]: valor }));
@@ -76,7 +107,7 @@ export default function SolicitudCitaForm({ servicioInicial, onGuardar, onCancel
     elegirHora('', '');
     setBarberos(null);
     if (!servicioId) return;
-    listarBarberosDelServicio(Number(servicioId))
+    fuentes.barberos(Number(servicioId))
       .then(setBarberos)
       .catch((err) => setErrorGeneral(obtenerError(err).mensaje));
   }
@@ -101,6 +132,7 @@ export default function SolicitudCitaForm({ servicioInicial, onGuardar, onCancel
           duracion: DURACION_DEFECTO,
         }
       : null,
+    fuentes.disponibilidad,
   );
   const agendaBarbero = disponibilidad?.barberos[0];
 
@@ -109,18 +141,24 @@ export default function SolicitudCitaForm({ servicioInicial, onGuardar, onCancel
     setErrorGeneral('');
     const { mensaje, errores: erroresLocales } = validarSolicitud(valores);
     setErrores(erroresLocales);
-    if (mensaje) {
-      setErrorGeneral(mensaje);
+    // Sin cuenta, nombre y teléfono también son obligatorios.
+    const faltaContacto: Partial<ContactoInvitado> = {};
+    if (invitado && !contacto.nombre.trim()) faltaContacto.nombre = 'Obligatorio';
+    if (invitado && !contacto.telefono.trim()) faltaContacto.telefono = 'Obligatorio';
+    setErroresContacto(faltaContacto);
+    if (mensaje || Object.keys(faltaContacto).length > 0) {
+      setErrorGeneral(mensaje || MENSAJES.CAMPOS_VACIOS);
       return;
     }
     setEnviando(true);
     try {
-      await onGuardar(aPedido(valores));
+      await onGuardar(aPedido(valores), invitado ? contacto : undefined);
     } catch (err) {
       // Ej.: "El barbero ya tiene una cita en ese horario" o fuera de su turno. Se conserva lo escrito.
       const { mensaje: mensajeBackend, campos } = obtenerError(err);
       setErrorGeneral(mensajeBackend);
       setErrores(campos as ErroresSolicitud);
+      setErroresContacto({ nombre: campos.nombre, telefono: campos.telefono });
     } finally {
       setEnviando(false);
     }
@@ -136,6 +174,31 @@ export default function SolicitudCitaForm({ servicioInicial, onGuardar, onCancel
     <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: 3, maxWidth: 720 }}>
       <Stack spacing={2}>
         {errorGeneral && <Alert severity="error">{errorGeneral}</Alert>}
+
+        {invitado && (
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField
+              label="Su nombre"
+              required
+              value={contacto.nombre}
+              onChange={(e) => setContacto({ ...contacto, nombre: e.target.value })}
+              error={!!erroresContacto.nombre}
+              helperText={erroresContacto.nombre ?? ' '}
+              slotProps={{ htmlInput: { maxLength: 80 } }}
+              sx={{ flex: 1 }}
+            />
+            <TextField
+              label="Teléfono / WhatsApp"
+              required
+              value={contacto.telefono}
+              onChange={(e) => setContacto({ ...contacto, telefono: e.target.value })}
+              error={!!erroresContacto.telefono}
+              helperText={erroresContacto.telefono ?? 'Para avisarle de su cita'}
+              slotProps={{ htmlInput: { maxLength: 15, inputMode: 'tel' } }}
+              sx={{ flex: 1 }}
+            />
+          </Stack>
+        )}
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <TextField

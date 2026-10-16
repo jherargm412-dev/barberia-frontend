@@ -18,7 +18,6 @@ import type { FiltrosCatalogo, ServicioCatalogo } from '../../types/consultar_se
 import { rutaParaReservar } from '../../utils/consultar_servicios/reservar';
 
 const SIN_FILTROS: FiltrosCatalogo = { q: '', precioMin: '', precioMax: '' };
-const MENSAJE_INICIAR_SESION = 'Inicie sesión (o active su cuenta de cliente) para reservar el servicio elegido';
 
 /**
  * CU13: Consultar Servicios. Vista pública (con o sin sesión) del catálogo de servicios activos:
@@ -68,14 +67,12 @@ export default function ConsultarServiciosPage() {
   }
 
   /**
-   * Paso 3: a CU12 si es cliente, a CU11 si es recepción. Reservar exige una cuenta: sin sesión se pasa por el
-   * login (con un aviso) y, al entrar, /reservar lo envía al formulario que le corresponde.
+   * Paso 3: a CU12 si es cliente, a CU11 si es recepción. Sin sesión se reserva sin cuenta (nombre y teléfono);
+   * esa pantalla también ofrece iniciar sesión a quien sí tiene cuenta.
    */
   function reservar(servicio: ServicioCatalogo) {
     if (!usuario) {
-      navigate('/login', {
-        state: { desde: `/reservar?servicio=${servicio.idServicio}`, mensaje: MENSAJE_INICIAR_SESION },
-      });
+      navigate(`/reservar-sin-cuenta?servicio=${servicio.idServicio}`);
       return;
     }
     const destino = rutaParaReservar(servicio.idServicio, tienePermiso);
