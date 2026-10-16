@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { useAuth } from '../../../seguridad_usuarios';
 import { listarCatalogo } from '../../api/consultar_servicios/catalogoApi';
+import BarraPublica from '../../components/consultar_servicios/BarraPublica';
 import ServicioCard from '../../components/consultar_servicios/ServicioCard';
 import type { FiltrosCatalogo, ServicioCatalogo } from '../../types/consultar_servicios';
 import { rutaParaReservar } from '../../utils/consultar_servicios/reservar';
@@ -43,7 +44,9 @@ export default function ConsultarServiciosPage() {
         if (!vigente) return;
         // Un filtro inválido (p. ej. mínimo mayor que el máximo) trae su campo; si no, error de conexión.
         const { mensaje, campos } = obtenerError(err);
-        setError(Object.keys(campos).length > 0 ? mensaje : 'No se pudo cargar el catálogo de servicios. Intente nuevamente.');
+        setError(
+          Object.keys(campos).length > 0 ? mensaje : 'No se pudo cargar el catálogo de servicios. Intente nuevamente.',
+        );
         setServicios([]);
       })
       .finally(() => vigente && setCargando(false));
@@ -84,97 +87,98 @@ export default function ConsultarServiciosPage() {
   const puedeReservar = !usuario || rutaParaReservar(0, tienePermiso) !== null;
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Encabezado: botón volver + título */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2, flexWrap: 'wrap' }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(usuario ? '/' : '/login')}>
-          Volver al inicio
-        </Button>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
-          Nuestros Servicios
-        </Typography>
-      </Box>
-
-      {/* Paso 2: búsqueda por texto y rango de precio */}
-      <Paper
-        component="form"
-        onSubmit={buscar}
-        noValidate
-        sx={{ p: 2, mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}
-      >
-        <TextField
-          label="Buscar servicio"
-          placeholder="Nombre o descripción"
-          value={escritos.q}
-          onChange={(e) => setEscritos({ ...escritos, q: e.target.value })}
-          sx={{ flex: '1 1 240px' }}
-        />
-        <TextField
-          label="Precio mínimo (Bs)"
-          type="number"
-          value={escritos.precioMin}
-          onChange={(e) => setEscritos({ ...escritos, precioMin: e.target.value })}
-          slotProps={{ htmlInput: { min: 0 } }}
-          sx={{ width: { xs: '100%', sm: 170 } }}
-        />
-        <TextField
-          label="Precio máximo (Bs)"
-          type="number"
-          value={escritos.precioMax}
-          onChange={(e) => setEscritos({ ...escritos, precioMax: e.target.value })}
-          slotProps={{ htmlInput: { min: 0 } }}
-          sx={{ width: { xs: '100%', sm: 170 } }}
-        />
-        <Button type="submit" variant="contained" startIcon={<SearchIcon />}>
-          Buscar
-        </Button>
-        {hayFiltros && <Button onClick={limpiar}>Limpiar filtros</Button>}
-      </Paper>
-
-      {/* Estado de carga */}
-      {cargando && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
-          <CircularProgress />
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <BarraPublica />
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        {/* Encabezado: botón volver + título */}
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2, flexWrap: 'wrap' }}>
+          <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')}>
+            Volver al inicio
+          </Button>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
+            Nuestros Servicios
+          </Typography>
         </Box>
-      )}
 
-      {/* Error de conexión o de filtros (p. ej. mínimo mayor que el máximo) */}
-      {!cargando && error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-
-      {/* Flujo 3a: sin servicios disponibles / sin resultados de la búsqueda */}
-      {!cargando && !error && servicios.length === 0 && (
-        <Alert severity="info">
-          {hayFiltros
-            ? 'Ningún servicio coincide con la búsqueda.'
-            : 'No hay servicios disponibles por el momento.'}
-        </Alert>
-      )}
-
-      {!cargando && !error && servicios.length > 0 && (
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(2, 1fr)',
-              md: 'repeat(3, 1fr)',
-            },
-            gap: 3,
-          }}
+        {/* Paso 2: búsqueda por texto y rango de precio */}
+        <Paper
+          component="form"
+          onSubmit={buscar}
+          noValidate
+          sx={{ p: 2, mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}
         >
-          {servicios.map((servicio) => (
-            <ServicioCard
-              key={servicio.idServicio}
-              servicio={servicio}
-              onReservar={puedeReservar ? reservar : undefined}
-            />
-          ))}
-        </Box>
-      )}
-    </Container>
+          <TextField
+            label="Buscar servicio"
+            placeholder="Nombre o descripción"
+            value={escritos.q}
+            onChange={(e) => setEscritos({ ...escritos, q: e.target.value })}
+            sx={{ flex: '1 1 240px' }}
+          />
+          <TextField
+            label="Precio mínimo (Bs)"
+            type="number"
+            value={escritos.precioMin}
+            onChange={(e) => setEscritos({ ...escritos, precioMin: e.target.value })}
+            slotProps={{ htmlInput: { min: 0 } }}
+            sx={{ width: { xs: '100%', sm: 170 } }}
+          />
+          <TextField
+            label="Precio máximo (Bs)"
+            type="number"
+            value={escritos.precioMax}
+            onChange={(e) => setEscritos({ ...escritos, precioMax: e.target.value })}
+            slotProps={{ htmlInput: { min: 0 } }}
+            sx={{ width: { xs: '100%', sm: 170 } }}
+          />
+          <Button type="submit" variant="contained" startIcon={<SearchIcon />}>
+            Buscar
+          </Button>
+          {hayFiltros && <Button onClick={limpiar}>Limpiar filtros</Button>}
+        </Paper>
+
+        {/* Estado de carga */}
+        {cargando && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+            <CircularProgress />
+          </Box>
+        )}
+
+        {/* Error de conexión o de filtros (p. ej. mínimo mayor que el máximo) */}
+        {!cargando && error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        {/* Flujo 3a: sin servicios disponibles / sin resultados de la búsqueda */}
+        {!cargando && !error && servicios.length === 0 && (
+          <Alert severity="info">
+            {hayFiltros ? 'Ningún servicio coincide con la búsqueda.' : 'No hay servicios disponibles por el momento.'}
+          </Alert>
+        )}
+
+        {!cargando && !error && servicios.length > 0 && (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(3, 1fr)',
+              },
+              gap: 3,
+            }}
+          >
+            {servicios.map((servicio) => (
+              <ServicioCard
+                key={servicio.idServicio}
+                servicio={servicio}
+                onReservar={puedeReservar ? reservar : undefined}
+              />
+            ))}
+          </Box>
+        )}
+      </Container>
+    </Box>
   );
 }

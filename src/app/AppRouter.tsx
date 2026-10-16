@@ -39,6 +39,7 @@ import {
   ServiciosListPage,
   PERMISOS_SOLICITUD,
   SolicitarCitaPage,
+  PortadaPage,
   ReservarServicioPage,
   ReservaInvitadoPage,
   CitaInvitadoPage,
@@ -72,8 +73,8 @@ export default function AppRouter() {
       <Route path="/reservar-sin-cuenta" element={<ReservaInvitadoPage />} />
       <Route path="/mi-cita/:codigo" element={<CitaInvitadoPage />} />
 
-      {/* Privadas: requieren sesión y usan el layout con menú */}
-      <Route element={<RutaProtegida />}>
+      {/* Privadas: requieren sesión y usan el layout con menú. Sin sesión, "/" muestra la portada pública. */}
+      <Route element={<RutaProtegida portada={<PortadaPage />} />}>
         {/* CU13 paso 3: tras el login, "Reservar" envía a CU12 (cliente) o CU11 (recepción). */}
         <Route path="/reservar" element={<ReservarServicioPage />} />
         <Route element={<MainLayout />}>

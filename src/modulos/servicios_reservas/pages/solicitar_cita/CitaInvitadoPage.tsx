@@ -15,6 +15,7 @@ import {
   consultarCitaInvitado,
   generarQrInvitado,
 } from '../../api/solicitar_cita/invitadoApi';
+import BarraPublica from '../../components/consultar_servicios/BarraPublica';
 import EstadoCitaChip from '../../components/gestionar_citas/EstadoCitaChip';
 import ComprobanteAnticipo from '../../components/registrar_pago_anticipo/ComprobanteAnticipo';
 import PagoQrAnticipo from '../../components/registrar_pago_anticipo/PagoQrAnticipo';
@@ -30,10 +31,12 @@ import { horaDe } from '../../utils/solicitar_cita/solicitudForm';
 export default function CitaInvitadoPage() {
   const codigo = useParams().codigo ?? '';
   const navigate = useNavigate();
-  const mensajeInicial = (useLocation().state as { mensaje?: string } | null)?.mensaje ?? '';
+  // Al llegar desde la reserva: su mensaje y el QR ya abierto para pagar.
+  const estado = useLocation().state as { mensaje?: string; pagar?: boolean } | null;
+  const mensajeInicial = estado?.mensaje ?? '';
   const [cita, setCita] = useState<Cita | null>(null);
   const [error, setError] = useState('');
-  const [pagando, setPagando] = useState(false);
+  const [pagando, setPagando] = useState(estado?.pagar ?? false);
   const [comprobante, setComprobante] = useState<PagoAnticipo | null>(null);
   const [copiado, setCopiado] = useState(false);
   // Cambia tras pagar para volver a pedir la cita (queda Confirmada).
@@ -61,80 +64,88 @@ export default function CitaInvitadoPage() {
   const porPagar = cita?.estado === 'PENDIENTE' && !cita.anticipoPagado;
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 2 }}>
-        Mi cita
-      </Typography>
-      {error && <Alert severity="error">{error}</Alert>}
-      {!cita && !error && <CircularProgress />}
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <BarraPublica />
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 2 }}>
+          Mi cita
+        </Typography>
+        {error && <Alert severity="error">{error}</Alert>}
+        {!cita && !error && <CircularProgress />}
 
-      {cita && (
-        <Stack spacing={2}>
-          {/* "Pague el anticipo…" solo tiene sentido mientras falta pagar. */}
-          {mensajeInicial && porPagar && <Alert severity="success">{mensajeInicial}</Alert>}
-          <Alert
-            severity="info"
-            action={
-              <Button color="inherit" size="small" startIcon={<ContentCopyIcon />} onClick={() => void copiarEnlace()}>
-                {copiado ? 'Copiado' : 'Copiar enlace'}
-              </Button>
-            }
-          >
-            Guarde este enlace: es la única forma de volver a ver su cita y pagar el anticipo sin cuenta.
-          </Alert>
-
-          <Paper sx={{ p: 3 }}>
-            <Stack spacing={1}>
-              <Typography variant="subtitle1">
-                {cita.servicio.nombre} · {cita.barbero?.nombre ?? 'Sin asignar'}
-              </Typography>
-              <Typography variant="body2">
-                {formatearFecha(cita.fecha)} · {cita.horaInicio}–{cita.horaFin}
-              </Typography>
-              <Typography variant="body2">A nombre de: {cita.cliente.nombre}</Typography>
-              <Typography variant="body2">
-                Anticipo: <strong>{formatearMonto(cita.montoAnticipo)}</strong> ·{' '}
-                {cita.anticipoPagado ? 'pagado' : 'sin pagar'}
-              </Typography>
-              <Box sx={{ alignSelf: 'flex-start' }}>
-                <EstadoCitaChip estado={cita.estado} />
-              </Box>
-            </Stack>
-          </Paper>
-
-          {porPagar && cita.pagarAntesDe && (
-            <Alert severity="warning">
-              Tiene hasta las <strong>{horaDe(cita.pagarAntesDe)}</strong> para pagar el anticipo. Si no lo paga, la
-              cita se cancela automáticamente y el horario queda libre.
+        {cita && (
+          <Stack spacing={2}>
+            {/* "Pague el anticipo…" solo tiene sentido mientras falta pagar. */}
+            {mensajeInicial && porPagar && <Alert severity="success">{mensajeInicial}</Alert>}
+            <Alert
+              severity="info"
+              action={
+                <Button
+                  color="inherit"
+                  size="small"
+                  startIcon={<ContentCopyIcon />}
+                  onClick={() => void copiarEnlace()}
+                >
+                  {copiado ? 'Copiado' : 'Copiar enlace'}
+                </Button>
+              }
+            >
+              Guarde este enlace: es la única forma de volver a ver su cita y pagar el anticipo sin cuenta.
             </Alert>
-          )}
 
-          {porPagar && !pagando && (
-            <Button variant="contained" sx={{ alignSelf: 'flex-start' }} onClick={() => setPagando(true)}>
-              Pagar anticipo
+            <Paper sx={{ p: 3 }}>
+              <Stack spacing={1}>
+                <Typography variant="subtitle1">
+                  {cita.servicio.nombre} · {cita.barbero?.nombre ?? 'Sin asignar'}
+                </Typography>
+                <Typography variant="body2">
+                  {formatearFecha(cita.fecha)} · {cita.horaInicio}–{cita.horaFin}
+                </Typography>
+                <Typography variant="body2">A nombre de: {cita.cliente.nombre}</Typography>
+                <Typography variant="body2">
+                  Anticipo: <strong>{formatearMonto(cita.montoAnticipo)}</strong> ·{' '}
+                  {cita.anticipoPagado ? 'pagado' : 'sin pagar'}
+                </Typography>
+                <Box sx={{ alignSelf: 'flex-start' }}>
+                  <EstadoCitaChip estado={cita.estado} />
+                </Box>
+              </Stack>
+            </Paper>
+
+            {porPagar && cita.pagarAntesDe && (
+              <Alert severity="warning">
+                Tiene hasta las <strong>{horaDe(cita.pagarAntesDe)}</strong> para pagar el anticipo. Si no lo paga, la
+                cita se cancela automáticamente y el horario queda libre.
+              </Alert>
+            )}
+
+            {porPagar && !pagando && (
+              <Button variant="contained" sx={{ alignSelf: 'flex-start' }} onClick={() => setPagando(true)}>
+                Pagar anticipo
+              </Button>
+            )}
+            {porPagar && pagando && (
+              <PagoQrAnticipo
+                generar={() => generarQrInvitado(codigo)}
+                confirmar={(referencia) => confirmarPagoQrInvitado(codigo, referencia)}
+                onPagado={(pago) => {
+                  setPagando(false);
+                  setComprobante(pago);
+                  setVersion((v) => v + 1);
+                }}
+                onSalir={() => setPagando(false)}
+                textoSalir="Pagar más tarde"
+              />
+            )}
+
+            <Button onClick={() => navigate('/')} sx={{ alignSelf: 'flex-start' }}>
+              Volver al inicio
             </Button>
-          )}
-          {porPagar && pagando && (
-            <PagoQrAnticipo
-              generar={() => generarQrInvitado(codigo)}
-              confirmar={(referencia) => confirmarPagoQrInvitado(codigo, referencia)}
-              onPagado={(pago) => {
-                setPagando(false);
-                setComprobante(pago);
-                setVersion((v) => v + 1);
-              }}
-              onSalir={() => setPagando(false)}
-              textoSalir="Pagar más tarde"
-            />
-          )}
+          </Stack>
+        )}
 
-          <Button onClick={() => navigate('/catalogo')} sx={{ alignSelf: 'flex-start' }}>
-            Ver servicios
-          </Button>
-        </Stack>
-      )}
-
-      {comprobante && <ComprobanteAnticipo pago={comprobante} onCerrar={() => setComprobante(null)} />}
-    </Container>
+        {comprobante && <ComprobanteAnticipo pago={comprobante} onCerrar={() => setComprobante(null)} />}
+      </Container>
+    </Box>
   );
 }

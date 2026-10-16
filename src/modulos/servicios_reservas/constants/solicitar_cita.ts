@@ -9,3 +9,6 @@ export const MENSAJES_SOLICITUD = {
   ANTICIPO: 'Para confirmar la cita deberá pagar un anticipo del 20 % del precio del servicio.',
   SIN_CITAS: 'Todavía no tiene citas. Solicite una desde "Solicitar cita".',
 };
+
+/** Minutos para pagar el anticipo de una cita web (app.citas.web.minutos-para-pagar del backend). */
+export const MINUTOS_PARA_PAGAR = 30;

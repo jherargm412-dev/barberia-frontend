@@ -1,74 +1,21 @@
-import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { solicitarCita } from '../../api/solicitar_cita/solicitudesApi';
-import EstadoCitaChip from '../../components/gestionar_citas/EstadoCitaChip';
 import SolicitudCitaForm from '../../components/solicitar_cita/SolicitudCitaForm';
-import type { RespuestaSolicitudCita, SolicitarCitaRequest } from '../../types/solicitar_cita';
-import { formatearFecha, formatearMonto } from '../../utils/gestionar_citas/citaForm';
-import { horaDe } from '../../utils/solicitar_cita/solicitudForm';
+import type { SolicitarCitaRequest } from '../../types/solicitar_cita';
 
-/** CU12: el cliente solicita su cita desde la web. Queda PENDIENTE hasta pagar el anticipo (CU14). */
+/**
+ * CU12: el cliente solicita su cita desde la web, por pasos. Queda PENDIENTE y se pasa directo al pago del
+ * anticipo (CU14); si lo deja para después, lo encuentra en "Mis citas".
+ */
 export default function SolicitarCitaPage() {
   const navigate = useNavigate();
   // Servicio elegido en el catálogo (CU13): /solicitar-cita?servicio=ID.
   const servicioInicial = Number(useSearchParams()[0].get('servicio')) || undefined;
-  // null = todavía no envió la solicitud; con valor = la cita ya se creó.
-  const [solicitada, setSolicitada] = useState<RespuestaSolicitudCita | null>(null);
 
   async function guardar(datos: SolicitarCitaRequest) {
-    setSolicitada(await solicitarCita(datos));
-  }
-
-  if (solicitada) {
-    const { reserva } = solicitada;
-    return (
-      <>
-        <Typography variant="h5" sx={{ mb: 2 }}>
-          Solicitar cita
-        </Typography>
-        <Stack spacing={2} sx={{ maxWidth: 720 }}>
-          <Alert severity="success">{solicitada.mensaje}</Alert>
-          <Paper sx={{ p: 3 }}>
-            <Stack spacing={1}>
-              <Typography variant="subtitle1">Su cita</Typography>
-              <Typography variant="body2">Servicio: {reserva.servicio.nombre}</Typography>
-              <Typography variant="body2">Barbero: {reserva.barbero?.nombre ?? 'Sin asignar'}</Typography>
-              <Typography variant="body2">
-                Fecha: {formatearFecha(reserva.fecha)} · {reserva.horaInicio}–{reserva.horaFin}
-              </Typography>
-              <Typography variant="body2">
-                Anticipo a pagar: <strong>{formatearMonto(reserva.montoAnticipo)}</strong>
-              </Typography>
-              <Box sx={{ alignSelf: 'flex-start' }}>
-                <EstadoCitaChip estado={reserva.estado} />
-              </Box>
-            </Stack>
-          </Paper>
-          {reserva.pagarAntesDe && (
-            <Alert severity="warning">
-              Tiene hasta las <strong>{horaDe(reserva.pagarAntesDe)}</strong> para pagar el anticipo. Si no lo paga,
-              la cita se cancela automáticamente y el horario queda libre.
-            </Alert>
-          )}
-          <Stack direction="row" spacing={2}>
-            <Button onClick={() => setSolicitada(null)}>Solicitar otra cita</Button>
-            <Button onClick={() => navigate('/mis-citas')}>Pagar más tarde</Button>
-            <Button
-              variant="contained"
-              onClick={() => navigate(`/pagar-anticipo/${reserva.idReserva}`)}
-            >
-              Pagar anticipo ahora
-            </Button>
-          </Stack>
-        </Stack>
-      </>
-    );
+    const { mensaje, reserva } = await solicitarCita(datos);
+    navigate(`/pagar-anticipo/${reserva.idReserva}`, { state: { mensaje, pagarAntesDe: reserva.pagarAntesDe } });
   }
 
   return (
@@ -76,7 +23,7 @@ export default function SolicitarCitaPage() {
       <Typography variant="h5" sx={{ mb: 2 }}>
         Solicitar cita
       </Typography>
-      <SolicitudCitaForm servicioInicial={servicioInicial} onGuardar={guardar} onCancelar={() => navigate('/')} />
+      <SolicitudCitaForm servicioInicial={servicioInicial} onGuardar={guardar} />
     </>
   );
 }
