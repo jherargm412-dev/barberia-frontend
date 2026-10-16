@@ -1,5 +1,6 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
@@ -69,7 +70,8 @@ export default function CitaInvitadoPage() {
 
       {cita && (
         <Stack spacing={2}>
-          {mensajeInicial && <Alert severity="success">{mensajeInicial}</Alert>}
+          {/* "Pague el anticipo…" solo tiene sentido mientras falta pagar. */}
+          {mensajeInicial && porPagar && <Alert severity="success">{mensajeInicial}</Alert>}
           <Alert
             severity="info"
             action={
@@ -94,7 +96,9 @@ export default function CitaInvitadoPage() {
                 Anticipo: <strong>{formatearMonto(cita.montoAnticipo)}</strong> ·{' '}
                 {cita.anticipoPagado ? 'pagado' : 'sin pagar'}
               </Typography>
-              <EstadoCitaChip estado={cita.estado} />
+              <Box sx={{ alignSelf: 'flex-start' }}>
+                <EstadoCitaChip estado={cita.estado} />
+              </Box>
             </Stack>
           </Paper>
 

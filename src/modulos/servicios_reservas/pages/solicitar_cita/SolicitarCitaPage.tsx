@@ -1,4 +1,5 @@
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -44,7 +45,9 @@ export default function SolicitarCitaPage() {
               <Typography variant="body2">
                 Anticipo a pagar: <strong>{formatearMonto(reserva.montoAnticipo)}</strong>
               </Typography>
-              <EstadoCitaChip estado={reserva.estado} />
+              <Box sx={{ alignSelf: 'flex-start' }}>
+                <EstadoCitaChip estado={reserva.estado} />
+              </Box>
             </Stack>
           </Paper>
           {reserva.pagarAntesDe && (
