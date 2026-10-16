@@ -15,15 +15,23 @@ http.interceptors.request.use((config) => {
   return config;
 });
 
+/** Páginas que se ven sin sesión: con un token vencido solo se borra el token, sin mandar al login. */
+function esPaginaPublica(ruta: string) {
+  return (
+    ['/', '/login', '/catalogo', '/reservar-sin-cuenta', '/recuperar', '/activar'].includes(ruta) ||
+    ruta.startsWith('/mi-cita/')
+  );
+}
+
 // Después de cada respuesta: si el backend responde 401 (token vencido o inválido),
-// borramos el token y mandamos al login.
+// borramos el token y mandamos al login (salvo en las páginas públicas: ahí se sigue como visitante).
 http.interceptors.response.use(
   (respuesta) => respuesta,
   (error) => {
     const esLogin = error.config?.url?.includes('/auth/login');
     if (error.response?.status === 401 && !esLogin) {
       tokenStorage.borrar();
-      if (window.location.pathname !== '/login') {
+      if (!esPaginaPublica(window.location.pathname)) {
         window.location.href = '/login';
       }
     }

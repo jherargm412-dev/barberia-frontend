@@ -60,7 +60,7 @@ export default function CambiarContrasenaForm() {
   const tipo = mostrar ? 'text' : 'password';
 
   return (
-    <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: 3 }}>
+    <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: { xs: 2, sm: 3 } }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
         Cambiar contraseña
       </Typography>
@@ -108,7 +108,7 @@ export default function CambiarContrasenaForm() {
         />
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button type="submit" variant="contained" disabled={enviando}>
+          <Button type="submit" variant="contained" loading={enviando}>
             {enviando ? 'Guardando...' : 'Cambiar contraseña'}
           </Button>
         </Box>

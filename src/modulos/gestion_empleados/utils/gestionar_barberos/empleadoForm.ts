@@ -16,7 +16,8 @@ export interface EmpleadoFormValores {
   telefono: string;
   fechaNacimiento: string;
   rol: string;
-  especialidad: string;
+  /** Especialidades = ids de los servicios del catálogo que realiza (solo rol Barbero). */
+  servicios: number[];
   tipoContrato: TipoContrato | '';
   turnoId: number | '';
 }
@@ -31,7 +32,7 @@ export const VALORES_VACIOS: EmpleadoFormValores = {
   telefono: '',
   fechaNacimiento: '',
   rol: 'Barbero',
-  especialidad: '',
+  servicios: [],
   tipoContrato: '',
   turnoId: '',
 };
@@ -63,7 +64,6 @@ export function validarEmpleado(v: EmpleadoFormValores, registrar: boolean): Err
   const hoy = new Date().toLocaleDateString('en-CA'); // "YYYY-MM-DD" sin zona horaria
   if (v.fechaNacimiento && v.fechaNacimiento > hoy) errores.fechaNacimiento = 'No puede ser una fecha futura';
 
-  if (v.especialidad.trim().length > 80) errores.especialidad = 'Máximo 80 caracteres';
   if (!v.tipoContrato) errores.tipoContrato = 'El tipo de contrato es obligatorio';
   return errores;
 }
@@ -77,7 +77,7 @@ export function valoresDesdeEmpleado(e: Empleado): EmpleadoFormValores {
     telefono: e.telefono ?? '',
     fechaNacimiento: e.fechaNacimiento ?? '',
     rol: e.roles[0] ?? '',
-    especialidad: e.especialidad ?? '',
+    servicios: e.servicios.map((s) => s.idServicio),
     tipoContrato: e.tipoContrato,
     turnoId: e.turno?.idTurno ?? '',
   };
@@ -89,9 +89,10 @@ export function construirActualizar(v: EmpleadoFormValores): ActualizarEmpleadoR
     correo: v.correo.trim(),
     telefono: v.telefono.trim() || null,
     fechaNacimiento: v.fechaNacimiento || null,
-    especialidad: v.especialidad.trim() || null,
     tipoContrato: v.tipoContrato as TipoContrato,
     turnoId: v.turnoId === '' ? null : v.turnoId,
+    // Solo el barbero tiene especialidades; para los demás no se envían.
+    servicios: v.rol === 'Barbero' ? v.servicios : null,
   };
 }
 

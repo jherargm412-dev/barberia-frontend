@@ -21,10 +21,31 @@ import {
   UsuariosListPage,
 } from '../modulos/seguridad_usuarios';
 import {
+  AgendaPage,
+  CitaCrearPage,
+  CitasListPage,
+  ConsultarServiciosPage,
+  PERMISOS_CITAS,
+  DisponibilidadPage,
+  PERMISOS_DISPONIBILIDAD,
+  HorarioDetallePage,
+  HorarioEditarPage,
+  HorariosListPage,
+  MENSAJES_HORARIOS,
+  PERMISOS_HORARIOS,
   PERMISOS_SERVICIOS,
   ServicioCrearPage,
   ServicioEditarPage,
   ServiciosListPage,
+  PERMISOS_SOLICITUD,
+  SolicitarCitaPage,
+  PortadaPage,
+  ReservarServicioPage,
+  ReservaInvitadoPage,
+  CitaInvitadoPage,
+  MisCitasPage,
+  PagoAnticipoPage,
+  PERMISOS_ANTICIPO,
 } from '../modulos/servicios_reservas';
 import {
   EmpleadoCrearPage,
@@ -34,6 +55,7 @@ import {
 } from '../modulos/gestion_empleados';
 import MainLayout from '../shared/layouts/MainLayout';
 import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
+import { CajaHistorialPage, CajaPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
 import InicioPage from '../shared/pages/InicioPage';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 
@@ -45,9 +67,16 @@ export default function AppRouter() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/recuperar" element={<RecuperarContrasenaPage />} />
       <Route path="/activar" element={<ActivarCuentaPage />} />
+      {/* CU13 Consultar Servicios: catálogo público, se abre desde el login sin iniciar sesión. */}
+      <Route path="/catalogo" element={<ConsultarServiciosPage />} />
+      {/* CU12 + CU14 sin cuenta: reservar con nombre y teléfono, y "Mi cita" (enlace secreto) para ver y pagar. */}
+      <Route path="/reservar-sin-cuenta" element={<ReservaInvitadoPage />} />
+      <Route path="/mi-cita/:codigo" element={<CitaInvitadoPage />} />
 
-      {/* Privadas: requieren sesión y usan el layout con menú */}
-      <Route element={<RutaProtegida />}>
+      {/* Privadas: requieren sesión y usan el layout con menú. Sin sesión, "/" muestra la portada pública. */}
+      <Route element={<RutaProtegida portada={<PortadaPage />} />}>
+        {/* CU13 paso 3: tras el login, "Reservar" envía a CU12 (cliente) o CU11 (recepción). */}
+        <Route path="/reservar" element={<ReservarServicioPage />} />
         <Route element={<MainLayout />}>
           <Route path="/" element={<InicioPage />} />
           {/* CU06: cada ruta exige el permiso de la operación que presenta. */}
@@ -108,6 +137,48 @@ export default function AppRouter() {
             <Route path="/servicios/nuevo" element={<ServicioCrearPage />} />
             <Route path="/servicios/:id/editar" element={<ServicioEditarPage />} />
           </Route>
+
+          {/* CU11 Gestionar Cita: la agenda exige AGENDA_CONSULTAR y agendar, RESERVA_CREAR. */}
+          <Route element={<RequierePermiso permiso={PERMISOS_CITAS.AGENDA} />}>
+            <Route path="/citas" element={<CitasListPage />} />
+          </Route>
+          <Route element={<RequierePermiso permiso={PERMISOS_CITAS.CREAR} />}>
+            <Route path="/citas/nueva" element={<CitaCrearPage />} />
+          </Route>
+          
+          {/* CU12 Solicitar Cita: solo el cliente (RESERVA_SOLICITAR, migración V14). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_SOLICITUD.SOLICITAR} />}>
+            <Route path="/solicitar-cita" element={<SolicitarCitaPage />} />
+            <Route path="/mis-citas" element={<MisCitasPage />} />
+          </Route>
+
+          {/* CU10 Consultar Disponibilidad: para quien agenda (RESERVA_CREAR). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_DISPONIBILIDAD.CONSULTAR} />}>
+            <Route path="/disponibilidad" element={<DisponibilidadPage />} />
+          </Route>
+
+          {/* CU09 Horarios de disponibilidad: USUARIO_GESTIONAR (igual que CU17), con el mensaje de 2a. */}
+          <Route
+            element={<RequierePermiso permiso={PERMISOS_HORARIOS.GESTIONAR} mensaje={MENSAJES_HORARIOS.SIN_PERMISO} />}
+          >
+            <Route path="/horarios" element={<HorariosListPage />} />
+            <Route path="/horarios/:id" element={<HorarioDetallePage />} />
+            <Route path="/horarios/:id/editar" element={<HorarioEditarPage />} />
+          </Route>
+
+          {/* CU21 exige consulta para abrir la pantalla; la API valida cada acción. */}
+          <Route element={<RequierePermiso permiso={PERMISOS_CAJA.CONSULTAR} />}>
+            <Route path="/caja" element={<CajaPage />} />
+            <Route path="/caja/historial" element={<CajaHistorialPage />} />
+          </Route>
+
+          {/* CU14 Pago web del anticipo: solo el cliente (ANTICIPO_PAGAR_PROPIO, migración V15). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_ANTICIPO.PAGAR_PROPIO} />}>
+            <Route path="/pagar-anticipo/:id" element={<PagoAnticipoPage />} />
+          </Route>
+
+          {/* CU16 Consultar Agenda: AGENDA_CONSULTAR o AGENDA_CONSULTAR_PROPIA; la página valida y muestra el mensaje 2a. */}
+          <Route path="/agenda" element={<AgendaPage />} />
         </Route>
       </Route>
 

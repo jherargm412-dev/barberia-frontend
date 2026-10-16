@@ -26,8 +26,8 @@ export default function ConfirmDialog({
   onCancelar,
 }: Props) {
   return (
-    <Dialog open={abierto} onClose={onCancelar}>
-      <DialogTitle>{titulo}</DialogTitle>
+    <Dialog open={abierto} onClose={cargando ? undefined : onCancelar} fullWidth maxWidth="xs" aria-labelledby="confirm-dialog-title">
+      <DialogTitle id="confirm-dialog-title">{titulo}</DialogTitle>
       <DialogContent>
         <DialogContentText>{mensaje}</DialogContentText>
       </DialogContent>
@@ -35,7 +35,7 @@ export default function ConfirmDialog({
         <Button onClick={onCancelar} disabled={cargando}>
           Cancelar
         </Button>
-        <Button onClick={onConfirmar} variant="contained" disabled={cargando}>
+        <Button onClick={onConfirmar} variant="contained" loading={cargando}>
           {textoConfirmar}
         </Button>
       </DialogActions>

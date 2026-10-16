@@ -1,3 +1,4 @@
+import PageHeader from '../../../../shared/components/PageHeader';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -23,7 +24,7 @@ export default function ClienteDetallePage() {
   if (error) return <Alert severity="error">{error}</Alert>;
   if (!cliente) return <CircularProgress />;
   return <>
-    <Typography variant="h5" sx={{ mb: 2 }}>Detalle del cliente</Typography>
+    <PageHeader title="Detalle del cliente" />
     <Typography>Nombre: {cliente.nombre}</Typography>
     <Typography>Teléfono: {cliente.telefono || 'No registrado'}</Typography>
     <Typography>Fecha de registro: {cliente.fechaRegistro}</Typography>

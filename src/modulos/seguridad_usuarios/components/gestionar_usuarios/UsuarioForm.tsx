@@ -15,11 +15,13 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState, type FormEvent } from 'react';
 import RequisitosContrasena from '../../../../shared/components/RequisitosContrasena';
+import { EspecialidadesSelector } from '../../../gestion_empleados';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarRoles } from '../../api/gestionar_usuarios/rolesApi';
 import { TIPOS_CONTRATO, TURNOS } from '../../constants/gestionar_usuarios';
 import type { RolResumen, TipoContrato } from '../../types/gestionar_usuarios';
 import {
+  esBarbero,
   esEmpleado,
   mapearErroresBackend,
   validarUsuario,
@@ -31,6 +33,8 @@ interface Props {
   valoresIniciales: UsuarioFormValores;
   /** true al crear (se pide contraseña); false al editar. */
   pedirContrasena: boolean;
+  /** Al editar: servicios que el barbero ya tiene (sus especialidades actuales). */
+  serviciosAsignados?: { idServicio: number; nombre: string }[];
   textoBoton: string;
   onGuardar: (valores: UsuarioFormValores) => Promise<void>;
   onCancelar: () => void;
@@ -40,6 +44,7 @@ interface Props {
 export default function UsuarioForm({
   valoresIniciales,
   pedirContrasena,
+  serviciosAsignados,
   textoBoton,
   onGuardar,
   onCancelar,
@@ -99,7 +104,7 @@ export default function UsuarioForm({
     roles.length === 0 ? [] : valoresIniciales.roles.filter((nombre) => !roles.some((r) => r.nombre === nombre));
 
   return (
-    <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: 3 }}>
+    <Paper component="form" onSubmit={handleSubmit} noValidate sx={{ p: { xs: 2, sm: 3 } }}>
       <Stack spacing={2}>
         {errorGeneral && <Alert severity="error">{errorGeneral}</Alert>}
 
@@ -247,13 +252,15 @@ export default function UsuarioForm({
                 ))}
               </TextField>
             </Stack>
-            <TextField
-              label="Especialidad"
-              value={valores.especialidad}
-              onChange={(e) => cambiar('especialidad', e.target.value)}
-              error={!!errores.especialidad}
-              helperText={errores.especialidad}
-            />
+            {/* Solo el barbero tiene especialidades: son los servicios del catálogo que realiza. */}
+            {esBarbero(valores.roles) && (
+              <EspecialidadesSelector
+                seleccionados={valores.servicios}
+                onChange={(ids) => cambiar('servicios', ids)}
+                asignados={serviciosAsignados}
+                error={errores.servicios}
+              />
+            )}
           </>
         )}
 
@@ -261,7 +268,7 @@ export default function UsuarioForm({
           <Button onClick={onCancelar} disabled={enviando}>
             Cancelar
           </Button>
-          <Button type="submit" variant="contained" disabled={enviando}>
+          <Button type="submit" variant="contained" loading={enviando}>
             {enviando ? 'Guardando...' : textoBoton}
           </Button>
         </Box>

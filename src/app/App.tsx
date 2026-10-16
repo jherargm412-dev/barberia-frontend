@@ -8,7 +8,8 @@ import { theme } from './theme';
 /** Componente raíz: aquí se "enchufan" los providers globales. */
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
+    // MUI guarda la elección y presenta el diseño oscuro en la primera visita.
+    <ThemeProvider theme={theme} defaultMode="dark" modeStorageKey="houseofcut-mode" disableTransitionOnChange>
       <CssBaseline />
       <BrowserRouter>
         <AuthProvider>
