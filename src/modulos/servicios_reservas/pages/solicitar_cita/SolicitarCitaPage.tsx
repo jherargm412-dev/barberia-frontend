@@ -4,7 +4,7 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { solicitarCita } from '../../api/solicitar_cita/solicitudesApi';
 import EstadoCitaChip from '../../components/gestionar_citas/EstadoCitaChip';
 import SolicitudCitaForm from '../../components/solicitar_cita/SolicitudCitaForm';
@@ -15,6 +15,8 @@ import { horaDe } from '../../utils/solicitar_cita/solicitudForm';
 /** CU12: el cliente solicita su cita desde la web. Queda PENDIENTE hasta pagar el anticipo (CU14). */
 export default function SolicitarCitaPage() {
   const navigate = useNavigate();
+  // Servicio elegido en el catálogo (CU13): /solicitar-cita?servicio=ID.
+  const servicioInicial = Number(useSearchParams()[0].get('servicio')) || undefined;
   // null = todavía no envió la solicitud; con valor = la cita ya se creó.
   const [solicitada, setSolicitada] = useState<RespuestaSolicitudCita | null>(null);
 
@@ -71,7 +73,7 @@ export default function SolicitarCitaPage() {
       <Typography variant="h5" sx={{ mb: 2 }}>
         Solicitar cita
       </Typography>
-      <SolicitudCitaForm onGuardar={guardar} onCancelar={() => navigate('/')} />
+      <SolicitudCitaForm servicioInicial={servicioInicial} onGuardar={guardar} onCancelar={() => navigate('/')} />
     </>
   );
 }

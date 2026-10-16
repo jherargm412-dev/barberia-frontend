@@ -1,18 +1,22 @@
+import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import type { ServicioResumen } from '../../types/gestionar_catalogo_servicios';
+import type { ServicioCatalogo } from '../../types/consultar_servicios';
 
 interface ServicioCardProps {
   /** Servicio a mostrar (viene del endpoint público). */
-  servicio: ServicioResumen;
+  servicio: ServicioCatalogo;
+  /** Paso 3: lleva a reservar este servicio (CU12 o CU11). Sin él (p. ej. un barbero) no hay acción. */
+  onReservar?: (servicio: ServicioCatalogo) => void;
 }
 
 /**
- * CU13 paso 4: muestra nombre, descripción y precio de un servicio activo.
- * Solo lectura: no hay acciones (reservar requiere iniciar sesión → CU12).
+ * CU13 paso 1: nombre, descripción y precio de un servicio activo. Paso 3: "Reservar" solo si algún
+ * barbero con horario lo presta; si no, se avisa que por ahora no se puede reservar.
  */
-export default function ServicioCard({ servicio }: ServicioCardProps) {
+export default function ServicioCard({ servicio, onReservar }: ServicioCardProps) {
   return (
     <Card
       sx={{
@@ -33,11 +37,7 @@ export default function ServicioCard({ servicio }: ServicioCardProps) {
           {servicio.nombre}
         </Typography>
 
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ mb: 2, minHeight: 40 }}
-        >
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
           {servicio.descripcion?.trim() || 'Sin descripción disponible.'}
         </Typography>
 
@@ -45,6 +45,19 @@ export default function ServicioCard({ servicio }: ServicioCardProps) {
           Bs. {servicio.precio.toFixed(2)}
         </Typography>
       </CardContent>
+      {onReservar && (
+        <CardActions sx={{ px: 2, pb: 2 }}>
+          {servicio.reservable ? (
+            <Button variant="contained" fullWidth onClick={() => onReservar(servicio)}>
+              Reservar
+            </Button>
+          ) : (
+            <Typography variant="caption" color="text.secondary">
+              Por ahora no hay barberos disponibles para este servicio
+            </Typography>
+          )}
+        </CardActions>
+      )}
     </Card>
   );
 }

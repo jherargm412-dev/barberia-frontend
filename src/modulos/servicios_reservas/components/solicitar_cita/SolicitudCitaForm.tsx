@@ -27,6 +27,8 @@ import {
 import HorasLibresGrid from '../consultar_disponibilidad/HorasLibresGrid';
 
 interface Props {
+  /** Servicio ya elegido en el catálogo (CU13), si viene de ahí. */
+  servicioInicial?: number;
   /** Envía la solicitud al backend. Si lanza un error, el formulario lo muestra y conserva lo escrito. */
   onGuardar: (datos: SolicitarCitaRequest) => Promise<void>;
   onCancelar: () => void;
@@ -36,8 +38,11 @@ interface Props {
  * CU12: el cliente elige servicio, barbero y fecha, y después una de las horas libres del barbero (CU10).
  * No escribe horas a mano: así solo puede pedir horarios que de verdad están disponibles.
  */
-export default function SolicitudCitaForm({ onGuardar, onCancelar }: Props) {
-  const [valores, setValores] = useState<SolicitudValores>(valoresInicialesSolicitud);
+export default function SolicitudCitaForm({ servicioInicial, onGuardar, onCancelar }: Props) {
+  const [valores, setValores] = useState<SolicitudValores>(() => ({
+    ...valoresInicialesSolicitud(),
+    servicioId: servicioInicial ? String(servicioInicial) : '',
+  }));
   const [servicios, setServicios] = useState<ServicioResumen[]>([]);
   // null = todavía no se eligió servicio (o se están cargando); [] = ningún barbero lo presta.
   const [barberos, setBarberos] = useState<BarberoDisponible[] | null>(null);
@@ -50,6 +55,14 @@ export default function SolicitudCitaForm({ onGuardar, onCancelar }: Props) {
       .then(setServicios)
       .catch((err) => setErrorGeneral(obtenerError(err).mensaje));
   }, []);
+
+  // Con el servicio ya elegido en el catálogo se cargan de una vez sus barberos.
+  useEffect(() => {
+    if (!servicioInicial) return;
+    listarBarberosDelServicio(servicioInicial)
+      .then(setBarberos)
+      .catch((err) => setErrorGeneral(obtenerError(err).mensaje));
+  }, [servicioInicial]);
 
   function cambiar<K extends keyof SolicitudValores>(campo: K, valor: SolicitudValores[K]) {
     setValores((anteriores) => ({ ...anteriores, [campo]: valor }));

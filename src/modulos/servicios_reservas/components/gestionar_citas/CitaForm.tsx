@@ -33,7 +33,7 @@ import ClienteSelector from './ClienteSelector';
 interface Props {
   puedeRegistrarCliente: boolean;
   /** Hora elegida en CU10 (Consultar disponibilidad): servicio, barbero, fecha y horas ya cargados. */
-  prellenado?: PrellenadoCita;
+  prellenado?: Partial<PrellenadoCita>;
   onGuardar: (datos: CitaRequest) => Promise<void>;
   onCancelar: () => void;
 }

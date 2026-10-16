@@ -64,6 +64,8 @@ const GRUPOS: GrupoMenu[] = [
       // CU12: el cliente solicita su cita en línea.
       { texto: 'Solicitar cita', ruta: '/solicitar-cita', icono: <EventNoteIcon />, permiso: 'RESERVA_SOLICITAR' },
       { texto: 'Mis citas', ruta: '/mis-citas', icono: <EventIcon />, permiso: 'RESERVA_SOLICITAR' },
+      // CU13: catálogo de servicios (también público, desde el login) para elegir qué reservar.
+      { texto: 'Catálogo de servicios', ruta: '/catalogo', icono: <ContentCutIcon />, permiso: ['RESERVA_SOLICITAR', 'RESERVA_CREAR'] },
       { texto: 'Citas', ruta: '/citas', icono: <EventIcon />, permiso: 'AGENDA_CONSULTAR' },
       { texto: 'Agenda de Citas', ruta: '/agenda', icono: <CalendarMonthIcon />, permiso: ['AGENDA_CONSULTAR', 'AGENDA_CONSULTAR_PROPIA'] },
       // CU10: horas libres por servicio y barbero, para agendar.

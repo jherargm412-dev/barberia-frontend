@@ -1,5 +1,5 @@
 import PageHeader from '../../../../shared/components/PageHeader';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../../seguridad_usuarios';
 import { registrarCita } from '../../api/gestionar_citas/citasApi';
 import CitaForm from '../../components/gestionar_citas/CitaForm';
@@ -11,7 +11,10 @@ export default function CitaCrearPage() {
   const navigate = useNavigate();
   const { tienePermiso } = useAuth();
   // Si viene de CU10 (Consultar disponibilidad), la hora elegida ya llega cargada.
-  const prellenado = (useLocation().state as { prellenado?: PrellenadoCita } | null)?.prellenado;
+  const desdeDisponibilidad = (useLocation().state as { prellenado?: PrellenadoCita } | null)?.prellenado;
+  // Si viene del catálogo (CU13, ?servicio=ID), solo llega el servicio elegido.
+  const servicioDelCatalogo = Number(useSearchParams()[0].get('servicio')) || undefined;
+  const prellenado = desdeDisponibilidad ?? (servicioDelCatalogo ? { servicioId: servicioDelCatalogo } : undefined);
 
   async function guardar(datos: CitaRequest) {
     const respuesta = await registrarCita(datos);

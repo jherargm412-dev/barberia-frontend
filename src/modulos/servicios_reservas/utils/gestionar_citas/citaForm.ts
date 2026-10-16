@@ -52,11 +52,11 @@ export function horaFinSugerida(horaInicio: string) {
 }
 
 /** Formulario vacío, o con la hora elegida en CU10 (servicio, barbero, fecha y horas). */
-export function valoresIniciales(prellenado?: PrellenadoCita): CitaFormValores {
+export function valoresIniciales(prellenado?: Partial<PrellenadoCita>): CitaFormValores {
   return {
     clienteId: null,
-    servicioId: prellenado ? String(prellenado.servicioId) : '',
-    empleadoId: prellenado ? String(prellenado.empleadoId) : '',
+    servicioId: prellenado?.servicioId ? String(prellenado.servicioId) : '',
+    empleadoId: prellenado?.empleadoId ? String(prellenado.empleadoId) : '',
     fecha: prellenado?.fecha ?? hoy(),
     horaInicio: prellenado?.horaInicio ?? '',
     horaFin: prellenado?.horaFin ?? '',
