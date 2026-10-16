@@ -39,6 +39,7 @@ import {
   ServiciosListPage,
   PERMISOS_SOLICITUD,
   SolicitarCitaPage,
+  ReservarServicioPage,
   MisCitasPage,
   PagoAnticipoPage,
   PERMISOS_ANTICIPO,
@@ -68,6 +69,8 @@ export default function AppRouter() {
 
       {/* Privadas: requieren sesión y usan el layout con menú */}
       <Route element={<RutaProtegida />}>
+        {/* CU13 paso 3: tras el login, "Reservar" envía a CU12 (cliente) o CU11 (recepción). */}
+        <Route path="/reservar" element={<ReservarServicioPage />} />
         <Route element={<MainLayout />}>
           <Route path="/" element={<InicioPage />} />
           {/* CU06: cada ruta exige el permiso de la operación que presenta. */}

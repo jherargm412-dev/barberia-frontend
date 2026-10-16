@@ -14,11 +14,11 @@ import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { useAuth } from '../../../seguridad_usuarios';
 import { listarCatalogo } from '../../api/consultar_servicios/catalogoApi';
 import ServicioCard from '../../components/consultar_servicios/ServicioCard';
-import { PERMISOS as PERMISOS_CITAS } from '../../constants/gestionar_citas';
-import { PERMISOS_SOLICITUD } from '../../constants/solicitar_cita';
 import type { FiltrosCatalogo, ServicioCatalogo } from '../../types/consultar_servicios';
+import { rutaParaReservar } from '../../utils/consultar_servicios/reservar';
 
 const SIN_FILTROS: FiltrosCatalogo = { q: '', precioMin: '', precioMax: '' };
+const MENSAJE_INICIAR_SESION = 'Inicie sesión (o active su cuenta de cliente) para reservar el servicio elegido';
 
 /**
  * CU13: Consultar Servicios. Vista pública (con o sin sesión) del catálogo de servicios activos:
@@ -67,20 +67,24 @@ export default function ConsultarServiciosPage() {
     setFiltros(SIN_FILTROS);
   }
 
-  /** Paso 3: a CU12 si es cliente, a CU11 si es recepción; sin sesión, al login y luego a CU12. */
+  /**
+   * Paso 3: a CU12 si es cliente, a CU11 si es recepción. Reservar exige una cuenta: sin sesión se pasa por el
+   * login (con un aviso) y, al entrar, /reservar lo envía al formulario que le corresponde.
+   */
   function reservar(servicio: ServicioCatalogo) {
-    const solicitar = `/solicitar-cita?servicio=${servicio.idServicio}`;
     if (!usuario) {
-      navigate('/login', { state: { desde: solicitar } });
-    } else if (tienePermiso(PERMISOS_SOLICITUD.SOLICITAR)) {
-      navigate(solicitar);
-    } else if (tienePermiso(PERMISOS_CITAS.CREAR)) {
-      navigate(`/citas/nueva?servicio=${servicio.idServicio}`);
+      navigate('/login', {
+        state: { desde: `/reservar?servicio=${servicio.idServicio}`, mensaje: MENSAJE_INICIAR_SESION },
+      });
+      return;
     }
+    const destino = rutaParaReservar(servicio.idServicio, tienePermiso);
+    if (destino) navigate(destino);
   }
 
   const hayFiltros = filtros.q.trim() !== '' || filtros.precioMin !== '' || filtros.precioMax !== '';
-  const puedeReservar = !usuario || tienePermiso(PERMISOS_SOLICITUD.SOLICITAR) || tienePermiso(PERMISOS_CITAS.CREAR);
+  // Sin sesión se ofrece igual (lleva al login); con sesión, solo a quien puede agendar.
+  const puedeReservar = !usuario || rutaParaReservar(0, tienePermiso) !== null;
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

@@ -35,6 +35,7 @@ export { PERMISOS_AGENDA } from './constants/consultar_agenda';
 
 // CU13 Consultar Servicios (catálogo público, sin sesión)
 export { default as ConsultarServiciosPage } from './pages/consultar_servicios/ConsultarServiciosPage';
+export { default as ReservarServicioPage } from './pages/consultar_servicios/ReservarServicioPage';
 
 
 // CU12 Solicitar Cita (Cliente)
