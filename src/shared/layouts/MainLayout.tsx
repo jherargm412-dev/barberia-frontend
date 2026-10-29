@@ -10,6 +10,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import HistoryIcon from '@mui/icons-material/HistoryOutlined';
 import HomeIcon from '@mui/icons-material/HomeOutlined';
+import Inventory2Icon from '@mui/icons-material/Inventory2Outlined';
 import LogoutIcon from '@mui/icons-material/LogoutOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
@@ -91,6 +92,12 @@ const GRUPOS: GrupoMenu[] = [
     titulo: 'Ventas y caja', icono: <AccountBalanceWalletIcon />, opciones: [
       // CU21 conserva la visibilidad según el permiso de consulta.
       { texto: 'Caja', ruta: '/caja', icono: <AccountBalanceWalletIcon />, permiso: 'CAJA_CONSULTAR' },
+    ],
+  },
+  {
+    titulo: 'Inventario y compras', icono: <Inventory2Icon />, opciones: [
+      // CU22: productos de venta e insumos de consumo interno.
+      { texto: 'Productos e insumos', ruta: '/productos', icono: <Inventory2Icon />, permiso: 'PRODUCTO_GESTIONAR' },
     ],
   },
 ];
