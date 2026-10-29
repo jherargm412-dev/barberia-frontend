@@ -56,6 +56,7 @@ import {
 import MainLayout from '../shared/layouts/MainLayout';
 import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
 import { CajaHistorialPage, CajaPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
+import { PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosListPage } from '../modulos/inventario_compras';
 import InicioPage from '../shared/pages/InicioPage';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 
@@ -136,6 +137,13 @@ export default function AppRouter() {
             <Route path="/servicios" element={<ServiciosListPage />} />
             <Route path="/servicios/nuevo" element={<ServicioCrearPage />} />
             <Route path="/servicios/:id/editar" element={<ServicioEditarPage />} />
+          </Route>
+
+          {/* CU22 Productos e insumos: requiere el permiso PRODUCTO_GESTIONAR (solo el Administrador). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_PRODUCTOS.GESTIONAR} />}>
+            <Route path="/productos" element={<ProductosListPage />} />
+            <Route path="/productos/nuevo" element={<ProductoCrearPage />} />
+            <Route path="/productos/:id/editar" element={<ProductoEditarPage />} />
           </Route>
 
           {/* CU11 Gestionar Cita: la agenda exige AGENDA_CONSULTAR y agendar, RESERVA_CREAR. */}
