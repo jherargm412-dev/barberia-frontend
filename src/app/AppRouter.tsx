@@ -58,6 +58,7 @@ import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPa
 import { CajaHistorialPage, CajaPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
 import { PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosListPage } from '../modulos/inventario_compras';
 import InicioPage from '../shared/pages/InicioPage';
+import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 
 /** Todas las rutas de la app en un solo lugar. */
@@ -140,6 +141,11 @@ export default function AppRouter() {
           </Route>
 
           {/* CU22 Productos e insumos: requiere el permiso PRODUCTO_GESTIONAR (solo el Administrador). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_PROVEEDORES.GESTIONAR} />}>
+            <Route path="/proveedores" element={<ProveedoresListPage />} />
+            <Route path="/proveedores/nuevo" element={<ProveedorEditarPage />} />
+            <Route path="/proveedores/:id/editar" element={<ProveedorEditarPage />} />
+          </Route>
           <Route element={<RequierePermiso permiso={PERMISOS_PRODUCTOS.GESTIONAR} />}>
             <Route path="/productos" element={<ProductosListPage />} />
             <Route path="/productos/nuevo" element={<ProductoCrearPage />} />

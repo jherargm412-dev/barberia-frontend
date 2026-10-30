@@ -1,0 +1,1 @@
+export const PERMISOS_PROVEEDORES = { GESTIONAR: 'PROVEEDOR_GESTIONAR' } as const;
