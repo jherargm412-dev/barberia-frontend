@@ -4,6 +4,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettingsOutlin
 import BadgeIcon from '@mui/icons-material/BadgeOutlined';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonthOutlined';
 import ContentCutIcon from '@mui/icons-material/ContentCutOutlined';
+import CreditCardIcon from '@mui/icons-material/CreditCardOutlined';
 import EventAvailableIcon from '@mui/icons-material/EventAvailableOutlined';
 import EventIcon from '@mui/icons-material/EventOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -93,6 +94,8 @@ const GRUPOS: GrupoMenu[] = [
     titulo: 'Ventas y caja', icono: <AccountBalanceWalletIcon />, opciones: [
       // CU21 conserva la visibilidad según el permiso de consulta.
       { texto: 'Caja', ruta: '/caja', icono: <AccountBalanceWalletIcon />, permiso: 'CAJA_CONSULTAR' },
+      // Gestionar pasarela de pago: cobros con tarjeta (Stripe) y activación de pasarelas.
+      { texto: 'Pasarela de pago', ruta: '/pasarela-pago', icono: <CreditCardIcon />, permiso: ['PASARELA_PAGO_COBRAR', 'PASARELA_PAGO_GESTIONAR'] },
     ],
   },
   {

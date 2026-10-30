@@ -55,7 +55,7 @@ import {
 } from '../modulos/gestion_empleados';
 import MainLayout from '../shared/layouts/MainLayout';
 import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
-import { CajaHistorialPage, CajaPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
+import { CajaHistorialPage, CajaPage, PasarelaPagoPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
 import { PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosListPage } from '../modulos/inventario_compras';
 import InicioPage from '../shared/pages/InicioPage';
 import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
@@ -185,6 +185,9 @@ export default function AppRouter() {
             <Route path="/caja" element={<CajaPage />} />
             <Route path="/caja/historial" element={<CajaHistorialPage />} />
           </Route>
+
+          {/* Gestionar pasarela de pago (Stripe): PASARELA_PAGO_COBRAR o PASARELA_PAGO_GESTIONAR (V22); la página valida. */}
+          <Route path="/pasarela-pago" element={<PasarelaPagoPage />} />
 
           {/* CU14 Pago web del anticipo: solo el cliente (ANTICIPO_PAGAR_PROPIO, migración V15). */}
           <Route element={<RequierePermiso permiso={PERMISOS_ANTICIPO.PAGAR_PROPIO} />}>
