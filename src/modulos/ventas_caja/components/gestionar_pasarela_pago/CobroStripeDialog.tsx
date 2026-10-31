@@ -13,6 +13,7 @@ import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { useState, type FormEvent } from 'react';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { confirmarCobroStripe, iniciarCobroStripe } from '../../api/gestionar_pasarela_pago/pasarelaPagoApi';
+import { confirmarCobroTarjetaVenta, iniciarCobroTarjetaVenta } from '../../api/registrar_venta/ventasApi';
 import type { CobroStripeIniciado, CobroTarjeta, EstadoStripe } from '../../types/gestionar_pasarela_pago';
 import { moneda } from '../../utils/gestionar_caja/formato';
 
@@ -27,15 +28,18 @@ interface Props {
   pasarela: EstadoStripe;
   onCerrar: () => void;
   onCobrado: (cobro: CobroTarjeta) => void;
+  concepto?: string;
+  monto?: number;
 }
 
 /** Venta con tarjeta: 1) concepto y monto, 2) datos de la tarjeta en el formulario seguro de Stripe. */
-export default function CobroStripeDialog({ pasarela, onCerrar, onCobrado }: Props) {
-  const [concepto, setConcepto] = useState('');
-  const [monto, setMonto] = useState('');
+export default function CobroStripeDialog({ pasarela, onCerrar, onCobrado, concepto: conceptoFijo, monto: montoFijo }: Props) {
+  const [concepto, setConcepto] = useState(conceptoFijo ?? '');
+  const [monto, setMonto] = useState(montoFijo === undefined ? '' : montoFijo.toFixed(2));
   const [cobro, setCobro] = useState<CobroStripeIniciado | null>(null);
   const [procesando, setProcesando] = useState(false);
   const [error, setError] = useState('');
+  const esVenta = conceptoFijo !== undefined && montoFijo !== undefined;
 
   async function preparar(evento: FormEvent) {
     evento.preventDefault();
@@ -43,22 +47,29 @@ export default function CobroStripeDialog({ pasarela, onCerrar, onCobrado }: Pro
       setError('Ingrese un concepto y un monto válido'); return;
     }
     setProcesando(true); setError('');
-    try { setCobro(await iniciarCobroStripe(concepto.trim(), Number(monto))); }
+    try {
+      const iniciar = esVenta ? iniciarCobroTarjetaVenta : iniciarCobroStripe;
+      setCobro(await iniciar(concepto.trim(), Number(monto)));
+    }
     catch (err) { setError(obtenerError(err).mensaje); }
     finally { setProcesando(false); }
   }
 
   return (
-    <Dialog open onClose={procesando ? undefined : onCerrar} fullWidth maxWidth="sm">
+    <Dialog open onClose={procesando || cobro ? undefined : onCerrar} fullWidth maxWidth="sm">
       <DialogTitle>Cobrar con tarjeta (Stripe)</DialogTitle>
       {!cobro ? (
         <Box component="form" onSubmit={preparar}>
           <DialogContent><Stack spacing={2} sx={{ pt: 1 }}>
             {error && <Alert severity="error">{error}</Alert>}
-            <TextField autoFocus label="Concepto" value={concepto} onChange={(e) => setConcepto(e.target.value)}
-              slotProps={{ htmlInput: { maxLength: 100 } }} required />
-            <TextField label={`Monto (${pasarela.moneda ?? 'BOB'})`} type="number" value={monto}
-              onChange={(e) => setMonto(e.target.value)} slotProps={{ htmlInput: { min: '0.01', step: '0.01' } }} required />
+            {esVenta ? (
+              <Typography>{concepto} · {moneda(Number(monto))}</Typography>
+            ) : <>
+              <TextField autoFocus label="Concepto" value={concepto} onChange={(e) => setConcepto(e.target.value)}
+                slotProps={{ htmlInput: { maxLength: 100 } }} required />
+              <TextField label={`Monto (${pasarela.moneda ?? 'BOB'})`} type="number" value={monto}
+                onChange={(e) => setMonto(e.target.value)} slotProps={{ htmlInput: { min: '0.01', step: '0.01' } }} required />
+            </>}
           </Stack></DialogContent>
           <DialogActions>
             <Button onClick={onCerrar} disabled={procesando}>Cancelar</Button>
@@ -68,6 +79,7 @@ export default function CobroStripeDialog({ pasarela, onCerrar, onCobrado }: Pro
       ) : (
         <Elements stripe={stripePara(cobro.clavePublica)} options={{ clientSecret: cobro.clientSecret }}>
           <PagoConTarjeta cobro={cobro} resumen={`${concepto.trim()} · ${moneda(Number(monto))}`}
+            confirmar={esVenta ? confirmarCobroTarjetaVenta : confirmarCobroStripe}
             modoPrueba={pasarela.modo !== 'PRODUCCION'} onCerrar={onCerrar} onCobrado={onCobrado} />
         </Elements>
       )}
@@ -78,13 +90,14 @@ export default function CobroStripeDialog({ pasarela, onCerrar, onCobrado }: Pro
 interface PropsPago {
   cobro: CobroStripeIniciado;
   resumen: string;
+  confirmar: (paymentIntentId: string) => Promise<CobroTarjeta>;
   modoPrueba: boolean;
   onCerrar: () => void;
   onCobrado: (cobro: CobroTarjeta) => void;
 }
 
 /** Stripe cobra la tarjeta; luego el backend verifica el pago y lo registra en la caja. */
-function PagoConTarjeta({ cobro, resumen, modoPrueba, onCerrar, onCobrado }: PropsPago) {
+function PagoConTarjeta({ cobro, resumen, confirmar, modoPrueba, onCerrar, onCobrado }: PropsPago) {
   const stripe = useStripe();
   const elements = useElements();
   const [procesando, setProcesando] = useState(false);
@@ -93,7 +106,7 @@ function PagoConTarjeta({ cobro, resumen, modoPrueba, onCerrar, onCobrado }: Pro
   const [pagado, setPagado] = useState(false);
 
   async function registrar() {
-    try { onCobrado(await confirmarCobroStripe(cobro.paymentIntentId)); }
+    try { onCobrado(await confirmar(cobro.paymentIntentId)); }
     catch (err) { setError(`El pago se cobró, pero no se pudo registrar en la caja: ${obtenerError(err).mensaje}`); }
   }
 
@@ -121,7 +134,7 @@ function PagoConTarjeta({ cobro, resumen, modoPrueba, onCerrar, onCobrado }: Pro
         {!pagado && <PaymentElement />}
       </Stack></DialogContent>
       <DialogActions>
-        <Button onClick={onCerrar} disabled={procesando}>{pagado ? 'Cerrar' : 'Cancelar'}</Button>
+        {!pagado && <Button onClick={onCerrar} disabled={procesando}>Cancelar</Button>}
         <Button type="submit" variant="contained" loading={procesando} disabled={!stripe}>
           {pagado ? 'Reintentar registro' : 'Pagar'}
         </Button>

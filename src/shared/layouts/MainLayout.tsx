@@ -93,6 +93,7 @@ const GRUPOS: GrupoMenu[] = [
   },
   {
     titulo: 'Ventas y caja', icono: <AccountBalanceWalletIcon />, opciones: [
+      { texto: 'Registrar venta', ruta: '/ventas/registrar', icono: <ShoppingCartIcon />, permiso: 'VENTA_REGISTRAR' },
       // CU21 conserva la visibilidad según el permiso de consulta.
       { texto: 'Caja', ruta: '/caja', icono: <AccountBalanceWalletIcon />, permiso: 'CAJA_CONSULTAR' },
       // Gestionar pasarela de pago: cobros con tarjeta (Stripe) y activación de pasarelas.

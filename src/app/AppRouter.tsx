@@ -55,7 +55,10 @@ import {
 } from '../modulos/gestion_empleados';
 import MainLayout from '../shared/layouts/MainLayout';
 import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
-import { CajaHistorialPage, CajaPage, PasarelaPagoPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
+import {
+  CajaHistorialPage, CajaPage, PasarelaPagoPage, PERMISOS_CAJA,
+  PERMISO_VENTA_REGISTRAR, RegistrarVentaPage,
+} from '../modulos/ventas_caja';
 import { PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosListPage } from '../modulos/inventario_compras';
 import InicioPage from '../shared/pages/InicioPage';
 import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
@@ -190,6 +193,10 @@ export default function AppRouter() {
           <Route element={<RequierePermiso permiso={PERMISOS_CAJA.CONSULTAR} />}>
             <Route path="/caja" element={<CajaPage />} />
             <Route path="/caja/historial" element={<CajaHistorialPage />} />
+          </Route>
+          {/* CU20 Registrar Venta: Recepcionista y Administrador con VENTA_REGISTRAR. */}
+          <Route element={<RequierePermiso permiso={PERMISO_VENTA_REGISTRAR} />}>
+            <Route path="/ventas/registrar" element={<RegistrarVentaPage />} />
           </Route>
 
           {/* Gestionar pasarela de pago (Stripe): PASARELA_PAGO_COBRAR o PASARELA_PAGO_GESTIONAR (V22); la página valida. */}
