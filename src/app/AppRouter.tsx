@@ -55,10 +55,14 @@ import {
 } from '../modulos/gestion_empleados';
 import MainLayout from '../shared/layouts/MainLayout';
 import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
-import { CajaHistorialPage, CajaPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
+import {
+  CajaHistorialPage, CajaPage, PasarelaPagoPage, PERMISOS_CAJA,
+  PERMISO_VENTA_REGISTRAR, RegistrarVentaPage,
+} from '../modulos/ventas_caja';
 import { PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosListPage } from '../modulos/inventario_compras';
 import InicioPage from '../shared/pages/InicioPage';
 import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
+import { CompraRegistrarPage, ComprasListPage, PERMISOS_COMPRAS } from '../modulos/inventario_compras';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 
 /** Todas las rutas de la app en un solo lugar. */
@@ -151,6 +155,11 @@ export default function AppRouter() {
             <Route path="/productos/nuevo" element={<ProductoCrearPage />} />
             <Route path="/productos/:id/editar" element={<ProductoEditarPage />} />
           </Route>
+          {/* CU25 Registrar compras: requiere COMPRA_REGISTRAR (solo el Administrador). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_COMPRAS.REGISTRAR} />}>
+            <Route path="/compras" element={<ComprasListPage />} />
+            <Route path="/compras/nueva" element={<CompraRegistrarPage />} />
+          </Route>
 
           {/* CU11 Gestionar Cita: la agenda exige AGENDA_CONSULTAR y agendar, RESERVA_CREAR. */}
           <Route element={<RequierePermiso permiso={PERMISOS_CITAS.AGENDA} />}>
@@ -185,6 +194,13 @@ export default function AppRouter() {
             <Route path="/caja" element={<CajaPage />} />
             <Route path="/caja/historial" element={<CajaHistorialPage />} />
           </Route>
+          {/* CU20 Registrar Venta: Recepcionista y Administrador con VENTA_REGISTRAR. */}
+          <Route element={<RequierePermiso permiso={PERMISO_VENTA_REGISTRAR} />}>
+            <Route path="/ventas/registrar" element={<RegistrarVentaPage />} />
+          </Route>
+
+          {/* Gestionar pasarela de pago (Stripe): PASARELA_PAGO_COBRAR o PASARELA_PAGO_GESTIONAR (V22); la página valida. */}
+          <Route path="/pasarela-pago" element={<PasarelaPagoPage />} />
 
           {/* CU14 Pago web del anticipo: solo el cliente (ANTICIPO_PAGAR_PROPIO, migración V15). */}
           <Route element={<RequierePermiso permiso={PERMISOS_ANTICIPO.PAGAR_PROPIO} />}>

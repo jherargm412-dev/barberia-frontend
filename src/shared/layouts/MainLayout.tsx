@@ -4,6 +4,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettingsOutlin
 import BadgeIcon from '@mui/icons-material/BadgeOutlined';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonthOutlined';
 import ContentCutIcon from '@mui/icons-material/ContentCutOutlined';
+import CreditCardIcon from '@mui/icons-material/CreditCardOutlined';
 import EventAvailableIcon from '@mui/icons-material/EventAvailableOutlined';
 import EventIcon from '@mui/icons-material/EventOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -18,6 +19,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
 import PeopleIcon from '@mui/icons-material/PeopleOutlined';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCartOutlined';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -91,8 +93,11 @@ const GRUPOS: GrupoMenu[] = [
   },
   {
     titulo: 'Ventas y caja', icono: <AccountBalanceWalletIcon />, opciones: [
+      { texto: 'Registrar venta', ruta: '/ventas/registrar', icono: <ShoppingCartIcon />, permiso: 'VENTA_REGISTRAR' },
       // CU21 conserva la visibilidad según el permiso de consulta.
       { texto: 'Caja', ruta: '/caja', icono: <AccountBalanceWalletIcon />, permiso: 'CAJA_CONSULTAR' },
+      // Gestionar pasarela de pago: cobros con tarjeta (Stripe) y activación de pasarelas.
+      { texto: 'Pasarela de pago', ruta: '/pasarela-pago', icono: <CreditCardIcon />, permiso: ['PASARELA_PAGO_COBRAR', 'PASARELA_PAGO_GESTIONAR'] },
     ],
   },
   {
@@ -100,6 +105,8 @@ const GRUPOS: GrupoMenu[] = [
       // CU22: productos de venta e insumos de consumo interno.
       { texto: 'Productos e insumos', ruta: '/productos', icono: <Inventory2Icon />, permiso: 'PRODUCTO_GESTIONAR' },
       { texto: 'Proveedores', ruta: '/proveedores', icono: <LocalShippingIcon />, permiso: 'PROVEEDOR_GESTIONAR' },
+      // CU25: compras a proveedores; suman al stock.
+      { texto: 'Compras', ruta: '/compras', icono: <ShoppingCartIcon />, permiso: 'COMPRA_REGISTRAR' },
     ],
   },
 ];

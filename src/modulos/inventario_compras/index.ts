@@ -9,3 +9,7 @@ export { PERMISOS as PERMISOS_PRODUCTOS } from './constants/gestionar_productos_
 export { default as ProveedoresListPage } from './pages/gestionar_proveedores/ProveedoresListPage';
 export { default as ProveedorEditarPage } from './pages/gestionar_proveedores/ProveedorEditarPage';
 export { PERMISOS_PROVEEDORES } from './constants/gestionar_proveedores';
+// CU25 Registrar Compras de Productos
+export { default as ComprasListPage } from './pages/registrar_compras/ComprasListPage';
+export { default as CompraRegistrarPage } from './pages/registrar_compras/CompraRegistrarPage';
+export { PERMISOS_COMPRAS } from './constants/registrar_compras';
