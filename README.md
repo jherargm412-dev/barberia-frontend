@@ -52,6 +52,24 @@ Consume la API del backend: [barberia-backend](https://github.com/jherargm412-de
 
 Antes de abrir un Pull Request, corre `npm run build` y `npm run lint`: los dos deben pasar sin errores.
 
+## Despliegue en Vercel (frontend)
+
+La prueba independiente usa Spring Boot y PostgreSQL en Render.
+
+- Framework: **Vite**. Build: `npm run build`. Salida: `dist`.
+- Variable de compilación: `VITE_API_URL=/api/v1`.
+- `vercel.json` reenvía `/api/v1/*` al backend
+  `https://houseofcut-test-api.onrender.com/api/v1/*` y resuelve las rutas de React
+  como `/agenda` mediante `index.html`.
+- Si cambia la dirección del backend, actualizar el destino en `vercel.json`.
+- Ajustar `APP_FRONTEND_URL` en el servicio backend a la URL de producción de Vercel
+  para que las invitaciones por correo apunten al nuevo frontend.
+- Agregar ese mismo origen a `CORS_ORIGIN` en el backend, conservando los
+  orígenes anteriores separados por coma. El proxy puede reenviar la cabecera
+  `Origin`, especialmente en solicitudes POST.
+- Para compilar localmente con la misma configuración en PowerShell:
+  `$env:VITE_API_URL='/api/v1'; npm run build`.
+
 ## Despliegue (Railway)
 
 Railway construye la imagen con el `Dockerfile` (compila con Vite y sirve con nginx) cada vez
