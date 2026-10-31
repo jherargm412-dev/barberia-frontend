@@ -19,6 +19,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
 import PeopleIcon from '@mui/icons-material/PeopleOutlined';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCartOutlined';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -103,6 +104,8 @@ const GRUPOS: GrupoMenu[] = [
       // CU22: productos de venta e insumos de consumo interno.
       { texto: 'Productos e insumos', ruta: '/productos', icono: <Inventory2Icon />, permiso: 'PRODUCTO_GESTIONAR' },
       { texto: 'Proveedores', ruta: '/proveedores', icono: <LocalShippingIcon />, permiso: 'PROVEEDOR_GESTIONAR' },
+      // CU25: compras a proveedores; suman al stock.
+      { texto: 'Compras', ruta: '/compras', icono: <ShoppingCartIcon />, permiso: 'COMPRA_REGISTRAR' },
     ],
   },
 ];

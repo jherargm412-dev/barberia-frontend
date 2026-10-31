@@ -59,6 +59,7 @@ import { CajaHistorialPage, CajaPage, PasarelaPagoPage, PERMISOS_CAJA } from '..
 import { PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosListPage } from '../modulos/inventario_compras';
 import InicioPage from '../shared/pages/InicioPage';
 import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
+import { CompraRegistrarPage, ComprasListPage, PERMISOS_COMPRAS } from '../modulos/inventario_compras';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 
 /** Todas las rutas de la app en un solo lugar. */
@@ -150,6 +151,11 @@ export default function AppRouter() {
             <Route path="/productos" element={<ProductosListPage />} />
             <Route path="/productos/nuevo" element={<ProductoCrearPage />} />
             <Route path="/productos/:id/editar" element={<ProductoEditarPage />} />
+          </Route>
+          {/* CU25 Registrar compras: requiere COMPRA_REGISTRAR (solo el Administrador). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_COMPRAS.REGISTRAR} />}>
+            <Route path="/compras" element={<ComprasListPage />} />
+            <Route path="/compras/nueva" element={<CompraRegistrarPage />} />
           </Route>
 
           {/* CU11 Gestionar Cita: la agenda exige AGENDA_CONSULTAR y agendar, RESERVA_CREAR. */}
