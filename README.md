@@ -52,7 +52,22 @@ Consume la API del backend: [barberia-backend](https://github.com/jherargm412-de
 
 Antes de abrir un Pull Request, corre `npm run build` y `npm run lint`: los dos deben pasar sin errores.
 
-## Despliegue en Vercel (frontend)
+## Prueba completa en Render
+
+El Blueprint `render.yaml` del repositorio backend administra los tres recursos:
+`houseofcut-test-web` (React estático), `houseofcut-test-api` (Spring Boot Docker)
+y `houseofcut-test-db` (PostgreSQL 17).
+
+- Rama frontend: `codex/deploy-render-test`.
+- Compilación: `npm ci --no-audit --no-fund && npm run build` con Node 24.
+- Directorio publicado: `dist`.
+- `VITE_API_URL=https://houseofcut-test-api.onrender.com/api/v1`.
+- Regla de React Router: Rewrite `/*` a `/index.html`.
+- El origen del sitio debe estar incluido en `CORS_ORIGIN` del backend.
+- La base es independiente de Railway. El administrador se define durante
+  la creación del Blueprint. No publicar credenciales en Git.
+
+## Despliegue en Vercel (frontend alternativo)
 
 La prueba independiente usa Spring Boot y PostgreSQL en Render.
 
