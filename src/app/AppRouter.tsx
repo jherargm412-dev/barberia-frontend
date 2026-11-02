@@ -64,6 +64,7 @@ import InicioPage from '../shared/pages/InicioPage';
 import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
 import { CompraRegistrarPage, ComprasListPage, PERMISOS_COMPRAS } from '../modulos/inventario_compras';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
+import LiquidacionPage from '../modulos/gestion_empleados/pages/liquidar_comisiones/LiquidacionPage';
 
 /** Todas las rutas de la app en un solo lugar. */
 export default function AppRouter() {
@@ -116,6 +117,11 @@ export default function AppRouter() {
             <Route element={<RequierePermiso permiso={PERMISOS_EMPLEADOS.REGISTRAR} />}>
               <Route path="/empleados/nuevo" element={<EmpleadoCrearPage />} />
             </Route>
+          </Route>
+
+          {/* CU18: Registrar Liquidación de Comisiones */}
+          <Route element={<RequierePermiso permiso="PAGO_EMPLEADO_GENERAR" />}>
+            <Route path="/liquidaciones" element={<LiquidacionPage />} />
           </Route>
 
           {/* CU03 Roles y permisos: solo el Administrador (ROL_ASIGNAR). */}
