@@ -1,7 +1,7 @@
 import { http } from '../../../../shared/api/httpClient';
 import type { ConsultaDisponibilidad, Disponibilidad } from '../../types/consultar_disponibilidad';
 import type { BarberoDisponible, Cita } from '../../types/gestionar_citas';
-import type { QrAnticipo, RespuestaPagoAnticipo } from '../../types/registrar_pago_anticipo';
+import type { AnticipoTarjeta, RespuestaPagoAnticipo } from '../../types/registrar_pago_anticipo';
 import type { RespuestaCitaInvitado, SolicitarCitaInvitadoRequest } from '../../types/solicitar_cita';
 
 // Endpoints públicos de /api/v1/publico (ReservaInvitadoController.java): reservar y pagar SIN cuenta.
@@ -33,16 +33,16 @@ export async function consultarCitaInvitado(codigo: string) {
   return respuesta.data;
 }
 
-/** CU14: QR para pagar el anticipo de la cita del invitado. */
-export async function generarQrInvitado(codigo: string) {
-  const respuesta = await http.post<QrAnticipo>(`/publico/citas/${codigo}/anticipo/qr`);
+/** CU14: el invitado prepara el pago con tarjeta (Stripe) del anticipo. */
+export async function iniciarPagoTarjetaInvitado(codigo: string) {
+  const respuesta = await http.post<AnticipoTarjeta>(`/publico/citas/${codigo}/anticipo/tarjeta`);
   return respuesta.data;
 }
 
-/** CU14: el invitado confirma que pagó el QR. */
-export async function confirmarPagoQrInvitado(codigo: string, referencia: string) {
-  const respuesta = await http.post<RespuestaPagoAnticipo>(`/publico/citas/${codigo}/anticipo/confirmar-qr`, {
-    referencia,
-  });
+/** CU14: tras cobrar con Stripe.js, el backend verifica el cobro y confirma la cita del invitado. */
+export async function confirmarPagoTarjetaInvitado(codigo: string, paymentIntentId: string) {
+  const respuesta = await http.post<RespuestaPagoAnticipo>(
+    `/publico/citas/${codigo}/anticipo/tarjeta/${paymentIntentId}/confirmacion`,
+  );
   return respuesta.data;
 }

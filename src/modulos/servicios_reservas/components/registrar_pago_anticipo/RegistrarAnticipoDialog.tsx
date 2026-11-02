@@ -13,7 +13,7 @@ import Stack from '@mui/material/Stack';
 import { useState, type FormEvent } from 'react';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { registrarAnticipo } from '../../api/registrar_pago_anticipo/anticiposApi';
-import type { MetodoPagoAnticipo, RespuestaPagoAnticipo } from '../../types/registrar_pago_anticipo';
+import type { MetodoMostrador, RespuestaPagoAnticipo } from '../../types/registrar_pago_anticipo';
 import { formatearMonto } from '../../utils/gestionar_citas/citaForm';
 import { faltanteMixto, prepararCobro } from '../../utils/registrar_pago_anticipo/anticipoForm';
 
@@ -35,7 +35,7 @@ interface Props {
 
 /** CU14 flujo B: cobro del anticipo en mostrador (efectivo, QR o mixto). */
 export default function RegistrarAnticipoDialog({ cita, onCerrar, onCobrado }: Props) {
-  const [metodo, setMetodo] = useState<MetodoPagoAnticipo>('EFECTIVO');
+  const [metodo, setMetodo] = useState<MetodoMostrador>('EFECTIVO');
   const [efectivo, setEfectivo] = useState('');
   const [qr, setQr] = useState('');
   const [referencia, setReferencia] = useState('');
@@ -44,7 +44,7 @@ export default function RegistrarAnticipoDialog({ cita, onCerrar, onCobrado }: P
   const [guardando, setGuardando] = useState(false);
 
   /** Al cambiar de método se limpian los errores: los de un método no aplican al otro. */
-  function cambiarMetodo(nuevo: MetodoPagoAnticipo) {
+  function cambiarMetodo(nuevo: MetodoMostrador) {
     setMetodo(nuevo);
     setErrores({});
     setError('');
@@ -90,7 +90,7 @@ export default function RegistrarAnticipoDialog({ cita, onCerrar, onCobrado }: P
               select
               label="Método de pago"
               value={metodo}
-              onChange={(e) => cambiarMetodo(e.target.value as MetodoPagoAnticipo)}
+              onChange={(e) => cambiarMetodo(e.target.value as MetodoMostrador)}
               helperText={
                 metodo === 'MIXTO'
                   ? 'Indique cuánto paga en efectivo y cuánto por QR'

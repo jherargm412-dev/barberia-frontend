@@ -10,7 +10,7 @@ import type { SolicitarCitaRequest } from '../../types/solicitar_cita';
 
 /**
  * CU12 sin cuenta (pública): quien no tiene cuenta reserva por pasos con su nombre y teléfono. Al confirmar va a
- * "Mi cita" (/mi-cita/:codigo) con el QR ya abierto para pagar el anticipo. Con sesión no hace falta:
+ * "Mi cita" (/mi-cita/:codigo) con el pago con tarjeta ya abierto para el anticipo. Con sesión no hace falta:
  * se lo envía a la reserva de su cuenta.
  */
 export default function ReservaInvitadoPage() {
