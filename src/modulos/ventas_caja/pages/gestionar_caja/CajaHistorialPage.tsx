@@ -188,6 +188,7 @@ function DetalleCaja({ caja, onCerrar }: { caja: Caja; onCerrar: () => void }) {
           {fila('Monto inicial', moneda(caja.montoInicial))}
           {fila('Ingresos en efectivo', moneda(caja.ingresosEfectivo))}
           {fila('Ingresos por QR (no van al cajón)', moneda(caja.ingresosQr))}
+          {fila('Ingresos con tarjeta (no van al cajón)', moneda(caja.ingresosTarjeta))}
           {fila('Egresos en efectivo', moneda(caja.egresosEfectivo))}
           {fila('Efectivo esperado', moneda(caja.saldoEsperado))}
           {fila('Efectivo contado', caja.efectivoContado === null ? '—' : moneda(caja.efectivoContado))}

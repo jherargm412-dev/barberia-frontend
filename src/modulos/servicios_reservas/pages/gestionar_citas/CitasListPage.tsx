@@ -168,6 +168,7 @@ export default function CitasListPage() {
         onCambiarTamano={(size) => cambiarFiltros({ size, page: 0 })}
         onReprogramar={setReprogramando}
         onCobrarAnticipo={setCobrando}
+        onCobrarVenta={(cita) => navigate('/ventas/registrar', { state: { reservaId: cita.idReserva } })}
         onCambiarEstado={(cita, accionElegida) => setPorCambiar({ cita, accion: accionElegida })}
       />
 

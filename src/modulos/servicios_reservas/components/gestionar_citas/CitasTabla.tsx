@@ -49,6 +49,7 @@ interface Props {
   onReprogramar: (cita: Cita) => void;
     /** La página abre el diálogo de cobro del anticipo (CU14). */
   onCobrarAnticipo: (cita: Cita) => void;
+  onCobrarVenta: (cita: Cita) => void;
   /** La página pide confirmación y llama al backend. */
   onCambiarEstado: (cita: Cita, accion: AccionEstado) => void;
 }
@@ -74,6 +75,7 @@ export default function CitasTabla({
   onCambiarTamano,
   onReprogramar,
   onCobrarAnticipo,
+  onCobrarVenta,
   onCambiarEstado,
 }: Props) {
   // Menú de estados abierto: la cita y el botón donde se ancla.
@@ -177,6 +179,14 @@ export default function CitasTabla({
                     {c.estado === 'PENDIENTE' && !c.anticipoPagado && c.montoAnticipo > 0 && tienePermiso(PERMISOS_ANTICIPO.COBRAR) && (
                       <Tooltip title="Cobrar anticipo">
                         <IconButton color="success" onClick={() => onCobrarAnticipo(c)}>
+                          <PaymentsIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {(c.estado === 'PENDIENTE' || c.estado === 'CONFIRMADA')
+                      && tienePermiso(PERMISOS.VENTA_REGISTRAR) && (
+                      <Tooltip title="Cobrar venta">
+                        <IconButton color="primary" onClick={() => onCobrarVenta(c)}>
                           <PaymentsIcon />
                         </IconButton>
                       </Tooltip>

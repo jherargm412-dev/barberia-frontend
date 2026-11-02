@@ -8,6 +8,7 @@ export const PERMISOS = {
   ATENDER: 'RESERVA_ATENDER',
   CANCELAR: 'RESERVA_CANCELAR',
   CLIENTE_CREAR: 'CLIENTE_CREAR',
+  VENTA_REGISTRAR: 'VENTA_REGISTRAR',
 };
 
 /** Colores de CU16: Pendiente amarillo, Confirmada verde, Atendida azul, Cancelada/No asistió rojo/gris. */

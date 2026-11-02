@@ -1,5 +1,5 @@
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import QrCodeIcon from '@mui/icons-material/QrCode2';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -41,8 +41,8 @@ export default function PortadaPage() {
       <Box sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>
         <Container maxWidth="lg" sx={{ py: { xs: 6, md: 10 } }}>
           <Chip
-            icon={<QrCodeIcon />}
-            label="Reserva en línea · anticipo por QR"
+            icon={<CreditCardIcon />}
+            label="Reserva en línea · anticipo con tarjeta"
             color="primary"
             variant="outlined"
             sx={{ mb: 3 }}
@@ -51,7 +51,7 @@ export default function PortadaPage() {
             Tu corte, a la hora que elijas.
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 400, mb: 4, maxWidth: 680 }}>
-            Elige el servicio, el barbero y un horario libre. Asegura tu turno con un anticipo del 20 % pagado por QR;
+            Elige el servicio, el barbero y un horario libre. Asegura tu turno con un anticipo del 20 % pagado con tarjeta;
             el resto lo pagas en la barbería.
           </Typography>
           <Button

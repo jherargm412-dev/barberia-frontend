@@ -11,14 +11,14 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import {
-  confirmarPagoQrInvitado,
+  confirmarPagoTarjetaInvitado,
   consultarCitaInvitado,
-  generarQrInvitado,
+  iniciarPagoTarjetaInvitado,
 } from '../../api/solicitar_cita/invitadoApi';
 import BarraPublica from '../../components/consultar_servicios/BarraPublica';
 import EstadoCitaChip from '../../components/gestionar_citas/EstadoCitaChip';
 import ComprobanteAnticipo from '../../components/registrar_pago_anticipo/ComprobanteAnticipo';
-import PagoQrAnticipo from '../../components/registrar_pago_anticipo/PagoQrAnticipo';
+import PagoTarjetaAnticipo from '../../components/registrar_pago_anticipo/PagoTarjetaAnticipo';
 import type { Cita } from '../../types/gestionar_citas';
 import type { PagoAnticipo } from '../../types/registrar_pago_anticipo';
 import { formatearFecha, formatearMonto } from '../../utils/gestionar_citas/citaForm';
@@ -31,7 +31,7 @@ import { horaDe } from '../../utils/solicitar_cita/solicitudForm';
 export default function CitaInvitadoPage() {
   const codigo = useParams().codigo ?? '';
   const navigate = useNavigate();
-  // Al llegar desde la reserva: su mensaje y el QR ya abierto para pagar.
+  // Al llegar desde la reserva: su mensaje y el pago con tarjeta ya abierto.
   const estado = useLocation().state as { mensaje?: string; pagar?: boolean } | null;
   const mensajeInicial = estado?.mensaje ?? '';
   const [cita, setCita] = useState<Cita | null>(null);
@@ -125,9 +125,9 @@ export default function CitaInvitadoPage() {
               </Button>
             )}
             {porPagar && pagando && (
-              <PagoQrAnticipo
-                generar={() => generarQrInvitado(codigo)}
-                confirmar={(referencia) => confirmarPagoQrInvitado(codigo, referencia)}
+              <PagoTarjetaAnticipo
+                iniciar={() => iniciarPagoTarjetaInvitado(codigo)}
+                confirmar={(paymentIntentId) => confirmarPagoTarjetaInvitado(codigo, paymentIntentId)}
                 onPagado={(pago) => {
                   setPagando(false);
                   setComprobante(pago);

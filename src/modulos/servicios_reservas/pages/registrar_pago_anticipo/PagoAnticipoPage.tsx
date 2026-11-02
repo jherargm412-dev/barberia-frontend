@@ -3,13 +3,13 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { confirmarPagoQr, generarQrAnticipo } from '../../api/registrar_pago_anticipo/anticiposApi';
+import { confirmarPagoTarjeta, iniciarPagoTarjeta } from '../../api/registrar_pago_anticipo/anticiposApi';
 import ComprobanteAnticipo from '../../components/registrar_pago_anticipo/ComprobanteAnticipo';
-import PagoQrAnticipo from '../../components/registrar_pago_anticipo/PagoQrAnticipo';
+import PagoTarjetaAnticipo from '../../components/registrar_pago_anticipo/PagoTarjetaAnticipo';
 import type { PagoAnticipo } from '../../types/registrar_pago_anticipo';
 import { horaDe } from '../../utils/solicitar_cita/solicitudForm';
 
-/** CU14 flujo A: el cliente (con cuenta) paga por la web, con un QR, el anticipo de su cita. */
+/** CU14 flujo A: el cliente (con cuenta) paga por la web, con tarjeta (Stripe), el anticipo de su cita. */
 export default function PagoAnticipoPage() {
   const idReserva = Number(useParams().id);
   const navigate = useNavigate();
@@ -34,9 +34,9 @@ export default function PagoAnticipoPage() {
         </Stack>
       )}
       {!comprobante && (
-        <PagoQrAnticipo
-          generar={() => generarQrAnticipo(idReserva)}
-          confirmar={(referencia) => confirmarPagoQr(idReserva, { referencia })}
+        <PagoTarjetaAnticipo
+          iniciar={() => iniciarPagoTarjeta(idReserva)}
+          confirmar={(paymentIntentId) => confirmarPagoTarjeta(idReserva, paymentIntentId)}
           onPagado={setComprobante}
           onSalir={() => navigate('/mis-citas')}
           textoSalir="Pagar más tarde"

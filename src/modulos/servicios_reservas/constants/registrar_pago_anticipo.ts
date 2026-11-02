@@ -1,4 +1,4 @@
-import type { MetodoPagoAnticipo } from '../types/registrar_pago_anticipo';
+import type { MetodoMostrador, MetodoPagoAnticipo } from '../types/registrar_pago_anticipo';
 
 /** Permisos del backend que usa CU14 (semillas V2 y V15). */
 export const PERMISOS_ANTICIPO = {
@@ -9,7 +9,7 @@ export const PERMISOS_ANTICIPO = {
 };
 
 /** Métodos que puede elegir la recepcionista al cobrar el anticipo. */
-export const METODOS_PAGO: { valor: MetodoPagoAnticipo; etiqueta: string }[] = [
+export const METODOS_PAGO: { valor: MetodoMostrador; etiqueta: string }[] = [
   { valor: 'EFECTIVO', etiqueta: 'Efectivo' },
   { valor: 'QR', etiqueta: 'QR' },
   { valor: 'MIXTO', etiqueta: 'Mixto (efectivo + QR)' },
@@ -20,6 +20,7 @@ export const ETIQUETAS_METODO: Record<MetodoPagoAnticipo, string> = {
   EFECTIVO: 'Efectivo',
   QR: 'QR',
   MIXTO: 'Mixto (efectivo + QR)',
+  TARJETA: 'Tarjeta (en línea)',
 };
 
 /** Flujo B, paso 6: con QR o mixto, la recepcionista comprueba que el dinero llegó antes de confirmar. */
@@ -36,8 +37,19 @@ export const MENSAJES_ANTICIPO = {
   REFERENCIA_LARGA: `Máximo ${MAX_REFERENCIA_QR} caracteres`,
 };
 
-/** Textos de la pantalla de pago del cliente (flujo A). */
+/**
+ * Anticipo mínimo (Bs) para pagarlo con tarjeta en la web. Stripe rechaza cobros menores a ~0,50 EUR; el backend
+ * usa el mismo valor (app.pagos.tarjeta.anticipo-minimo). Un anticipo menor se paga en la barbería.
+ */
+export const ANTICIPO_MINIMO_TARJETA = 10;
+
+/** Campo del error del backend que indica que el anticipo se paga en la barbería (PagoAnticipoWebService). */
+export const CAMPO_PAGO_EN_BARBERIA = 'pagoEnBarberia';
+
+/** Textos de la pantalla de pago del cliente con tarjeta (flujo A, CU29 Stripe). */
 export const MENSAJES_PAGO_WEB = {
-  INSTRUCCION: 'Escanee el código con la aplicación de su banco, pague el monto exacto y luego pulse "Confirmar pago".',
-  QR_VENCIDO: 'El código QR venció. Genere uno nuevo para pagar.',
+  INSTRUCCION: 'Ingrese los datos de su tarjeta. El pago lo procesa Stripe de forma segura: la barbería no ve ni guarda su tarjeta.',
+  MODO_PRUEBA: 'Modo prueba: use la tarjeta 4242 4242 4242 4242, cualquier fecha futura y cualquier CVC.',
+  NO_COMPLETADO: 'El pago con tarjeta no se completó',
+  COBRADO_SIN_REGISTRAR: 'El pago se cobró, pero no se pudo registrar. Pulse "Reintentar registro" (no se le cobrará otra vez).',
 };

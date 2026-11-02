@@ -14,6 +14,8 @@ export type { ServicioResumen } from './types/gestionar_catalogo_servicios';
 export { default as CitasListPage } from './pages/gestionar_citas/CitasListPage';
 export { default as CitaCrearPage } from './pages/gestionar_citas/CitaCrearPage';
 export { PERMISOS as PERMISOS_CITAS } from './constants/gestionar_citas';
+export { listarBarberos } from './api/gestionar_citas/citasApi';
+export type { BarberoDisponible } from './types/gestionar_citas';
 
 // CU10 Consultar Disponibilidad
 export { default as DisponibilidadPage } from './pages/consultar_disponibilidad/DisponibilidadPage';

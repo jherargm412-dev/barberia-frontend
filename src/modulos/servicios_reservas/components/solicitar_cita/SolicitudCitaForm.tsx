@@ -2,7 +2,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import QrCodeIcon from '@mui/icons-material/QrCode2';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Avatar from '@mui/material/Avatar';
@@ -31,6 +31,7 @@ import { listarBarberosDelServicio } from '../../api/solicitar_cita/solicitudesA
 import { consultarDisponibilidad } from '../../api/consultar_disponibilidad/disponibilidadApi';
 import { DURACION_DEFECTO } from '../../constants/consultar_disponibilidad';
 import { MENSAJES } from '../../constants/gestionar_citas';
+import { ANTICIPO_MINIMO_TARJETA } from '../../constants/registrar_pago_anticipo';
 import { MENSAJES_SOLICITUD, MINUTOS_PARA_PAGAR } from '../../constants/solicitar_cita';
 import type { ServicioCatalogo } from '../../types/consultar_servicios';
 import type { BarberoDisponible } from '../../types/gestionar_citas';
@@ -573,8 +574,17 @@ export default function SolicitudCitaForm({ servicioInicial, invitado = false, o
                 <Alert severity="warning">
                   <AlertTitle>Política de anticipo</AlertTitle>
                   {MENSAJES_SOLICITUD.ANTICIPO} La cita queda <strong>Pendiente</strong> y tienes {MINUTOS_PARA_PAGAR}{' '}
-                  minutos para pagarlo por QR; si no lo pagas a tiempo, se cancela sola y el horario queda libre. Una
-                  vez pagado, <strong>el anticipo no se devuelve</strong> aunque se cancele la cita.
+                  minutos para pagarlo{' '}
+                  {calcularAnticipo(servicio.precio) >= ANTICIPO_MINIMO_TARJETA ? (
+                    'con tarjeta'
+                  ) : (
+                    <>
+                      <strong>en la barbería</strong> (es menor a {formatearMonto(ANTICIPO_MINIMO_TARJETA)}, el mínimo
+                      para pagar con tarjeta)
+                    </>
+                  )}
+                  ; si no lo pagas a tiempo, se cancela sola y el horario queda libre. Una vez pagado,{' '}
+                  <strong>el anticipo no se devuelve</strong> aunque se cancele la cita.
                 </Alert>
                 <FormControlLabel
                   sx={{ mt: 2 }}
@@ -608,7 +618,7 @@ export default function SolicitudCitaForm({ servicioInicial, invitado = false, o
           size="large"
           onClick={continuar}
           disabled={!puedeContinuar() || enviando}
-          endIcon={paso === 'resumen' ? <QrCodeIcon /> : <ArrowForwardIcon />}
+          endIcon={paso === 'resumen' ? <CreditCardIcon /> : <ArrowForwardIcon />}
         >
           {paso !== 'resumen' && 'Continuar'}
           {paso === 'resumen' && (enviando ? 'Enviando...' : 'Confirmar y pagar anticipo')}

@@ -83,6 +83,8 @@ export default function ComprobanteAnticipo({ pago, onCerrar }: Props) {
             {pago.montoEfectivo > 0 && <Fila etiqueta="Efectivo">{formatearMonto(pago.montoEfectivo)}</Fila>}
             {pago.montoQr > 0 && <Fila etiqueta="QR">{formatearMonto(pago.montoQr)}</Fila>}
             {pago.referenciaQr && <Fila etiqueta="Referencia QR">{pago.referenciaQr}</Fila>}
+            {pago.montoTarjeta > 0 && <Fila etiqueta="Tarjeta">{formatearMonto(pago.montoTarjeta)}</Fila>}
+            {pago.referenciaTarjeta && <Fila etiqueta="Referencia Stripe">{pago.referenciaTarjeta}</Fila>}
             <Fila etiqueta="Anticipo cobrado">
               <strong>{formatearMonto(pago.montoTotal)}</strong>
             </Fila>

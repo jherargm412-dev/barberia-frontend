@@ -7,6 +7,7 @@ export interface Caja {
   montoInicial: number;
   ingresosEfectivo: number;
   ingresosQr: number;
+  ingresosTarjeta: number;
   egresosEfectivo: number;
   saldoEsperado: number;
   efectivoContado: number | null;
@@ -21,7 +22,7 @@ export interface MovimientoCaja {
   tipo: 'INGRESO' | 'EGRESO';
   concepto: string;
   monto: number;
-  medioPago: 'EFECTIVO' | 'QR';
+  medioPago: 'EFECTIVO' | 'QR' | 'TARJETA';
   fecha: string;
   observaciones: string | null;
   responsable: string;
