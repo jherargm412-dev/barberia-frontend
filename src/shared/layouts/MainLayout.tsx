@@ -14,11 +14,6 @@ import HomeIcon from '@mui/icons-material/HomeOutlined';
 import Inventory2Icon from '@mui/icons-material/Inventory2Outlined';
 import LocalShippingIcon from '@mui/icons-material/LocalShippingOutlined';
 import LogoutIcon from '@mui/icons-material/LogoutOutlined';
-import BadgeIcon from '@mui/icons-material/Badge';
-import ContentCutIcon from '@mui/icons-material/ContentCut';
-import HistoryIcon from '@mui/icons-material/History';
-import HomeIcon from '@mui/icons-material/Home';
-import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
@@ -50,10 +45,6 @@ interface OpcionMenu {
   texto: string;
   ruta: string;
   icono: ReactNode;
-  /**
-   * Si se indica, la opción solo aparece para usuarios con ese permiso.
-   * Con una lista basta con tener cualquiera de ellos (ej. CU16: agenda completa o propia).
-   */
   permiso?: string | string[];
 }
 
@@ -66,19 +57,14 @@ interface GrupoMenu {
 const INICIO: OpcionMenu = { texto: 'Inicio', ruta: '/', icono: <HomeIcon /> };
 const PERFIL: OpcionMenu = { texto: 'Mi perfil', ruta: '/perfil', icono: <AccountCircleIcon />, permiso: 'PERFIL_EDITAR' };
 
-// Cada grupo conserva los permisos de sus opciones; si ninguna es visible, se oculta completo.
 const GRUPOS: GrupoMenu[] = [
   {
-    // Agrupa las nuevas pantallas de reservas conservando sus permisos.
     titulo: 'Citas y horarios', icono: <CalendarMonthIcon />, opciones: [
-      // CU12: el cliente solicita su cita en línea.
       { texto: 'Solicitar cita', ruta: '/solicitar-cita', icono: <EventNoteIcon />, permiso: 'RESERVA_SOLICITAR' },
       { texto: 'Mis citas', ruta: '/mis-citas', icono: <EventIcon />, permiso: 'RESERVA_SOLICITAR' },
-      // CU13: catálogo de servicios (también público, desde el login) para elegir qué reservar.
       { texto: 'Catálogo de servicios', ruta: '/catalogo', icono: <ContentCutIcon />, permiso: ['RESERVA_SOLICITAR', 'RESERVA_CREAR'] },
       { texto: 'Citas', ruta: '/citas', icono: <EventIcon />, permiso: 'AGENDA_CONSULTAR' },
       { texto: 'Agenda de Citas', ruta: '/agenda', icono: <CalendarMonthIcon />, permiso: ['AGENDA_CONSULTAR', 'AGENDA_CONSULTAR_PROPIA'] },
-      // CU10: horas libres por servicio y barbero, para agendar.
       { texto: 'Disponibilidad', ruta: '/disponibilidad', icono: <ScheduleIcon />, permiso: 'RESERVA_CREAR' },
       { texto: 'Horarios', ruta: '/horarios', icono: <EventAvailableIcon />, permiso: 'USUARIO_GESTIONAR' },
     ],
@@ -101,37 +87,23 @@ const GRUPOS: GrupoMenu[] = [
   {
     titulo: 'Ventas y caja', icono: <AccountBalanceWalletIcon />, opciones: [
       { texto: 'Registrar venta', ruta: '/ventas/registrar', icono: <ShoppingCartIcon />, permiso: 'VENTA_REGISTRAR' },
-      // CU21 conserva la visibilidad según el permiso de consulta.
       { texto: 'Caja', ruta: '/caja', icono: <AccountBalanceWalletIcon />, permiso: 'CAJA_CONSULTAR' },
-      // Gestionar pasarela de pago: cobros con tarjeta (Stripe) y activación de pasarelas.
       { texto: 'Pasarela de pago', ruta: '/pasarela-pago', icono: <CreditCardIcon />, permiso: ['PASARELA_PAGO_COBRAR', 'PASARELA_PAGO_GESTIONAR'] },
     ],
   },
   {
     titulo: 'Inventario y compras', icono: <Inventory2Icon />, opciones: [
-      // CU22: productos de venta e insumos de consumo interno.
       { texto: 'Productos e insumos', ruta: '/productos', icono: <Inventory2Icon />, permiso: 'PRODUCTO_GESTIONAR' },
       { texto: 'Proveedores', ruta: '/proveedores', icono: <LocalShippingIcon />, permiso: 'PROVEEDOR_GESTIONAR' },
-      // CU25: compras a proveedores; suman al stock.
       { texto: 'Compras', ruta: '/compras', icono: <ShoppingCartIcon />, permiso: 'COMPRA_REGISTRAR' },
     ],
   },
-const OPCIONES: OpcionMenu[] = [
-  { texto: 'Inicio', ruta: '/', icono: <HomeIcon /> },
-  // La opción de CU06 solo aparece para usuarios que pueden consultar clientes.
-  { texto: 'Clientes', ruta: '/clientes', icono: <PeopleIcon />, permiso: 'CLIENTE_CONSULTAR' },
-  { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
-  // CU16: mismo permiso que CU01 (solo el Administrador).
-  { texto: 'Barberos', ruta: '/barberos', icono: <BadgeIcon />, permiso: 'USUARIO_GESTIONAR' },
-  { texto: 'Servicios', ruta: '/servicios', icono: <ContentCutIcon />, permiso: 'SERVICIO_GESTIONAR' },
-  { texto: 'Bitácora', ruta: '/bitacora', icono: <HistoryIcon />, permiso: 'BITACORA_CONSULTAR' },
-];
+]; // <--- AQUÍ ESTABA EL ERROR, FALTABA ESTE CORCHETE DE CIERRE
 
 function rutaSeleccionada(ruta: string, pathname: string) {
   return ruta === '/' ? pathname === '/' : pathname === ruta || pathname.startsWith(`${ruta}/`);
 }
 
-/** Estructura de las páginas privadas: barra superior + menú lateral + contenido. */
 export default function MainLayout() {
   const { usuario, cerrarSesion, tienePermiso } = useAuth();
   const navigate = useNavigate();
@@ -142,7 +114,6 @@ export default function MainLayout() {
     Object.fromEntries(GRUPOS.map((grupo) => [grupo.titulo, grupo.opciones.some((opcion) => rutaSeleccionada(opcion.ruta, pathname))])),
   );
 
-  // Sincroniza el grupo también al navegar desde enlaces, historial o accesos rápidos.
   if (rutaAnterior !== pathname) {
     setRutaAnterior(pathname);
     const actual = GRUPOS.find((grupo) => grupo.opciones.some((opcion) => rutaSeleccionada(opcion.ruta, pathname)));
@@ -160,7 +131,6 @@ export default function MainLayout() {
   }
 
   function irA(opcion: OpcionMenu) {
-    // Mantiene visible el apartado elegido al navegar desde el menú.
     const grupo = GRUPOS.find((actual) => actual.opciones.includes(opcion));
     if (grupo) setGruposAbiertos((anteriores) => ({ ...anteriores, [grupo.titulo]: true }));
     navigate(opcion.ruta);
@@ -239,7 +209,6 @@ export default function MainLayout() {
               HOUSE <Box component="span" sx={{ fontWeight: 400, color: 'text.secondary', fontSize: '0.85em' }}>of</Box> CUT
             </Typography>
           </Box>
-          {/* Identidad de la sesión actual; los roles se leen de la autenticación existente. */}
           <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.25, pr: 2, mr: 1, borderRight: 1, borderColor: 'divider' }}>
             <Avatar sx={{ width: 36, height: 36, fontSize: 12, fontWeight: 600, bgcolor: 'action.selected', color: 'primary.main', border: 1, borderColor: 'divider' }}>
               {usuario?.nombre.trim().split(/\s+/).slice(0, 2).map((parte) => parte[0]).join('').toUpperCase()}
@@ -259,7 +228,6 @@ export default function MainLayout() {
         </Toolbar>
       </AppBar>
 
-      {/* Menú en celular: se abre con el botón hamburguesa. */}
       <Drawer
         variant="temporary"
         open={menuMovilAbierto}
@@ -269,7 +237,6 @@ export default function MainLayout() {
         {menu}
       </Drawer>
 
-      {/* Menú en escritorio: siempre visible. */}
       <Drawer
         variant="permanent"
         sx={{
@@ -284,7 +251,6 @@ export default function MainLayout() {
 
       <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3, lg: 4 }, minWidth: 0 }}>
         <Toolbar />
-        {/* Aquí React Router pinta la página de la ruta actual. */}
         <Box sx={{ maxWidth: 1440, mx: 'auto' }}><Outlet /></Box>
       </Box>
     </Box>
