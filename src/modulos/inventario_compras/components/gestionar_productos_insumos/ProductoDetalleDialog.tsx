@@ -28,6 +28,8 @@ interface Props {
   /** null = diálogo cerrado. */
   producto: Producto | null;
   onCerrar: () => void;
+  /** El historial de ajustes solo lo ve quien gestiona el inventario (PRODUCTO_GESTIONAR). */
+  verHistorial?: boolean;
 }
 
 /** Un dato del detalle: etiqueta arriba, valor abajo. */
@@ -74,7 +76,7 @@ function HistorialAjustes({ idProducto }: { idProducto: number }) {
 }
 
 /** CU22 flujo Consultar: muestra todos los detalles del ítem y su historial de ajustes. */
-export default function ProductoDetalleDialog({ producto, onCerrar }: Props) {
+export default function ProductoDetalleDialog({ producto, onCerrar, verHistorial = true }: Props) {
   return (
     <Dialog open={producto !== null} onClose={onCerrar} fullWidth maxWidth="sm" aria-labelledby="detalle-producto-titulo">
       {producto && (
@@ -96,9 +98,13 @@ export default function ProductoDetalleDialog({ producto, onCerrar }: Props) {
               <Dato etiqueta="Stock actual">{producto.stockActual}</Dato>
               <Dato etiqueta="Stock mínimo">{producto.stockMinimo}</Dato>
             </Box>
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>Ajustes de stock</Typography>
-            <HistorialAjustes idProducto={producto.idProducto} />
+            {verHistorial && (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>Ajustes de stock</Typography>
+                <HistorialAjustes idProducto={producto.idProducto} />
+              </>
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={onCerrar}>Cerrar</Button>

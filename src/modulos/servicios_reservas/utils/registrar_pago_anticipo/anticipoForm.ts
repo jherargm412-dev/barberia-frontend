@@ -1,9 +1,9 @@
 import { MAX_REFERENCIA_QR, MENSAJES_ANTICIPO } from '../../constants/registrar_pago_anticipo';
-import type { MetodoPagoAnticipo, RegistrarAnticipoRequest } from '../../types/registrar_pago_anticipo';
+import type { MetodoMostrador, RegistrarAnticipoRequest } from '../../types/registrar_pago_anticipo';
 
 /** Lo que el usuario tiene escrito en el diálogo (todo texto, como lo entrega un input). */
 export interface DatosCobro {
-  metodo: MetodoPagoAnticipo;
+  metodo: MetodoMostrador;
   efectivo: string;
   qr: string;
   referencia: string;

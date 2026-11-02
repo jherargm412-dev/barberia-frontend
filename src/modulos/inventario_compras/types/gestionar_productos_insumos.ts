@@ -19,7 +19,8 @@ export interface Producto {
 
 /**
  * Body de POST /productos y PUT /productos/{id} (ProductoRequestDTO.java).
- * No lleva stock actual ni estado: el stock empieza en 0 y el estado cambia por PATCH /estado.
+ * No lleva stock actual ni estado: el estado cambia por PATCH /estado.
+ * stockInicial solo se usa al registrar (0 si no se envía); al modificar el backend lo ignora.
  * precioVenta es opcional para INSUMO (el backend guarda 0).
  */
 export interface ProductoRequest {
@@ -30,6 +31,7 @@ export interface ProductoRequest {
   precioVenta: number | null;
   comisionUnitaria: number;
   stockMinimo: number;
+  stockInicial?: number;
 }
 
 /** Respuesta de POST, PUT y PATCH: "Ítem registrado", "Ítem actualizado", etc. + el producto. */
@@ -38,8 +40,11 @@ export interface RespuestaProducto {
   producto: Producto;
 }
 
-/** Motivo del ajuste manual de stock (CHECK de la tabla ajuste_stock en V19). */
-export type TipoAjusteStock = 'INVENTARIO_INICIAL' | 'PERDIDA' | 'VENCIDO';
+/**
+ * Motivo del ajuste de stock (CHECK de la tabla ajuste_stock en V19 y V27).
+ * INVENTARIO_INICIAL lo registra el alta del ítem; los demás se eligen en "Ajustar stock".
+ */
+export type TipoAjusteStock = 'INVENTARIO_INICIAL' | 'SOBRANTE' | 'FALTANTE' | 'PERDIDA' | 'VENCIDO';
 
 /** Body de POST /productos/{id}/ajustes (AjusteStockRequestDTO.java). La cantidad siempre es positiva. */
 export interface AjusteStockRequest {

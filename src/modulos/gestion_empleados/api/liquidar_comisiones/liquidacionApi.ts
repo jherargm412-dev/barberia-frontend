@@ -11,6 +11,3 @@ export async function pagarLiquidacion(empleadoId: number, cajaId: number, datos
   return respuesta.data;
 }
 
-// NOTA: Necesitas importar tus funciones de empleados y caja.
-// Ejemplo: import { listarEmpleados } from '../../../gestion_empleados/api/gestionar_barberos/empleadosApi';
-// Ejemplo: import { obtenerCajaActual } from '../../../ventas_caja/api/gestionar_caja/cajaApi';

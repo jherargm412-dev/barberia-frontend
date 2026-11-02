@@ -6,5 +6,7 @@ export { default as PasarelaPagoPage } from './pages/gestionar_pasarela_pago/Pas
 export { PERMISOS_PASARELA } from './constants/gestionar_pasarela_pago';
 export { default as RegistrarVentaPage } from './pages/registrar_venta/RegistrarVentaPage';
 export { PERMISO_VENTA_REGISTRAR } from './constants/registrar_venta';
+// CU18 paga las comisiones como egreso de la caja abierta.
+export { obtenerCajaActual } from './api/gestionar_caja/cajaApi';
 // Exporta aquí las páginas y lo que otros módulos necesiten. Estructura: ver ../README.md
 export {};

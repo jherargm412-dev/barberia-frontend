@@ -20,10 +20,12 @@ interface Props {
   textoBoton: string;
   onGuardar: (valores: ProductoFormValores) => Promise<void>;
   onCancelar: () => void;
+  /** Solo en "Nuevo ítem": el stock inicial se carga al registrar; después cambia por compras y ajustes. */
+  mostrarStockInicial?: boolean;
 }
 
 /** Formulario compartido entre "Nuevo ítem" (vacío) y "Editar ítem" (con datos). CU22 paso 4. */
-export default function ProductoForm({ valoresIniciales, textoBoton, onGuardar, onCancelar }: Props) {
+export default function ProductoForm({ valoresIniciales, textoBoton, onGuardar, onCancelar, mostrarStockInicial = false }: Props) {
   const [valores, setValores] = useState<ProductoFormValores>(valoresIniciales);
   const [errores, setErrores] = useState<ErroresFormulario>({});
   const [errorGeneral, setErrorGeneral] = useState('');
@@ -140,16 +142,29 @@ export default function ProductoForm({ valoresIniciales, textoBoton, onGuardar, 
           helperText={errores.comisionUnitaria ?? 'Monto para el barbero vendedor. Se aplica a las nuevas ventas; 0 significa sin comisión.'}
           slotProps={{ htmlInput: { inputMode: 'decimal' }, input: { startAdornment: <InputAdornment position="start">Bs</InputAdornment> } }}
         />}
-        <TextField
-          label="Stock mínimo"
-          required
-          value={valores.stockMinimo}
-          onChange={(e) => cambiar('stockMinimo', e.target.value)}
-          error={!!errores.stockMinimo}
-          helperText={errores.stockMinimo ?? 'Se avisa cuando el stock llega a esta cantidad'}
-          sx={{ maxWidth: { sm: 'calc(50% - 8px)' } }}
-          slotProps={{ htmlInput: { inputMode: 'numeric' } }}
-        />
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+          {mostrarStockInicial && (
+            <TextField
+              label="Stock inicial"
+              value={valores.stockInicial}
+              onChange={(e) => cambiar('stockInicial', e.target.value)}
+              error={!!errores.stockInicial}
+              helperText={errores.stockInicial ?? 'Unidades que ya hay (opcional, 0 si se deja vacío)'}
+              sx={{ flex: 1 }}
+              slotProps={{ htmlInput: { inputMode: 'numeric' } }}
+            />
+          )}
+          <TextField
+            label="Stock mínimo"
+            required
+            value={valores.stockMinimo}
+            onChange={(e) => cambiar('stockMinimo', e.target.value)}
+            error={!!errores.stockMinimo}
+            helperText={errores.stockMinimo ?? 'Se avisa cuando el stock llega a esta cantidad'}
+            sx={mostrarStockInicial ? { flex: 1 } : { maxWidth: { sm: 'calc(50% - 8px)' } }}
+            slotProps={{ htmlInput: { inputMode: 'numeric' } }}
+          />
+        </Stack>
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 1 }}>
           <Button onClick={onCancelar} disabled={enviando}>

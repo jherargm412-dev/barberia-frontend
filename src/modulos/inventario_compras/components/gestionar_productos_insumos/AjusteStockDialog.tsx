@@ -13,7 +13,7 @@ import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { ajustarStock } from '../../api/gestionar_productos_insumos/productosApi';
 import { MENSAJES, TIPOS_AJUSTE } from '../../constants/gestionar_productos_insumos';
 import type { Producto, TipoAjusteStock } from '../../types/gestionar_productos_insumos';
-import { datosAjuste } from '../../utils/gestionar_productos_insumos/productoForm';
+import { datosAjuste, MAX_CANTIDAD } from '../../utils/gestionar_productos_insumos/productoForm';
 
 interface Props {
   abierto: boolean;
@@ -26,8 +26,12 @@ interface Props {
 
 type Errores = Partial<Record<'tipo' | 'cantidad' | 'observacion', string>>;
 
+// Motivos que se pueden elegir aquí; el inventario inicial se carga al crear el ítem.
+const MOTIVOS = TIPOS_AJUSTE.filter((t) => t.manual);
+
 /**
- * Flujo "Ajustar stock": inventario inicial (suma, una sola vez por ítem) o pérdida / vencido (restan).
+ * Flujo "Ajustar stock": sobrante (suma) o faltante / pérdida / vencido (restan).
+ * Las correcciones (sobrante y faltante) exigen observación.
  * La página lo vuelve a montar (key) cada vez que se abre, así empieza vacío.
  */
 export default function AjusteStockDialog({ abierto, producto, onCerrar, onAjustado }: Props) {
@@ -41,6 +45,7 @@ export default function AjusteStockDialog({ abierto, producto, onCerrar, onAjust
   const stockActual = producto?.stockActual ?? 0;
   const cantidadValida = /^\d{1,9}$/.test(cantidad.trim()) && Number(cantidad) > 0;
   // Vista previa: cómo quedará el stock si se confirma.
+  const pideMotivo = tipo ? datosAjuste(tipo).motivo : false;
   const stockNuevo = tipo && cantidadValida
     ? stockActual + (datosAjuste(tipo).suma ? 1 : -1) * Number(cantidad)
     : null;
@@ -55,10 +60,13 @@ export default function AjusteStockDialog({ abierto, producto, onCerrar, onAjust
     if (!tipo) nuevos.tipo = 'Obligatorio';
     if (!cantidad.trim()) nuevos.cantidad = 'Obligatorio';
     else if (!cantidadValida) nuevos.cantidad = 'Debe ser un número entero mayor a 0';
+    else if (Number(cantidad) > MAX_CANTIDAD) nuevos.cantidad = `Máximo ${MAX_CANTIDAD.toLocaleString('es-BO')}`;
     else if (stockNuevo !== null && stockNuevo < 0) nuevos.cantidad = `Máximo ${stockActual}`;
+    if (pideMotivo && !observacion.trim()) nuevos.observacion = 'Explique la corrección';
     setErrores(nuevos);
     if (Object.keys(nuevos).length > 0) {
-      setErrorGeneral(!tipo || !cantidad.trim() ? MENSAJES.CAMPOS_VACIOS : MENSAJES.VALOR_INVALIDO);
+      const faltanObligatorios = !tipo || !cantidad.trim() || (pideMotivo && !observacion.trim());
+      setErrorGeneral(faltanObligatorios ? MENSAJES.CAMPOS_VACIOS : MENSAJES.VALOR_INVALIDO);
       return;
     }
 
@@ -71,7 +79,7 @@ export default function AjusteStockDialog({ abierto, producto, onCerrar, onAjust
       });
       onAjustado(respuesta.mensaje);
     } catch (err) {
-      // Por ejemplo "El inventario inicial de este ítem ya fue registrado".
+      // Por ejemplo "El ítem está deshabilitado; habilítelo para ajustar su stock".
       const { mensaje, campos } = obtenerError(err);
       setErrorGeneral(mensaje);
       setErrores(campos as Errores);
@@ -101,9 +109,9 @@ export default function AjusteStockDialog({ abierto, producto, onCerrar, onAjust
                 setErrores((anteriores) => ({ ...anteriores, tipo: undefined }));
               }}
               error={!!errores.tipo}
-              helperText={errores.tipo ?? 'Inventario inicial suma (una sola vez); pérdida y vencido restan.'}
+              helperText={errores.tipo ?? 'Use sobrante o faltante para corregir un conteo; pérdida y vencido restan.'}
             >
-              {TIPOS_AJUSTE.map((t) => (
+              {MOTIVOS.map((t) => (
                 <MenuItem key={t.valor} value={t.valor}>
                   {t.etiqueta} ({t.suma ? 'suma' : 'resta'})
                 </MenuItem>
@@ -123,12 +131,16 @@ export default function AjusteStockDialog({ abierto, producto, onCerrar, onAjust
             />
             <TextField
               label="Observación"
+              required={pideMotivo}
               multiline
               minRows={2}
               value={observacion}
-              onChange={(e) => setObservacion(e.target.value)}
+              onChange={(e) => {
+                setObservacion(e.target.value);
+                setErrores((anteriores) => ({ ...anteriores, observacion: undefined }));
+              }}
               error={!!errores.observacion}
-              helperText={errores.observacion ?? `${observacion.length}/200 (opcional)`}
+              helperText={errores.observacion ?? `${observacion.length}/200${pideMotivo ? '' : ' (opcional)'}`}
               slotProps={{ htmlInput: { maxLength: 200 } }}
             />
           </Stack>

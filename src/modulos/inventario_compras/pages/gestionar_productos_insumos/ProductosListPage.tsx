@@ -7,16 +7,23 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
 import PageHeader from '../../../../shared/components/PageHeader';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
+import { useAuth } from '../../../seguridad_usuarios';
 import { cambiarEstadoProducto, listarProductos } from '../../api/gestionar_productos_insumos/productosApi';
 import AjusteStockDialog from '../../components/gestionar_productos_insumos/AjusteStockDialog';
 import ProductoDetalleDialog from '../../components/gestionar_productos_insumos/ProductoDetalleDialog';
 import ProductosTabla from '../../components/gestionar_productos_insumos/ProductosTabla';
+import { PERMISOS } from '../../constants/gestionar_productos_insumos';
 import type { Producto } from '../../types/gestionar_productos_insumos';
 
-/** CU22 paso 2 (listado) y flujos Consultar, Habilitar, Deshabilitar y Ajustar stock. */
+/**
+ * CU22 paso 2 (listado) y flujos Consultar, Habilitar, Deshabilitar y Ajustar stock.
+ * Con solo PRODUCTO_CONSULTAR (Recepcionista) la pantalla es de solo lectura.
+ */
 export default function ProductosListPage() {
   const navigate = useNavigate();
   const ubicacion = useLocation();
+  const { tienePermiso } = useAuth();
+  const puedeGestionar = tienePermiso(PERMISOS.GESTIONAR);
 
   const [productos, setProductos] = useState<Producto[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -91,9 +98,11 @@ export default function ProductosListPage() {
   return (
     <>
       <PageHeader title="Productos e insumos" description="Registra los productos de venta y los insumos de consumo interno." action={
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/productos/nuevo')}>
-          Nuevo ítem
-        </Button>
+        puedeGestionar && (
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/productos/nuevo')}>
+            Nuevo ítem
+          </Button>
+        )
       } />
 
       {mensaje && (
@@ -114,6 +123,7 @@ export default function ProductosListPage() {
         onVer={setViendo}
         onCambiarEstado={pedirConfirmacion}
         onAjustarStock={abrirAjuste}
+        soloLectura={!puedeGestionar}
       />
 
       <AjusteStockDialog
@@ -124,7 +134,7 @@ export default function ProductosListPage() {
         onAjustado={ajusteGuardado}
       />
 
-      <ProductoDetalleDialog producto={viendo} onCerrar={() => setViendo(null)} />
+      <ProductoDetalleDialog producto={viendo} onCerrar={() => setViendo(null)} verHistorial={puedeGestionar} />
 
       <ConfirmDialog
         abierto={confirmando}
