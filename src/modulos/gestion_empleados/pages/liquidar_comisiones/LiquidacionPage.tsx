@@ -19,6 +19,8 @@ import CalculateIcon from '@mui/icons-material/CalculateOutlined';
 
 import PageHeader from '../../../../shared/components/PageHeader';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
+import { obtenerCajaActual } from '../../../ventas_caja';
+import { listarEmpleados } from '../../api/gestionar_barberos/empleadosApi';
 import { calcularLiquidacion, pagarLiquidacion } from '../../api/liquidar_comisiones/liquidacionApi';
 import type { LiquidacionResponse } from '../../types/liquidar_comisiones';
 
@@ -39,18 +41,17 @@ export default function LiquidacionPage() {
   useEffect(() => {
     let vigente = true;
 
-    const peticionEmpleados = Promise.resolve([
-      { idEmpleado: 3, nombre: 'Marco Antonio Cuéllar' },
-      { idEmpleado: 4, nombre: 'Luis Fernando Paz' }
-    ]);
-    
-    const peticionCaja = Promise.resolve({ idCaja: 1, estado: 'ABIERTA' });
+    // Solo los comisionistas activos tienen comisiones; el pago sale de la caja abierta (CU21).
+    const peticionEmpleados = listarEmpleados({
+      q: '', rol: '', estado: 'ACTIVO', tipoContrato: 'COMISIONISTA', page: 0, size: 100,
+    });
+    const peticionCaja = obtenerCajaActual();
 
     Promise.all([peticionEmpleados, peticionCaja])
-      .then(([listaEmpleados, cajaActual]) => {
+      .then(([pagina, cajaActual]) => {
         if (vigente) {
-          setEmpleados(listaEmpleados);
-          setCajaId(cajaActual?.idCaja || null);
+          setEmpleados(pagina.contenido.map((e) => ({ idEmpleado: e.idEmpleado, nombre: e.nombre })));
+          setCajaId(cajaActual?.estado === 'ABIERTA' ? cajaActual.idCaja : null);
         }
       })
       .catch((err: unknown) => {
