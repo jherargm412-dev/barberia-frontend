@@ -44,7 +44,7 @@ type MetodoElegido = string;
 const IMPORTE = /^\d{1,8}(?:\.\d{1,2})?$/;
 const vaciaServicio = (clave: number): LineaServicioFormulario => ({ clave, servicioId: '', empleadoId: '' });
 const vacioProducto = (clave: number): LineaProductoFormulario => ({
-  clave, productoId: '', cantidad: '1', descripcion: '',
+  clave, productoId: '', cantidad: '1', descripcion: '', empleadoId: '',
 });
 const vacioPago = (clave: number, metodoPagoId: number | ''): LineaPagoFormulario => ({
   clave, metodoPagoId, monto: '',
@@ -508,6 +508,12 @@ export default function RegistrarVentaPage() {
                   helperText={errores[`productos[${indice}].cantidad`] ?? ''}
                   slotProps={{ htmlInput: { min: 1, max: producto?.stockActual ?? 100000, step: 1 } }}
                   onChange={(e) => actualizarProducto(linea.clave, { cantidad: e.target.value })} />
+                <TextField select label="Barbero vendedor" fullWidth disabled={bloqueadaPorPago}
+                  value={linea.empleadoId} helperText="Sin asignar: sin comisión de barbero"
+                  onChange={e => actualizarProducto(linea.clave, { empleadoId: e.target.value === '' ? '' : Number(e.target.value) })}>
+                  <MenuItem value="">Sin asignar</MenuItem>
+                  {(opciones.barberosVendedores ?? []).map(b => <MenuItem key={b.idEmpleado} value={b.idEmpleado}>{b.nombre}</MenuItem>)}
+                </TextField>
                 <TextField label="Descripción (opcional)" sx={{ minWidth: 180 }} disabled={bloqueadaPorPago}
                   value={linea.descripcion} slotProps={{ htmlInput: { maxLength: 150 } }}
                   onChange={(e) => actualizarProducto(linea.clave, { descripcion: e.target.value })} />

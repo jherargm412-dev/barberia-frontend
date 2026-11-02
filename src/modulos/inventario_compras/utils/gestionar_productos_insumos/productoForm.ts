@@ -8,6 +8,7 @@ export interface ProductoFormValores {
   descripcion: string;
   costo: string;
   precioVenta: string;
+  comisionUnitaria: string;
   stockMinimo: string;
 }
 
@@ -19,6 +20,7 @@ export const VALORES_VACIOS: ProductoFormValores = {
   descripcion: '',
   costo: '',
   precioVenta: '',
+  comisionUnitaria: '0',
   stockMinimo: '',
 };
 
@@ -81,6 +83,11 @@ export function validarProducto(v: ProductoFormValores): { mensaje: string; erro
     hayInvalidos = true;
   }
 
+  if (v.tipo !== 'INSUMO' && v.comisionUnitaria.trim() && !MONTO.test(v.comisionUnitaria.trim())) {
+    errores.comisionUnitaria = 'Debe ser un monto no negativo con máximo 2 decimales';
+    hayInvalidos = true;
+  }
+
   if (!v.stockMinimo.trim()) {
     errores.stockMinimo = 'Obligatorio';
     hayVacios = true;
@@ -103,6 +110,7 @@ export function valoresDesdeProducto(p: Producto): ProductoFormValores {
     descripcion: p.descripcion ?? '',
     costo: p.costo.toFixed(2),
     precioVenta: p.precioVenta.toFixed(2),
+    comisionUnitaria: (p.comisionUnitaria ?? 0).toFixed(2),
     stockMinimo: String(p.stockMinimo),
   };
 }
@@ -115,6 +123,7 @@ export function construirRequest(v: ProductoFormValores): ProductoRequest {
     descripcion: v.descripcion.trim() || null,
     costo: aNumero(v.costo),
     precioVenta: v.precioVenta.trim() ? aNumero(v.precioVenta) : null,
+    comisionUnitaria: v.tipo === 'INSUMO' || !v.comisionUnitaria.trim() ? 0 : aNumero(v.comisionUnitaria),
     stockMinimo: Number(v.stockMinimo.trim()),
   };
 }

@@ -14,6 +14,7 @@ export interface LineaServicioFormulario {
 }
 
 export interface LineaProductoFormulario {
+  empleadoId: number | '';
   clave: number;
   productoId: number | '';
   cantidad: string;
@@ -46,6 +47,7 @@ export function construirDatosVenta(
     empleadoId: Number(linea.empleadoId),
   }));
   const lineasProducto: LineaProductoVentaRequest[] = productos.map((linea) => ({
+    ...(linea.empleadoId ? { empleadoId: Number(linea.empleadoId) } : {}),
     productoId: Number(linea.productoId),
     cantidad: Number(linea.cantidad),
     ...(linea.descripcion.trim() ? { descripcion: linea.descripcion.trim() } : {}),

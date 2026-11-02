@@ -11,6 +11,7 @@ export interface Producto {
   descripcion: string | null;
   costo: number;
   precioVenta: number;
+  comisionUnitaria: number;
   stockMinimo: number;
   stockActual: number;
   activo: boolean;
@@ -27,6 +28,7 @@ export interface ProductoRequest {
   descripcion: string | null;
   costo: number;
   precioVenta: number | null;
+  comisionUnitaria: number;
   stockMinimo: number;
 }
 

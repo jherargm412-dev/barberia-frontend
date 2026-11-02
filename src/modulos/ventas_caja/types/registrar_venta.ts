@@ -27,6 +27,7 @@ export interface OpcionesFormularioVenta {
   servicios: ServicioVenta[];
   productos: ProductoVenta[];
   metodosPago: MetodoPagoVenta[];
+  barberosVendedores: { idEmpleado: number; nombre: string }[];
 }
 
 export interface ClienteVenta {
@@ -56,6 +57,7 @@ export interface LineaServicioVentaRequest {
 }
 
 export interface LineaProductoVentaRequest {
+  empleadoId?: number;
   productoId: number;
   cantidad: number;
   descripcion?: string;

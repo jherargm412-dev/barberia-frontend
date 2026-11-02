@@ -84,6 +84,7 @@ const GRUPOS: GrupoMenu[] = [
       { texto: 'Barberos', ruta: '/empleados', icono: <BadgeIcon />, permiso: 'USUARIO_GESTIONAR' },
       { texto: 'Servicios', ruta: '/servicios', icono: <ContentCutIcon />, permiso: 'SERVICIO_GESTIONAR' },
       { texto: 'Liquidaciones', ruta: '/liquidaciones', icono: <PaymentsIcon />, permiso: 'PAGO_EMPLEADO_GENERAR' },
+      { texto: 'Comisiones', ruta: '/comisiones', icono: <PaymentsIcon />, permiso: 'COMISION_CONSULTAR_PROPIA' },
     ],
   },
   {

@@ -132,6 +132,14 @@ export default function ProductoForm({ valoresIniciales, textoBoton, onGuardar, 
             }}
           />
         </Stack>
+        {!esInsumo && <TextField
+          label="Comisión por unidad"
+          value={valores.comisionUnitaria}
+          onChange={e => cambiar('comisionUnitaria', e.target.value)}
+          error={!!errores.comisionUnitaria}
+          helperText={errores.comisionUnitaria ?? 'Monto para el barbero vendedor. Se aplica a las nuevas ventas; 0 significa sin comisión.'}
+          slotProps={{ htmlInput: { inputMode: 'decimal' }, input: { startAdornment: <InputAdornment position="start">Bs</InputAdornment> } }}
+        />}
         <TextField
           label="Stock mínimo"
           required

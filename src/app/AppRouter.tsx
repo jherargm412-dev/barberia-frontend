@@ -51,6 +51,7 @@ import {
   EmpleadoCrearPage,
   EmpleadoEditarPage,
   EmpleadosListPage,
+  ComisionesPage,
   PERMISOS_EMPLEADOS,
 } from '../modulos/gestion_empleados';
 import MainLayout from '../shared/layouts/MainLayout';
@@ -119,6 +120,8 @@ export default function AppRouter() {
             </Route>
           </Route>
 
+          {/* CU19: Consultar Comisiones */}
+          <Route path="/comisiones" element={<ComisionesPage />} />
           {/* CU18: Registrar Liquidación de Comisiones */}
           <Route element={<RequierePermiso permiso="PAGO_EMPLEADO_GENERAR" />}>
             <Route path="/liquidaciones" element={<LiquidacionPage />} />
