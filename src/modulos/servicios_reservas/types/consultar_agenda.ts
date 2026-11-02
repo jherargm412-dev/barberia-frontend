@@ -14,6 +14,8 @@ export interface CitaAgenda {
   estado: EstadoAgenda;
   canal: CanalAgenda;
   montoAnticipo: number;
+  /** Si ya se cobró el anticipo (CU14). */
+  anticipoPagado: boolean;
   cliente: { idCliente: number; nombre: string; telefono: string | null };
   servicio: { idServicio: number; nombre: string; precio: number };
   /** Null si la cita no tiene barbero asignado. */

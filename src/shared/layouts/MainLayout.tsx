@@ -1,29 +1,30 @@
-<<<<<<< HEAD
 import AccountCircleIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
 import BadgeIcon from '@mui/icons-material/BadgeOutlined';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonthOutlined';
 import ContentCutIcon from '@mui/icons-material/ContentCutOutlined';
+import CreditCardIcon from '@mui/icons-material/CreditCardOutlined';
 import EventAvailableIcon from '@mui/icons-material/EventAvailableOutlined';
 import EventIcon from '@mui/icons-material/EventOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import HistoryIcon from '@mui/icons-material/HistoryOutlined';
 import HomeIcon from '@mui/icons-material/HomeOutlined';
+import Inventory2Icon from '@mui/icons-material/Inventory2Outlined';
+import LocalShippingIcon from '@mui/icons-material/LocalShippingOutlined';
 import LogoutIcon from '@mui/icons-material/LogoutOutlined';
-=======
 import BadgeIcon from '@mui/icons-material/Badge';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import HistoryIcon from '@mui/icons-material/History';
 import HomeIcon from '@mui/icons-material/Home';
 import LogoutIcon from '@mui/icons-material/Logout';
->>>>>>> origin/bastian
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
 import PeopleIcon from '@mui/icons-material/PeopleOutlined';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCartOutlined';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -41,6 +42,7 @@ import { useState, type ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../modulos/seguridad_usuarios';
 import ThemeModeButton from '../components/ThemeModeButton';
+import PaymentsIcon from '@mui/icons-material/PaymentsOutlined';
 
 const ANCHO_MENU = 280;
 
@@ -55,7 +57,6 @@ interface OpcionMenu {
   permiso?: string | string[];
 }
 
-<<<<<<< HEAD
 interface GrupoMenu {
   titulo: string;
   icono: ReactNode;
@@ -70,6 +71,11 @@ const GRUPOS: GrupoMenu[] = [
   {
     // Agrupa las nuevas pantallas de reservas conservando sus permisos.
     titulo: 'Citas y horarios', icono: <CalendarMonthIcon />, opciones: [
+      // CU12: el cliente solicita su cita en línea.
+      { texto: 'Solicitar cita', ruta: '/solicitar-cita', icono: <EventNoteIcon />, permiso: 'RESERVA_SOLICITAR' },
+      { texto: 'Mis citas', ruta: '/mis-citas', icono: <EventIcon />, permiso: 'RESERVA_SOLICITAR' },
+      // CU13: catálogo de servicios (también público, desde el login) para elegir qué reservar.
+      { texto: 'Catálogo de servicios', ruta: '/catalogo', icono: <ContentCutIcon />, permiso: ['RESERVA_SOLICITAR', 'RESERVA_CREAR'] },
       { texto: 'Citas', ruta: '/citas', icono: <EventIcon />, permiso: 'AGENDA_CONSULTAR' },
       { texto: 'Agenda de Citas', ruta: '/agenda', icono: <CalendarMonthIcon />, permiso: ['AGENDA_CONSULTAR', 'AGENDA_CONSULTAR_PROPIA'] },
       // CU10: horas libres por servicio y barbero, para agendar.
@@ -82,11 +88,11 @@ const GRUPOS: GrupoMenu[] = [
       { texto: 'Clientes', ruta: '/clientes', icono: <PeopleIcon />, permiso: 'CLIENTE_CONSULTAR' },
       { texto: 'Barberos', ruta: '/empleados', icono: <BadgeIcon />, permiso: 'USUARIO_GESTIONAR' },
       { texto: 'Servicios', ruta: '/servicios', icono: <ContentCutIcon />, permiso: 'SERVICIO_GESTIONAR' },
+      { texto: 'Liquidaciones', ruta: '/liquidaciones', icono: <PaymentsIcon />, permiso: 'PAGO_EMPLEADO_GENERAR' },
     ],
   },
   {
     titulo: 'Usuarios y permisos', icono: <AdminPanelSettingsIcon />, opciones: [
-  { texto: 'Solicitar cita', ruta: '/solicitar-cita', icono: <EventNoteIcon />, permiso: 'RESERVA_SOLICITAR' },
       { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
       { texto: 'Roles y permisos', ruta: '/roles', icono: <AdminPanelSettingsIcon />, permiso: 'ROL_ASIGNAR' },
       { texto: 'Bitácora', ruta: '/bitacora', icono: <HistoryIcon />, permiso: 'BITACORA_CONSULTAR' },
@@ -94,11 +100,22 @@ const GRUPOS: GrupoMenu[] = [
   },
   {
     titulo: 'Ventas y caja', icono: <AccountBalanceWalletIcon />, opciones: [
+      { texto: 'Registrar venta', ruta: '/ventas/registrar', icono: <ShoppingCartIcon />, permiso: 'VENTA_REGISTRAR' },
       // CU21 conserva la visibilidad según el permiso de consulta.
       { texto: 'Caja', ruta: '/caja', icono: <AccountBalanceWalletIcon />, permiso: 'CAJA_CONSULTAR' },
+      // Gestionar pasarela de pago: cobros con tarjeta (Stripe) y activación de pasarelas.
+      { texto: 'Pasarela de pago', ruta: '/pasarela-pago', icono: <CreditCardIcon />, permiso: ['PASARELA_PAGO_COBRAR', 'PASARELA_PAGO_GESTIONAR'] },
     ],
   },
-=======
+  {
+    titulo: 'Inventario y compras', icono: <Inventory2Icon />, opciones: [
+      // CU22: productos de venta e insumos de consumo interno.
+      { texto: 'Productos e insumos', ruta: '/productos', icono: <Inventory2Icon />, permiso: 'PRODUCTO_GESTIONAR' },
+      { texto: 'Proveedores', ruta: '/proveedores', icono: <LocalShippingIcon />, permiso: 'PROVEEDOR_GESTIONAR' },
+      // CU25: compras a proveedores; suman al stock.
+      { texto: 'Compras', ruta: '/compras', icono: <ShoppingCartIcon />, permiso: 'COMPRA_REGISTRAR' },
+    ],
+  },
 const OPCIONES: OpcionMenu[] = [
   { texto: 'Inicio', ruta: '/', icono: <HomeIcon /> },
   // La opción de CU06 solo aparece para usuarios que pueden consultar clientes.
@@ -108,7 +125,6 @@ const OPCIONES: OpcionMenu[] = [
   { texto: 'Barberos', ruta: '/barberos', icono: <BadgeIcon />, permiso: 'USUARIO_GESTIONAR' },
   { texto: 'Servicios', ruta: '/servicios', icono: <ContentCutIcon />, permiso: 'SERVICIO_GESTIONAR' },
   { texto: 'Bitácora', ruta: '/bitacora', icono: <HistoryIcon />, permiso: 'BITACORA_CONSULTAR' },
->>>>>>> origin/bastian
 ];
 
 function rutaSeleccionada(ruta: string, pathname: string) {

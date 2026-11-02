@@ -7,6 +7,14 @@ export async function obtenerCajaActual(): Promise<Caja | null> {
   return respuesta.data || null;
 }
 
+/** Historial: cajas cerradas con su arqueo, por fecha de apertura (sin fechas, los últimos 30 días). */
+export async function listarCajasCerradas(desde: string, hasta: string): Promise<Caja[]> {
+  const respuesta = await http.get<Caja[]>('/caja/cerradas', {
+    params: { desde: desde || undefined, hasta: hasta || undefined },
+  });
+  return respuesta.data;
+}
+
 export async function listarMovimientos(idCaja: number): Promise<MovimientoCaja[]> {
   const respuesta = await http.get<MovimientoCaja[]>(`/caja/${idCaja}/movimientos`);
   return respuesta.data;

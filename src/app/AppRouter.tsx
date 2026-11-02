@@ -39,6 +39,11 @@ import {
   ServiciosListPage,
   PERMISOS_SOLICITUD,
   SolicitarCitaPage,
+  PortadaPage,
+  ReservarServicioPage,
+  ReservaInvitadoPage,
+  CitaInvitadoPage,
+  MisCitasPage,
   PagoAnticipoPage,
   PERMISOS_ANTICIPO,
 } from '../modulos/servicios_reservas';
@@ -50,11 +55,15 @@ import {
 } from '../modulos/gestion_empleados';
 import MainLayout from '../shared/layouts/MainLayout';
 import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
-import { CajaPage, PERMISOS_CAJA } from '../modulos/ventas_caja';
 import { BarberoCrearPage, BarberoEditarPage, BarberosListPage, PERMISOS_BARBEROS } from '../modulos/gestion_empleados';
+import {CajaHistorialPage, CajaPage, PasarelaPagoPage, PERMISOS_CAJA, PERMISO_VENTA_REGISTRAR, RegistrarVentaPage,
+} from '../modulos/ventas_caja';
+import { PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosListPage } from '../modulos/inventario_compras';
 import InicioPage from '../shared/pages/InicioPage';
+import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
+import { CompraRegistrarPage, ComprasListPage, PERMISOS_COMPRAS } from '../modulos/inventario_compras';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
-
+import { LiquidacionPage } from '../modulos/gestion_empleados';
 /** Todas las rutas de la app en un solo lugar. */
 export default function AppRouter() {
   return (
@@ -65,9 +74,14 @@ export default function AppRouter() {
       <Route path="/activar" element={<ActivarCuentaPage />} />
       {/* CU13 Consultar Servicios: catálogo público, se abre desde el login sin iniciar sesión. */}
       <Route path="/catalogo" element={<ConsultarServiciosPage />} />
+      {/* CU12 + CU14 sin cuenta: reservar con nombre y teléfono, y "Mi cita" (enlace secreto) para ver y pagar. */}
+      <Route path="/reservar-sin-cuenta" element={<ReservaInvitadoPage />} />
+      <Route path="/mi-cita/:codigo" element={<CitaInvitadoPage />} />
 
-      {/* Privadas: requieren sesión y usan el layout con menú */}
-      <Route element={<RutaProtegida />}>
+      {/* Privadas: requieren sesión y usan el layout con menú. Sin sesión, "/" muestra la portada pública. */}
+      <Route element={<RutaProtegida portada={<PortadaPage />} />}>
+        {/* CU13 paso 3: tras el login, "Reservar" envía a CU12 (cliente) o CU11 (recepción). */}
+        <Route path="/reservar" element={<ReservarServicioPage />} />
         <Route element={<MainLayout />}>
           <Route path="/" element={<InicioPage />} />
           {/* CU06: cada ruta exige el permiso de la operación que presenta. */}
@@ -103,6 +117,11 @@ export default function AppRouter() {
             </Route>
           </Route>
 
+          {/* CU18: Registrar Liquidación de Comisiones */}
+          <Route element={<RequierePermiso permiso="PAGO_EMPLEADO_GENERAR" />}>
+            <Route path="/liquidaciones" element={<LiquidacionPage />} />
+          </Route>
+
           {/* CU03 Roles y permisos: solo el Administrador (ROL_ASIGNAR). */}
           <Route element={<RequierePermiso permiso={PERMISOS_ROLES.GESTIONAR} />}>
             <Route path="/roles" element={<RolesListPage />} />
@@ -128,6 +147,24 @@ export default function AppRouter() {
             <Route path="/servicios/nuevo" element={<ServicioCrearPage />} />
             <Route path="/servicios/:id/editar" element={<ServicioEditarPage />} />
           </Route>
+
+          {/* CU22 Productos e insumos: requiere el permiso PRODUCTO_GESTIONAR (solo el Administrador). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_PROVEEDORES.GESTIONAR} />}>
+            <Route path="/proveedores" element={<ProveedoresListPage />} />
+            <Route path="/proveedores/nuevo" element={<ProveedorEditarPage />} />
+            <Route path="/proveedores/:id/editar" element={<ProveedorEditarPage />} />
+          </Route>
+          <Route element={<RequierePermiso permiso={PERMISOS_PRODUCTOS.GESTIONAR} />}>
+            <Route path="/productos" element={<ProductosListPage />} />
+            <Route path="/productos/nuevo" element={<ProductoCrearPage />} />
+            <Route path="/productos/:id/editar" element={<ProductoEditarPage />} />
+          </Route>
+          {/* CU25 Registrar compras: requiere COMPRA_REGISTRAR (solo el Administrador). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_COMPRAS.REGISTRAR} />}>
+            <Route path="/compras" element={<ComprasListPage />} />
+            <Route path="/compras/nueva" element={<CompraRegistrarPage />} />
+          </Route>
+
           {/* CU11 Gestionar Cita: la agenda exige AGENDA_CONSULTAR y agendar, RESERVA_CREAR. */}
           <Route element={<RequierePermiso permiso={PERMISOS_CITAS.AGENDA} />}>
             <Route path="/citas" element={<CitasListPage />} />
@@ -139,6 +176,7 @@ export default function AppRouter() {
           {/* CU12 Solicitar Cita: solo el cliente (RESERVA_SOLICITAR, migración V14). */}
           <Route element={<RequierePermiso permiso={PERMISOS_SOLICITUD.SOLICITAR} />}>
             <Route path="/solicitar-cita" element={<SolicitarCitaPage />} />
+            <Route path="/mis-citas" element={<MisCitasPage />} />
           </Route>
 
           {/* CU10 Consultar Disponibilidad: para quien agenda (RESERVA_CREAR). */}
@@ -158,7 +196,15 @@ export default function AppRouter() {
           {/* CU21 exige consulta para abrir la pantalla; la API valida cada acción. */}
           <Route element={<RequierePermiso permiso={PERMISOS_CAJA.CONSULTAR} />}>
             <Route path="/caja" element={<CajaPage />} />
+            <Route path="/caja/historial" element={<CajaHistorialPage />} />
           </Route>
+          {/* CU20 Registrar Venta: Recepcionista y Administrador con VENTA_REGISTRAR. */}
+          <Route element={<RequierePermiso permiso={PERMISO_VENTA_REGISTRAR} />}>
+            <Route path="/ventas/registrar" element={<RegistrarVentaPage />} />
+          </Route>
+
+          {/* Gestionar pasarela de pago (Stripe): PASARELA_PAGO_COBRAR o PASARELA_PAGO_GESTIONAR (V22); la página valida. */}
+          <Route path="/pasarela-pago" element={<PasarelaPagoPage />} />
 
           {/* CU14 Pago web del anticipo: solo el cliente (ANTICIPO_PAGAR_PROPIO, migración V15). */}
           <Route element={<RequierePermiso permiso={PERMISOS_ANTICIPO.PAGAR_PROPIO} />}>

@@ -8,7 +8,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import LinearProgress from '@mui/material/LinearProgress';
 import Stack from '@mui/material/Stack';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +21,9 @@ import {
   formatearFechaLarga,
   formatearMonto,
 } from '../../utils/consultar_agenda/agendaFormato';
+import type { PagoAnticipo } from '../../types/registrar_pago_anticipo';
+import ComprobanteAnticipo from '../registrar_pago_anticipo/ComprobanteAnticipo';
+import RegistrarAnticipoDialog from '../registrar_pago_anticipo/RegistrarAnticipoDialog';
 import EstadoAgendaChip from './EstadoAgendaChip';
 
 interface Props {
@@ -29,15 +31,23 @@ interface Props {
   idReserva: number;
   /** Recepcionista y Administrador ven las acciones que llevan a CU11 y CU14. */
   puedeGestionar: boolean;
+  /** Puede cobrar el anticipo en mostrador (CU14, CAJA_MOVIMIENTO_REGISTRAR). */
+  puedeCobrar: boolean;
   onCerrar: () => void;
+  /** Tras cobrar el anticipo: la agenda se vuelve a pedir para mostrar la cita Confirmada. */
+  onCambio: () => void;
 }
 
 /** Ficha de la cita, con el historial reciente del cliente y los accesos a CU11 y CU14. */
-export default function CitaDetalleDialog({ idReserva, puedeGestionar, onCerrar }: Props) {
+export default function CitaDetalleDialog({ idReserva, puedeGestionar, puedeCobrar, onCerrar, onCambio }: Props) {
   const navigate = useNavigate();
   const [detalle, setDetalle] = useState<CitaAgendaDetalle | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
+  const [cobrando, setCobrando] = useState(false);
+  const [comprobante, setComprobante] = useState<PagoAnticipo | null>(null);
+  // Cambia tras un cobro para volver a pedir el detalle (la cita pasa a Confirmada).
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     let vigente = true;
@@ -54,7 +64,7 @@ export default function CitaDetalleDialog({ idReserva, puedeGestionar, onCerrar 
     return () => {
       vigente = false;
     };
-  }, [idReserva]);
+  }, [idReserva, version]);
 
   const cita = detalle?.cita;
 
@@ -91,7 +101,7 @@ export default function CitaDetalleDialog({ idReserva, puedeGestionar, onCerrar 
               <Fila etiqueta="Anticipo">
                 {formatearMonto(cita.montoAnticipo)}
                 <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 400 }}>
-                  {MENSAJES_AGENDA.PAGO_NO_DISPONIBLE}. {MENSAJES_AGENDA.PAGO_DETALLE}
+                  {cita.anticipoPagado ? MENSAJES_AGENDA.ANTICIPO_CUBIERTO : MENSAJES_AGENDA.ANTICIPO_PENDIENTE}
                 </Typography>
               </Fila>
             </Stack>
@@ -126,17 +136,30 @@ export default function CitaDetalleDialog({ idReserva, puedeGestionar, onCerrar 
         )}
       </DialogContent>
       <DialogActions sx={{ flexWrap: 'wrap', gap: 1, px: 3, pb: 2 }}>
-        {/* Flujo 8a: queda visible pero deshabilitado hasta que exista CU14. */}
-        {puedeGestionar && cita?.estado === 'PENDIENTE' && (
-          <Tooltip title={MENSAJES_AGENDA.ANTICIPO_NO_DISPONIBLE}>
-            <span>
-              <Button disabled>Registrar anticipo</Button>
-            </span>
-          </Tooltip>
+        {/* Flujo 8a: cobrar el anticipo en mostrador (CU14), que confirma la cita. */}
+        {puedeCobrar && cita?.estado === 'PENDIENTE' && !cita.anticipoPagado && cita.montoAnticipo > 0 && (
+          <Button variant="contained" onClick={() => setCobrando(true)}>
+            Registrar anticipo
+          </Button>
         )}
         {puedeGestionar && cita && <Button onClick={gestionarCita}>Gestionar cita</Button>}
         <Button onClick={onCerrar}>Cerrar</Button>
       </DialogActions>
+
+      {cobrando && cita && (
+        <RegistrarAnticipoDialog
+          cita={cita}
+          onCerrar={() => setCobrando(false)}
+          onCobrado={(respuesta) => {
+            setCobrando(false);
+            setComprobante(respuesta.pago);
+            setCargando(true);
+            setVersion((v) => v + 1);
+            onCambio();
+          }}
+        />
+      )}
+      {comprobante && <ComprobanteAnticipo pago={comprobante} onCerrar={() => setComprobante(null)} />}
     </Dialog>
   );
 }

@@ -14,6 +14,8 @@ export type { ServicioResumen } from './types/gestionar_catalogo_servicios';
 export { default as CitasListPage } from './pages/gestionar_citas/CitasListPage';
 export { default as CitaCrearPage } from './pages/gestionar_citas/CitaCrearPage';
 export { PERMISOS as PERMISOS_CITAS } from './constants/gestionar_citas';
+export { listarBarberos } from './api/gestionar_citas/citasApi';
+export type { BarberoDisponible } from './types/gestionar_citas';
 
 // CU10 Consultar Disponibilidad
 export { default as DisponibilidadPage } from './pages/consultar_disponibilidad/DisponibilidadPage';
@@ -35,10 +37,15 @@ export { PERMISOS_AGENDA } from './constants/consultar_agenda';
 
 // CU13 Consultar Servicios (catálogo público, sin sesión)
 export { default as ConsultarServiciosPage } from './pages/consultar_servicios/ConsultarServiciosPage';
+export { default as PortadaPage } from './pages/consultar_servicios/PortadaPage';
+export { default as ReservarServicioPage } from './pages/consultar_servicios/ReservarServicioPage';
 
 
 // CU12 Solicitar Cita (Cliente)
 export { default as SolicitarCitaPage } from './pages/solicitar_cita/SolicitarCitaPage';
+export { default as MisCitasPage } from './pages/solicitar_cita/MisCitasPage';
+export { default as ReservaInvitadoPage } from './pages/solicitar_cita/ReservaInvitadoPage';
+export { default as CitaInvitadoPage } from './pages/solicitar_cita/CitaInvitadoPage';
 export { PERMISOS_SOLICITUD } from './constants/solicitar_cita';
 
 // CU14 Registrar Pago de Anticipo (flujo web del Cliente)

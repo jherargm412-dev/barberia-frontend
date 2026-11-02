@@ -188,6 +188,7 @@ export default function ReprogramarDialog({ cita, onCerrar, onGuardado }: Props)
                 {agenda && !agenda.motivo && (
                   <HorasLibresGrid
                     horas={agenda.horasLibres}
+                    ocupadas={agenda.horasOcupadas}
                     seleccionada={horaInicio}
                     textoVacio="El barbero no tiene horas libres este día"
                     onSeleccionar={(h) => {

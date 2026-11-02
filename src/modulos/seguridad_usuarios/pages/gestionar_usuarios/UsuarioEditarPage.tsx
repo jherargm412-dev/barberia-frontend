@@ -39,6 +39,7 @@ export default function UsuarioEditarPage() {
       <UsuarioForm
         valoresIniciales={valoresDesdeUsuario(usuario)}
         pedirContrasena={false}
+        serviciosAsignados={usuario.empleado?.servicios}
         textoBoton="Guardar cambios"
         onGuardar={guardar}
         onCancelar={() => navigate(`/usuarios/${idUsuario}`)}

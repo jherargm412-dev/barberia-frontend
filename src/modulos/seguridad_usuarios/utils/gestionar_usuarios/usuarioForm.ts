@@ -13,7 +13,8 @@ export interface UsuarioFormValores {
   fechaNacimiento: string;
   roles: string[];
   tipoContrato: TipoContrato | '';
-  especialidad: string;
+  /** Especialidades = ids de los servicios del catálogo que realiza (solo rol Barbero). */
+  servicios: number[];
   turnoId: number | '';
 }
 
@@ -21,6 +22,11 @@ export type ErroresFormulario = Partial<Record<keyof UsuarioFormValores, string>
 
 export function esEmpleado(roles: string[]) {
   return roles.some((rol) => ROLES_EMPLEADO.includes(rol));
+}
+
+/** Solo el barbero tiene especialidades. */
+export function esBarbero(roles: string[]) {
+  return roles.includes('Barbero');
 }
 
 /**
@@ -54,7 +60,6 @@ export function validarUsuario(v: UsuarioFormValores, pedirContrasena: boolean):
 
   if (esEmpleado(v.roles)) {
     if (!v.tipoContrato) errores.tipoContrato = 'Obligatorio para roles de empleado';
-    if (v.especialidad.length > 80) errores.especialidad = 'Máximo 80 caracteres';
   }
 
   return errores;
@@ -82,7 +87,7 @@ export const VALORES_VACIOS: UsuarioFormValores = {
   fechaNacimiento: '',
   roles: [],
   tipoContrato: '',
-  especialidad: '',
+  servicios: [],
   turnoId: '',
 };
 
@@ -97,7 +102,7 @@ export function valoresDesdeUsuario(u: UsuarioDetalle): UsuarioFormValores {
     fechaNacimiento: u.fechaNacimiento ?? '',
     roles: u.roles.map((r) => r.nombre),
     tipoContrato: u.empleado?.tipoContrato ?? '',
-    especialidad: u.empleado?.especialidad ?? '',
+    servicios: u.empleado?.servicios.map((s) => s.idServicio) ?? [],
     turnoId: u.empleado?.turno?.idTurno ?? '',
   };
 }
@@ -114,8 +119,8 @@ export function construirRequest(v: UsuarioFormValores): ActualizarUsuarioReques
       esEmpleado(v.roles) && v.tipoContrato
         ? {
             tipoContrato: v.tipoContrato,
-            especialidad: v.especialidad.trim() || null,
             turnoId: v.turnoId === '' ? null : v.turnoId,
+            servicios: esBarbero(v.roles) ? v.servicios : null,
           }
         : null,
   };

@@ -8,6 +8,7 @@ export const PERMISOS = {
   ATENDER: 'RESERVA_ATENDER',
   CANCELAR: 'RESERVA_CANCELAR',
   CLIENTE_CREAR: 'CLIENTE_CREAR',
+  VENTA_REGISTRAR: 'VENTA_REGISTRAR',
 };
 
 /** Colores de CU16: Pendiente amarillo, Confirmada verde, Atendida azul, Cancelada/No asistió rojo/gris. */
@@ -48,7 +49,7 @@ export const ACCIONES_ESTADO: Record<AccionEstado, { titulo: string; boton: stri
     titulo: 'Confirmar cita',
     boton: 'Confirmar',
     permiso: PERMISOS.EDITAR,
-    mensaje: 'La cita pasará a Confirmada.',
+    mensaje: 'La cita pasará a Confirmada al cobrar su anticipo.',
   },
   atender: {
     titulo: 'Marcar como atendida',
@@ -66,7 +67,7 @@ export const ACCIONES_ESTADO: Record<AccionEstado, { titulo: string; boton: stri
     titulo: 'Cancelar cita',
     boton: 'Cancelar cita',
     permiso: PERMISOS.CANCELAR,
-    mensaje: 'La cita pasará a Cancelada y el horario del barbero quedará libre. Ya no se podrá modificar.',
+    mensaje: 'La cita pasará a Cancelada y el horario del barbero quedará libre. Si ya pagó el anticipo, no se devuelve. Ya no se podrá modificar.',
   },
 };
 

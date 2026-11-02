@@ -41,14 +41,12 @@ export const ETIQUETAS_CANAL: Record<CanalAgenda, string> = {
   WEB: 'Web',
 };
 
-/** Textos fijos del flujo de CU16 (flujos 2a, 3a y 5a) y de las dependencias pendientes. */
+/** Textos fijos del flujo de CU16 (flujos 2a, 3a y 5a) y del estado del anticipo (CU14). */
 export const MENSAJES_AGENDA = {
   SIN_PERMISO: 'No tiene permisos para acceder a la agenda',
   SIN_CITAS: 'No hay citas programadas para esta fecha',
   SIN_CITAS_SEMANA: 'No hay citas programadas para esta semana',
   FECHA_INVALIDA: 'La fecha ingresada no es válida',
-  /** Sin CU14 no hay registro de pagos: se muestra el monto, nunca "pagado". */
-  PAGO_NO_DISPONIBLE: 'Estado del pago no disponible',
-  PAGO_DETALLE: 'El registro de pagos de anticipo llegará con CU14 (Registrar Pago de Anticipo).',
-  ANTICIPO_NO_DISPONIBLE: 'Disponible cuando se implemente CU14 (Registrar Pago de Anticipo)',
+  ANTICIPO_CUBIERTO: 'Anticipo cubierto',
+  ANTICIPO_PENDIENTE: 'Anticipo pendiente',
 };

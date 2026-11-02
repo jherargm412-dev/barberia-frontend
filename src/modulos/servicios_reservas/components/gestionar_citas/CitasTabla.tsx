@@ -49,6 +49,7 @@ interface Props {
   onReprogramar: (cita: Cita) => void;
     /** La página abre el diálogo de cobro del anticipo (CU14). */
   onCobrarAnticipo: (cita: Cita) => void;
+  onCobrarVenta: (cita: Cita) => void;
   /** La página pide confirmación y llama al backend. */
   onCambiarEstado: (cita: Cita, accion: AccionEstado) => void;
 }
@@ -74,6 +75,7 @@ export default function CitasTabla({
   onCambiarTamano,
   onReprogramar,
   onCobrarAnticipo,
+  onCobrarVenta,
   onCambiarEstado,
 }: Props) {
   // Menú de estados abierto: la cita y el botón donde se ancla.
@@ -83,10 +85,11 @@ export default function CitasTabla({
     const abierta = !esFinal(cita);
     const opciones: OpcionEstado[] = [
       {
+        // Confirmar = cobrar: abre el cobro del anticipo (CU14), que es lo que confirma la cita.
         accion: 'confirmar',
-        texto: 'Confirmar',
+        texto: 'Confirmar (cobrar anticipo)',
         icono: <CheckCircleIcon fontSize="small" color="success" />,
-        visible: cita.estado === 'PENDIENTE' && tienePermiso(PERMISOS.EDITAR),
+        visible: cita.estado === 'PENDIENTE' && !cita.anticipoPagado && tienePermiso(PERMISOS_ANTICIPO.COBRAR),
       },
       {
         accion: 'atender',
@@ -173,9 +176,17 @@ export default function CitasTabla({
                         </IconButton>
                       </Tooltip>
                     )}
-                    {c.estado === 'PENDIENTE' && c.montoAnticipo > 0 && tienePermiso(PERMISOS_ANTICIPO.COBRAR) && (
+                    {c.estado === 'PENDIENTE' && !c.anticipoPagado && c.montoAnticipo > 0 && tienePermiso(PERMISOS_ANTICIPO.COBRAR) && (
                       <Tooltip title="Cobrar anticipo">
                         <IconButton color="success" onClick={() => onCobrarAnticipo(c)}>
+                          <PaymentsIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {(c.estado === 'PENDIENTE' || c.estado === 'CONFIRMADA')
+                      && tienePermiso(PERMISOS.VENTA_REGISTRAR) && (
+                      <Tooltip title="Cobrar venta">
+                        <IconButton color="primary" onClick={() => onCobrarVenta(c)}>
                           <PaymentsIcon />
                         </IconButton>
                       </Tooltip>
@@ -219,7 +230,8 @@ export default function CitasTabla({
               key={o.accion}
               disabled={!!o.motivo}
               onClick={() => {
-                onCambiarEstado(menu.cita, o.accion);
+                if (o.accion === 'confirmar') onCobrarAnticipo(menu.cita);
+                else onCambiarEstado(menu.cita, o.accion);
                 setMenu(null);
               }}
             >

@@ -13,14 +13,21 @@ import Stack from '@mui/material/Stack';
 import { useState, type FormEvent } from 'react';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { registrarAnticipo } from '../../api/registrar_pago_anticipo/anticiposApi';
-import type { Cita } from '../../types/gestionar_citas';
 import type { MetodoPagoAnticipo, RespuestaPagoAnticipo } from '../../types/registrar_pago_anticipo';
 import { formatearMonto } from '../../utils/gestionar_citas/citaForm';
 import { faltanteMixto, prepararCobro } from '../../utils/registrar_pago_anticipo/anticipoForm';
 
+/** Lo que el cobro necesita de la cita; sirve tanto la de Citas (CU11) como la de la Agenda (CU16). */
+interface CitaPorCobrar {
+  idReserva: number;
+  montoAnticipo: number;
+  cliente: { nombre: string };
+  servicio: { nombre: string };
+}
+
 interface Props {
   /** La página monta el diálogo solo mientras está abierto, así cada cobro empieza con el formulario limpio. */
-  cita: Cita;
+  cita: CitaPorCobrar;
   onCerrar: () => void;
   /** Se llama con el comprobante cuando el backend registró el cobro. */
   onCobrado: (respuesta: RespuestaPagoAnticipo) => void;

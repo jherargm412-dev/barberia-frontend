@@ -13,7 +13,11 @@ interface Resultado {
  * Pide la disponibilidad (CU10) cada vez que cambia la consulta. Con {@code consulta} null no consulta
  * (faltan datos). Las respuestas de una consulta anterior se descartan, así no "parpadea" una vieja.
  */
-export function useDisponibilidad(consulta: ConsultaDisponibilidad | null) {
+export function useDisponibilidad(
+  consulta: ConsultaDisponibilidad | null,
+  // El invitado sin cuenta usa la ruta pública; el resto, la de CU10 con sesión.
+  consultar: (c: ConsultaDisponibilidad) => Promise<Disponibilidad> = consultarDisponibilidad,
+) {
   const [resultado, setResultado] = useState<Resultado | null>(null);
   // La consulta como texto: el efecto solo vuelve a correr si de verdad cambió algún dato.
   const clave = consulta ? JSON.stringify(consulta) : '';
@@ -21,12 +25,14 @@ export function useDisponibilidad(consulta: ConsultaDisponibilidad | null) {
   useEffect(() => {
     if (!clave) return;
     let vigente = true;
-    consultarDisponibilidad(JSON.parse(clave) as ConsultaDisponibilidad)
+    consultar(JSON.parse(clave) as ConsultaDisponibilidad)
       .then((datos) => vigente && setResultado({ clave, datos, error: '' }))
       .catch((err) => vigente && setResultado({ clave, datos: null, error: obtenerError(err).mensaje }));
     return () => {
       vigente = false;
     };
+    // "consultar" es fija para cada pantalla: solo se vuelve a pedir si cambia la consulta.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clave]);
 
   const actual = resultado?.clave === clave ? resultado : null;

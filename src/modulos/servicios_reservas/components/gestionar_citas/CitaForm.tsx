@@ -1,8 +1,6 @@
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -35,7 +33,7 @@ import ClienteSelector from './ClienteSelector';
 interface Props {
   puedeRegistrarCliente: boolean;
   /** Hora elegida en CU10 (Consultar disponibilidad): servicio, barbero, fecha y horas ya cargados. */
-  prellenado?: PrellenadoCita;
+  prellenado?: Partial<PrellenadoCita>;
   onGuardar: (datos: CitaRequest) => Promise<void>;
   onCancelar: () => void;
 }
@@ -115,7 +113,6 @@ export default function CitaForm({ puedeRegistrarCliente, prellenado, onGuardar,
         horaInicio: valores.horaInicio,
         horaFin: valores.horaFin,
         canal: valores.canal,
-        estado: valores.anticipoPagado ? 'CONFIRMADA' : 'PENDIENTE',
       });
     } catch (err) {
       // Ej.: "El barbero ya tiene una cita en ese horario" o fuera de su horario. Se conserva lo escrito.
@@ -257,6 +254,7 @@ export default function CitaForm({ puedeRegistrarCliente, prellenado, onGuardar,
             {agendaBarbero && !agendaBarbero.motivo && (
               <HorasLibresGrid
                 horas={agendaBarbero.horasLibres}
+                ocupadas={agendaBarbero.horasOcupadas}
                 seleccionada={valores.horaInicio}
                 textoVacio="El barbero no tiene horas libres este día"
                 onSeleccionar={(h) => elegirHora(h.horaInicio, h.horaFin)}
@@ -287,15 +285,6 @@ export default function CitaForm({ puedeRegistrarCliente, prellenado, onGuardar,
               </MenuItem>
             ))}
           </TextField>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={valores.anticipoPagado}
-                onChange={(e) => cambiar('anticipoPagado', e.target.checked)}
-              />
-            }
-            label="El cliente pagó el anticipo ahora (la cita queda Confirmada)"
-          />
         </Stack>
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 1 }}>

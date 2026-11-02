@@ -21,8 +21,11 @@ export interface UsuarioResumen {
 export interface EmpleadoDetalle {
   idEmpleado: number;
   tipoContrato: TipoContrato;
+  /** Se arma con los nombres de "servicios" (solo barberos). */
   especialidad: string | null;
   turno: { idTurno: number; nombre: string } | null;
+  /** Especialidades del barbero: servicios del catálogo que realiza. */
+  servicios: { idServicio: number; nombre: string }[];
 }
 
 export interface ClienteDetalle {
@@ -55,8 +58,9 @@ export interface InvitacionPendiente {
 
 export interface EmpleadoRequest {
   tipoContrato: TipoContrato;
-  especialidad: string | null;
   turnoId: number | null;
+  /** Especialidades = ids de servicios que realiza (solo Barbero). null = no cambiar. */
+  servicios: number[] | null;
 }
 
 /** Body de PUT /usuarios/{id}. */

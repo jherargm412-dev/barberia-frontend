@@ -123,9 +123,9 @@ export default function LoginPage() {
               <Link component={RouterLink} to="/recuperar" variant="body2" sx={{ textAlign: 'center' }}>
                 ¿Olvidaste tu contraseña?
               </Link>
-              {/* CU13: catálogo público de servicios, sin iniciar sesión. */}
-              <Link component={RouterLink} to="/catalogo" variant="body2" sx={{ textAlign: 'center' }}>
-                Ver nuestros servicios
+              {/* Portada pública: servicios (CU13) y reservar sin cuenta (CU12). */}
+              <Link component={RouterLink} to="/" variant="body2" sx={{ textAlign: 'center' }}>
+                Volver a la página de inicio
               </Link>
             </Stack>
           </Box>

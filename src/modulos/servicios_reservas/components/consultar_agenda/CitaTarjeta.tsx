@@ -16,8 +16,7 @@ interface Props {
 }
 
 /**
- * Una cita: horario, estado, cliente con teléfono, servicio y anticipo. Sin CU14 no hay registro de
- * pagos, así que se muestra el monto y se aclara que el estado del pago no está disponible.
+ * Una cita: horario, estado, cliente con teléfono, servicio y anticipo (con si ya se cobró, CU14).
  */
 export default function CitaTarjeta({ cita, mostrarBarbero, onClick }: Props) {
   function alTeclear(e: KeyboardEvent<HTMLDivElement>) {
@@ -62,7 +61,8 @@ export default function CitaTarjeta({ cita, mostrarBarbero, onClick }: Props) {
         </Typography>
       )}
       <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 0.5 }}>
-        Anticipo {formatearMonto(cita.montoAnticipo)} · {MENSAJES_AGENDA.PAGO_NO_DISPONIBLE}
+        {cita.anticipoPagado ? MENSAJES_AGENDA.ANTICIPO_CUBIERTO : MENSAJES_AGENDA.ANTICIPO_PENDIENTE}{' '}
+        ({formatearMonto(cita.montoAnticipo)})
       </Typography>
     </Paper>
   );

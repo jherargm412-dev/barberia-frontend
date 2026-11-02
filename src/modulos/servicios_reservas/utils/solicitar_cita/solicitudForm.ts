@@ -19,7 +19,7 @@ export function valoresInicialesSolicitud(): SolicitudValores {
 
 /**
  * Mismas reglas que el backend (SolicitudCitaService): primero campos vacíos y después horas inválidas.
- * Horario ocupado o fuera del turno del barbero solo lo puede saber el backend.
+ * La hora se elige de la grilla de horas libres (CU10); si falta, se pide elegir una.
  */
 export function validarSolicitud(v: SolicitudValores): { mensaje: string; errores: ErroresSolicitud } {
   const { errores: horario, hayVacios: horarioVacio } = validarHorario(v.fecha, v.horaInicio, v.horaFin);
@@ -33,10 +33,16 @@ export function validarSolicitud(v: SolicitudValores): { mensaje: string; errore
     errores.empleadoId = 'Obligatorio';
     hayVacios = true;
   }
+  if (!v.horaInicio || !v.horaFin) errores.horaInicio = 'Elija una hora libre';
   let mensaje = '';
   if (hayVacios) mensaje = MENSAJES.CAMPOS_VACIOS;
   else if (Object.keys(errores).length > 0) mensaje = Object.values(errores)[0] ?? '';
   return { mensaje, errores };
+}
+
+/** "AAAA-MM-DDTHH:mm" → "HH:mm" (la hora límite para pagar ya viene en hora de Bolivia). */
+export function horaDe(fechaHora: string) {
+  return fechaHora.slice(11, 16);
 }
 
 /** Convierte lo escrito en el pedido para el backend (los ids pasan de texto a número). */

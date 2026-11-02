@@ -1,6 +1,6 @@
 import PageHeader from '../../../../shared/components/PageHeader';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from '@mui/icons-material/Add';import HistoryIcon from '@mui/icons-material/History';
 import LockIcon from '@mui/icons-material/Lock';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -22,14 +22,13 @@ import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { useAuth } from '../../../seguridad_usuarios';
-import { abrirCaja, cerrarCaja, listarMovimientos, obtenerCajaActual, registrarEgreso } from '../../api/gestionar_caja/cajaApi';
-import { PERMISOS_CAJA } from '../../constants/gestionar_caja';
+import { abrirCaja, cerrarCaja, listarMovimientos, obtenerCajaActual, registrarEgreso } from '../../api/gestionar_caja/cajaApi';import { PERMISOS_CAJA } from '../../constants/gestionar_caja';
 import type { Caja, MovimientoCaja } from '../../types/gestionar_caja';
+import { fecha, moneda, resultadoArqueo } from '../../utils/gestionar_caja/formato';
 
-const moneda = (valor: number) => `Bs ${valor.toFixed(2)}`;
-const fecha = (valor: string) => new Date(`${valor.replace(' ', 'T')}-04:00`).toLocaleString('es-BO', { timeZone: 'America/La_Paz' });
 
 /** Evita enviar importes negativos o con más de dos decimales. */
 function importeValido(valor: string, aceptaCero: boolean) {
@@ -40,6 +39,7 @@ function importeValido(valor: string, aceptaCero: boolean) {
 /** CU21: apertura, egresos y cierre; cada formulario conserva sus datos hasta confirmar o cancelar. */
 export default function CajaPage() {
   const { tienePermiso } = useAuth();
+  const navigate = useNavigate();
   const [caja, setCaja] = useState<Caja | null>(null);
   const [movimientos, setMovimientos] = useState<MovimientoCaja[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -53,7 +53,6 @@ export default function CajaPage() {
   const [observaciones, setObservaciones] = useState('');
   const [efectivoContado, setEfectivoContado] = useState('');
   const [observacionCierre, setObservacionCierre] = useState('');
-
   // Carga la caja vigente y sus movimientos al entrar; no necesita una petición para las cerradas.
   useEffect(() => {
     let vigente = true;
@@ -122,7 +121,8 @@ export default function CajaPage() {
   }
 
   return <>
-    <PageHeader title="Caja" description="Controla la apertura, los egresos y el arqueo de la jornada." />
+    <PageHeader title="Caja" description="Controla la apertura, los egresos y el arqueo de la jornada."
+      action={<Button startIcon={<HistoryIcon />} onClick={() => navigate('/caja/historial')}>Historial de cajas</Button>} />
     {mensaje && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setMensaje('')}>{mensaje}</Alert>}
     {error && !dialogo && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
     {cargando && <LinearProgress />}
@@ -140,21 +140,21 @@ export default function CajaPage() {
           </Box>
           <Chip label={caja.estado === 'ABIERTA' ? 'Abierta' : 'Cerrada'} color={caja.estado === 'ABIERTA' ? 'success' : 'default'} />
         </Stack>
-        <Stack sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(5, minmax(0, 1fr))' }, gap: 2, mb: 3, '& > div': { bgcolor: 'action.hover', p: 2, borderRadius: 2 } }}>
+        <Stack sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(6, minmax(0, 1fr))' }, gap: 2, mb: 3, '& > div': { bgcolor: 'action.hover', p: 2, borderRadius: 2 } }}>
           <Box><Typography color="text.secondary">Monto inicial</Typography><Typography variant="h6">{moneda(caja.montoInicial)}</Typography></Box>
           <Box><Typography color="text.secondary">Ingresos en efectivo</Typography><Typography variant="h6">{moneda(caja.ingresosEfectivo)}</Typography></Box>
           <Box><Typography color="text.secondary">Ingresos QR</Typography><Typography variant="h6">{moneda(caja.ingresosQr)}</Typography></Box>
+          <Box><Typography color="text.secondary">Ingresos con tarjeta</Typography><Typography variant="h6">{moneda(caja.ingresosTarjeta)}</Typography></Box>
           <Box><Typography color="text.secondary">Egresos en efectivo</Typography><Typography variant="h6">{moneda(caja.egresosEfectivo)}</Typography></Box>
           <Box><Typography color="text.secondary">Efectivo esperado</Typography><Typography variant="h6">{moneda(caja.saldoEsperado)}</Typography></Box>
         </Stack>
         {caja.estado === 'CERRADA' && <Alert severity="info" sx={{ mb: 2 }}>
-          Contado: {moneda(caja.efectivoContado ?? 0)} · Diferencia: {moneda(caja.diferencia ?? 0)}
+          Contado: {moneda(caja.efectivoContado ?? 0)} · {resultadoArqueo(caja.diferencia).texto}
           {caja.observacionCierre && ` · ${caja.observacionCierre}`}
         </Alert>}
         <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
           {caja.estado === 'ABIERTA' && tienePermiso(PERMISOS_CAJA.MOVIMIENTO) &&
-            <Button variant="outlined" startIcon={<AddIcon />} onClick={() => abrirDialogo('egreso')}>Registrar egreso</Button>}
-          {caja.estado === 'ABIERTA' && tienePermiso(PERMISOS_CAJA.CERRAR) &&
+            <Button variant="outlined" startIcon={<AddIcon />} onClick={() => abrirDialogo('egreso')}>Registrar egreso</Button>}          {caja.estado === 'ABIERTA' && tienePermiso(PERMISOS_CAJA.CERRAR) &&
             <Button variant="contained" startIcon={<LockIcon />} onClick={prepararCierre}>Cerrar caja</Button>}
           {caja.estado === 'CERRADA' && tienePermiso(PERMISOS_CAJA.ABRIR) &&
             <Button variant="outlined" onClick={() => { setCaja(null); setMovimientos([]); abrirDialogo('abrir'); }}>Abrir nueva caja</Button>}

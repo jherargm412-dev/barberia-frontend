@@ -1,7 +1,5 @@
 import Alert from '@mui/material/Alert';
-import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
-import Stack from '@mui/material/Stack';
 import PageHeader from '../../../../shared/components/PageHeader';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -42,17 +40,10 @@ export default function EmpleadoEditarPage() {
   return (
     <>
       <PageHeader title="Editar empleado" action={<EstadoEmpleadoChip estado={empleado.estado} />} />
-      {/* Vista rápida de servicios asignados (extra del CU); se editan desde el listado. */}
-      {empleado.servicios.length > 0 && (
-        <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}>
-          {empleado.servicios.map((s) => (
-            <Chip key={s.idServicio} label={s.nombre} size="small" variant="outlined" />
-          ))}
-        </Stack>
-      )}
       <EmpleadoForm
         valoresIniciales={valoresDesdeEmpleado(empleado)}
         registrar={false}
+        serviciosAsignados={empleado.servicios}
         onGuardar={guardar}
         onCancelar={() => navigate('/empleados')}
       />
