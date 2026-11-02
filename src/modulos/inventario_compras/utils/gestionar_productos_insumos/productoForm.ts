@@ -10,6 +10,8 @@ export interface ProductoFormValores {
   precioVenta: string;
   comisionUnitaria: string;
   stockMinimo: string;
+  /** Solo en "Nuevo ítem": unidades que ya hay al registrarlo (vacío = 0). */
+  stockInicial: string;
 }
 
 export type ErroresFormulario = Partial<Record<keyof ProductoFormValores, string>>;
@@ -22,6 +24,7 @@ export const VALORES_VACIOS: ProductoFormValores = {
   precioVenta: '',
   comisionUnitaria: '0',
   stockMinimo: '',
+  stockInicial: '',
 };
 
 // Monto positivo con máximo 2 decimales. Se acepta coma o punto: "30", "30.5", "30,50".
@@ -29,6 +32,8 @@ export const VALORES_VACIOS: ProductoFormValores = {
 const MONTO = /^\d{1,8}([.,]\d{1,2})?$/;
 // Stock: número entero mayor o igual a 0.
 const ENTERO = /^\d{1,9}$/;
+// Tope del stock inicial, el mismo que el backend (ProductoService.MAX_CANTIDAD).
+export const MAX_CANTIDAD = 1_000_000;
 
 /** "30,5" → 30.5 */
 function aNumero(texto: string) {
@@ -96,6 +101,12 @@ export function validarProducto(v: ProductoFormValores): { mensaje: string; erro
     hayInvalidos = true;
   }
 
+  // Opcional: vacío significa 0. Al modificar el campo no se muestra y queda vacío.
+  if (v.stockInicial.trim() && (!ENTERO.test(v.stockInicial.trim()) || Number(v.stockInicial) > MAX_CANTIDAD)) {
+    errores.stockInicial = `Debe ser un número entero entre 0 y ${MAX_CANTIDAD.toLocaleString('es-BO')}`;
+    hayInvalidos = true;
+  }
+
   let mensaje = '';
   if (hayVacios) mensaje = MENSAJES.CAMPOS_VACIOS;
   else if (hayInvalidos) mensaje = MENSAJES.VALOR_INVALIDO;
@@ -112,6 +123,7 @@ export function valoresDesdeProducto(p: Producto): ProductoFormValores {
     precioVenta: p.precioVenta.toFixed(2),
     comisionUnitaria: (p.comisionUnitaria ?? 0).toFixed(2),
     stockMinimo: String(p.stockMinimo),
+    stockInicial: '',
   };
 }
 
@@ -125,6 +137,7 @@ export function construirRequest(v: ProductoFormValores): ProductoRequest {
     precioVenta: v.precioVenta.trim() ? aNumero(v.precioVenta) : null,
     comisionUnitaria: v.tipo === 'INSUMO' || !v.comisionUnitaria.trim() ? 0 : aNumero(v.comisionUnitaria),
     stockMinimo: Number(v.stockMinimo.trim()),
+    stockInicial: v.stockInicial.trim() ? Number(v.stockInicial.trim()) : 0,
   };
 }
 
@@ -145,7 +158,7 @@ export function stockBajo(p: Producto) {
 
 /** 'PERDIDA' → { etiqueta: "Pérdida", suma: false } */
 export function datosAjuste(tipo: TipoAjusteStock) {
-  return TIPOS_AJUSTE.find((t) => t.valor === tipo) ?? { valor: tipo, etiqueta: tipo, suma: false };
+  return TIPOS_AJUSTE.find((t) => t.valor === tipo) ?? { valor: tipo, etiqueta: tipo, suma: false, manual: false, motivo: false };
 }
 
 /** "2026-10-29T12:04:31.37" → "29/10/2026 12:04" */

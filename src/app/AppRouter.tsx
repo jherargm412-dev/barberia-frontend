@@ -120,8 +120,10 @@ export default function AppRouter() {
             </Route>
           </Route>
 
-          {/* CU19: Consultar Comisiones */}
-          <Route path="/comisiones" element={<ComisionesPage />} />
+          {/* CU19: Consultar Comisiones (Barbero y Administrador con COMISION_CONSULTAR_PROPIA). */}
+          <Route element={<RequierePermiso permiso="COMISION_CONSULTAR_PROPIA" />}>
+            <Route path="/comisiones" element={<ComisionesPage />} />
+          </Route>
           {/* CU18: Registrar Liquidación de Comisiones */}
           <Route element={<RequierePermiso permiso="PAGO_EMPLEADO_GENERAR" />}>
             <Route path="/liquidaciones" element={<LiquidacionPage />} />
@@ -153,14 +155,18 @@ export default function AppRouter() {
             <Route path="/servicios/:id/editar" element={<ServicioEditarPage />} />
           </Route>
 
-          {/* CU22 Productos e insumos: requiere el permiso PRODUCTO_GESTIONAR (solo el Administrador). */}
+          {/* CU24 Proveedores: requiere el permiso PROVEEDOR_GESTIONAR (solo el Administrador). */}
           <Route element={<RequierePermiso permiso={PERMISOS_PROVEEDORES.GESTIONAR} />}>
             <Route path="/proveedores" element={<ProveedoresListPage />} />
             <Route path="/proveedores/nuevo" element={<ProveedorEditarPage />} />
             <Route path="/proveedores/:id/editar" element={<ProveedorEditarPage />} />
           </Route>
-          <Route element={<RequierePermiso permiso={PERMISOS_PRODUCTOS.GESTIONAR} />}>
+          {/* CU22 Productos e insumos: el Administrador (PRODUCTO_GESTIONAR) los administra;
+              la Recepcionista (PRODUCTO_CONSULTAR) solo ve el listado y el detalle. */}
+          <Route element={<RequierePermiso permiso={[PERMISOS_PRODUCTOS.GESTIONAR, PERMISOS_PRODUCTOS.CONSULTAR]} />}>
             <Route path="/productos" element={<ProductosListPage />} />
+          </Route>
+          <Route element={<RequierePermiso permiso={PERMISOS_PRODUCTOS.GESTIONAR} />}>
             <Route path="/productos/nuevo" element={<ProductoCrearPage />} />
             <Route path="/productos/:id/editar" element={<ProductoEditarPage />} />
           </Route>

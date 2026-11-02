@@ -20,12 +20,13 @@ export default function ProductoCrearPage() {
 
   return (
     <>
-      <PageHeader title="Nuevo ítem" description="El ítem se registra con stock 0 y estado activo." />
+      <PageHeader title="Nuevo ítem" description="El ítem se registra activo y con el stock inicial que indiques (0 si lo dejas vacío)." />
       <ProductoForm
         valoresIniciales={VALORES_VACIOS}
         textoBoton="Guardar"
         onGuardar={guardar}
         onCancelar={() => navigate('/productos')}
+        mostrarStockInicial
       />
     </>
   );

@@ -33,13 +33,17 @@ interface Props {
   onCambiarEstado: (producto: Producto) => void;
   /** Flujo Ajustar stock: la página abre el diálogo. */
   onAjustarStock: (producto: Producto) => void;
+  /** Sin PRODUCTO_GESTIONAR (Recepcionista) solo se muestra el botón Ver. */
+  soloLectura?: boolean;
 }
 
 /**
  * CU22 paso 2: tipo, nombre, costo, precio de venta, stock mínimo y estado de cada ítem.
  * También el stock actual, con la alerta cuando llega al mínimo.
  */
-export default function ProductosTabla({ mostrarVacio = true, productos, onVer, onCambiarEstado, onAjustarStock }: Props) {
+export default function ProductosTabla({
+  mostrarVacio = true, productos, onVer, onCambiarEstado, onAjustarStock, soloLectura = false,
+}: Props) {
   const navigate = useNavigate();
 
   return (
@@ -100,26 +104,33 @@ export default function ProductosTabla({ mostrarVacio = true, productos, onVer, 
                       <VisibilityIcon />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Ajustar stock">
-                    <IconButton size="small" aria-label="Ajustar stock" onClick={() => onAjustarStock(p)}>
-                      <TuneIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Editar">
-                    <IconButton size="small" aria-label="Editar ítem" onClick={() => navigate(`/productos/${p.idProducto}/editar`)}>
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={p.activo ? 'Deshabilitar' : 'Habilitar'}>
-                    <IconButton
-                      size="small"
-                      aria-label={p.activo ? 'Deshabilitar ítem' : 'Habilitar ítem'}
-                      onClick={() => onCambiarEstado(p)}
-                      color={p.activo ? 'default' : 'success'}
-                    >
-                      {p.activo ? <BlockIcon /> : <CheckCircleIcon />}
-                    </IconButton>
-                  </Tooltip>
+                  {!soloLectura && (
+                    <>
+                      {/* Un ítem deshabilitado no se ajusta (el backend también lo rechaza). El span deja ver el tooltip. */}
+                      <Tooltip title={p.activo ? 'Ajustar stock' : 'Habilite el ítem para ajustar su stock'}>
+                        <span>
+                          <IconButton size="small" aria-label="Ajustar stock" onClick={() => onAjustarStock(p)} disabled={!p.activo}>
+                            <TuneIcon />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Editar">
+                        <IconButton size="small" aria-label="Editar ítem" onClick={() => navigate(`/productos/${p.idProducto}/editar`)}>
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={p.activo ? 'Deshabilitar' : 'Habilitar'}>
+                        <IconButton
+                          size="small"
+                          aria-label={p.activo ? 'Deshabilitar ítem' : 'Habilitar ítem'}
+                          onClick={() => onCambiarEstado(p)}
+                          color={p.activo ? 'default' : 'success'}
+                        >
+                          {p.activo ? <BlockIcon /> : <CheckCircleIcon />}
+                        </IconButton>
+                      </Tooltip>
+                    </>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

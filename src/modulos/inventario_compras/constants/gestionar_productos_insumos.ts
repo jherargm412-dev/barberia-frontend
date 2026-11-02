@@ -7,18 +7,23 @@ export const TIPOS_PRODUCTO: { valor: TipoProducto; etiqueta: string }[] = [
 ];
 
 /**
- * Motivos del ajuste manual de stock. El inventario inicial suma (una sola vez por ítem);
- * pérdida y vencido restan. Las compras y ventas no pasan por aquí.
+ * Motivos del ajuste de stock, para el historial y el diálogo "Ajustar stock".
+ * - manual: se puede elegir en el diálogo. El inventario inicial se carga al crear el ítem.
+ * - motivo: exige observación (las correcciones de conteo deben explicar qué pasó).
+ * Las compras y ventas no pasan por aquí.
  */
-export const TIPOS_AJUSTE: { valor: TipoAjusteStock; etiqueta: string; suma: boolean }[] = [
-  { valor: 'INVENTARIO_INICIAL', etiqueta: 'Inventario inicial', suma: true },
-  { valor: 'PERDIDA', etiqueta: 'Pérdida', suma: false },
-  { valor: 'VENCIDO', etiqueta: 'Vencido', suma: false },
+export const TIPOS_AJUSTE: { valor: TipoAjusteStock; etiqueta: string; suma: boolean; manual: boolean; motivo: boolean }[] = [
+  { valor: 'INVENTARIO_INICIAL', etiqueta: 'Inventario inicial', suma: true, manual: false, motivo: false },
+  { valor: 'SOBRANTE', etiqueta: 'Corrección: sobrante', suma: true, manual: true, motivo: true },
+  { valor: 'FALTANTE', etiqueta: 'Corrección: faltante', suma: false, manual: true, motivo: true },
+  { valor: 'PERDIDA', etiqueta: 'Pérdida', suma: false, manual: true, motivo: false },
+  { valor: 'VENCIDO', etiqueta: 'Vencido', suma: false, manual: true, motivo: false },
 ];
 
-/** Permisos del backend que usa este caso de uso. */
+/** Permisos del backend que usa este caso de uso. CONSULTAR (Recepcionista) solo ve el catálogo. */
 export const PERMISOS = {
   GESTIONAR: 'PRODUCTO_GESTIONAR',
+  CONSULTAR: 'PRODUCTO_CONSULTAR',
 };
 
 /** Mensajes exactos del CU22 (flujo 6a), los mismos que devuelve el backend. */
