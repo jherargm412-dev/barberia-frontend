@@ -93,6 +93,7 @@ export default function ProductoDetalleDialog({ producto, onCerrar, verHistorial
               <Dato etiqueta="Estado"><EstadoProductoChip activo={producto.activo} /></Dato>
               <Dato etiqueta="Descripción" ancho>{producto.descripcion ?? '—'}</Dato>
               <Dato etiqueta="Costo">{formatearMonto(producto.costo)}</Dato>
+              <Dato etiqueta="Costo promedio">{formatearMonto(producto.costoPromedio ?? producto.costo)}</Dato>
               <Dato etiqueta="Precio de venta">{formatearMonto(producto.precioVenta)}</Dato>
               {producto.tipo === 'VENTA' && <Dato etiqueta="Comisión por unidad">{formatearMonto(producto.comisionUnitaria ?? 0)}</Dato>}
               <Dato etiqueta="Stock actual">{producto.stockActual}</Dato>

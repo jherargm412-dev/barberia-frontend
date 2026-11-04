@@ -10,6 +10,8 @@ export interface Producto {
   nombre: string;
   descripcion: string | null;
   costo: number;
+  /** Promedio ponderado del costo; se recalcula al registrar compras (CU25). */
+  costoPromedio: number;
   precioVenta: number;
   comisionUnitaria: number;
   stockMinimo: number;

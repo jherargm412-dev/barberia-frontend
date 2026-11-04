@@ -21,7 +21,7 @@ import type { Producto } from '../../types/gestionar_productos_insumos';
 import { etiquetaTipo, formatearMonto, stockBajo } from '../../utils/gestionar_productos_insumos/productoForm';
 import EstadoProductoChip from './EstadoProductoChip';
 
-const COLUMNAS = ['Tipo', 'Nombre', 'Costo', 'Precio de venta', 'Stock actual', 'Stock mínimo', 'Estado', 'Acciones'];
+const COLUMNAS = ['Tipo', 'Nombre', 'Costo', 'Costo promedio', 'Precio de venta', 'Stock actual', 'Stock mínimo', 'Estado', 'Acciones'];
 
 interface Props {
   /** Oculta el estado vacío mientras carga o se muestra un error. */
@@ -49,12 +49,13 @@ export default function ProductosTabla({
   return (
     <Paper elevation={0}>
       <TableContainer>
-        <Table columns={COLUMNAS} sx={{ minWidth: 860 }}>
+        <Table columns={COLUMNAS} sx={{ minWidth: 960 }}>
           <TableHead>
             <TableRow>
               <TableCell>Tipo</TableCell>
               <TableCell>Nombre</TableCell>
               <TableCell align="right">Costo</TableCell>
+              <TableCell align="right">Costo promedio</TableCell>
               <TableCell align="right">Precio de venta</TableCell>
               <TableCell align="right">Stock actual</TableCell>
               <TableCell align="right">Stock mínimo</TableCell>
@@ -82,6 +83,7 @@ export default function ProductosTabla({
                   )}
                 </TableCell>
                 <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>{formatearMonto(p.costo)}</TableCell>
+                <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>{formatearMonto(p.costoPromedio ?? p.costo)}</TableCell>
                 <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>{formatearMonto(p.precioVenta)}</TableCell>
                 <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                   {/* Alerta de stock mínimo: solo para ítems activos. */}
