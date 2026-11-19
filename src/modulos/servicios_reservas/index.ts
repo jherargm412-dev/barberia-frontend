@@ -40,6 +40,9 @@ export { default as ConsultarServiciosPage } from './pages/consultar_servicios/C
 export { default as PortadaPage } from './pages/consultar_servicios/PortadaPage';
 // Barra de las páginas públicas; también la usa el catálogo de productos (CU23).
 export { default as BarraPublica } from './components/consultar_servicios/BarraPublica';
+export { default as PiePublico } from './components/consultar_servicios/PiePublico';
+export { default as EncabezadoCatalogo } from './components/consultar_servicios/EncabezadoCatalogo';
+export { default as FiltrosCatalogoPublico } from './components/consultar_servicios/FiltrosCatalogoPublico';
 export { default as ReservarServicioPage } from './pages/consultar_servicios/ReservarServicioPage';
 
 

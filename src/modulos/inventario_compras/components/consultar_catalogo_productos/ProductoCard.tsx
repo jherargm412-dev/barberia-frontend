@@ -1,10 +1,8 @@
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBagOutlined';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
+import { sxPrecio, sxTarjetaPublica } from '../../../../shared/styles/publico';
 import { urlImagenProducto } from '../../api/consultar_catalogo_productos/catalogoProductosApi';
 import type { ProductoCatalogo } from '../../types/consultar_catalogo_productos';
 
@@ -13,66 +11,52 @@ interface ProductoCardProps {
   producto: ProductoCatalogo;
 }
 
+/** Etiqueta pequeña tipo píldora. */
+function Etiqueta({ children, tono }: { children: string; tono: 'disponible' | 'agotado' }) {
+  return (
+    <Box component="span" sx={tono === 'disponible'
+      ? { fontSize: 12, fontWeight: 600, color: 'success.main', bgcolor: 'rgba(76,175,80,0.12)', px: 1.25, py: 0.5, borderRadius: 999 }
+      : { fontSize: 12, fontWeight: 600, color: 'text.primary', bgcolor: 'background.paper', border: 1, borderColor: 'divider',
+        px: 1.25, py: 0.5, borderRadius: 999 }}>
+      {children}
+    </Box>
+  );
+}
+
 /** CU23 paso 1: imagen, nombre, descripción, precio y disponibilidad (sin revelar el stock exacto). */
 export default function ProductoCard({ producto }: ProductoCardProps) {
   return (
-    <Card
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: 2,
-        borderRadius: 2,
-        transition: 'transform 0.2s, box-shadow 0.2s',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: 4,
-        },
-      }}
-    >
-      {producto.imagenVersion !== null ? (
-        <CardMedia
-          component="img"
-          image={urlImagenProducto(producto.idProducto, producto.imagenVersion)}
-          alt={producto.nombre}
-          loading="lazy"
-          sx={{ aspectRatio: '4 / 3', objectFit: 'cover', bgcolor: 'action.hover' }}
-        />
-      ) : (
-        <Box
-          sx={{
-            aspectRatio: '4 / 3',
-            bgcolor: 'action.hover',
-            color: 'text.disabled',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <ShoppingBagIcon sx={{ fontSize: 56 }} />
-        </Box>
-      )}
-      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: 'bold' }}>
+    <Card sx={sxTarjetaPublica}>
+      <Box sx={{ position: 'relative', aspectRatio: '4 / 3', bgcolor: 'action.hover' }}>
+        {producto.imagenVersion !== null ? (
+          <Box component="img" src={urlImagenProducto(producto.idProducto, producto.imagenVersion)} alt={producto.nombre}
+            loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        ) : (
+          <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'text.disabled' }}>
+            <ShoppingBagIcon sx={{ fontSize: 56 }} />
+          </Box>
+        )}
+        {!producto.disponible && (
+          <Box sx={{ position: 'absolute', top: 14, left: 14 }}>
+            <Etiqueta tono="agotado">Agotado</Etiqueta>
+          </Box>
+        )}
+      </Box>
+      <Box sx={{ p: 2.75, display: 'flex', flexDirection: 'column', gap: 1, flexGrow: 1 }}>
+        <Typography component="h3" sx={{ fontWeight: 600, fontSize: 18, lineHeight: 1.35 }}>
           {producto.nombre}
         </Typography>
-
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40, flexGrow: 1 }}>
-          {producto.descripcion?.trim() || 'Sin descripción disponible.'}
+        <Typography color="text.secondary" sx={{ fontSize: 14, flexGrow: 1 }}>
+          {producto.descripcion?.trim() || 'Pregunta por este producto en la barbería.'}
         </Typography>
-
-        <Typography variant="h6" color="primary.main" sx={{ fontWeight: 'bold', mb: 1 }}>
-          Bs. {producto.precioVenta.toFixed(2)}
-        </Typography>
-
-        <Chip
-          size="small"
-          label={producto.disponible ? 'Disponible' : 'Agotado'}
-          color={producto.disponible ? 'success' : 'default'}
-          variant={producto.disponible ? 'filled' : 'outlined'}
-          sx={{ alignSelf: 'flex-start' }}
-        />
-      </CardContent>
+        <Box sx={{ mt: 1, pt: 1.75, borderTop: 1, borderColor: 'divider', display: 'flex', alignItems: 'center',
+          justifyContent: 'space-between', gap: 1 }}>
+          <Typography sx={[sxPrecio, { fontSize: 26, color: 'primary.main' }]}>
+            Bs {producto.precioVenta.toFixed(2)}
+          </Typography>
+          {producto.disponible && <Etiqueta tono="disponible">Disponible</Etiqueta>}
+        </Box>
+      </Box>
     </Card>
   );
 }

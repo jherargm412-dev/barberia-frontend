@@ -1,19 +1,17 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SearchIcon from '@mui/icons-material/Search';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
-import Container from '@mui/material/Container';
-import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
+import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ANCHO_PUBLICO } from '../../../../shared/styles/publico';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { useAuth } from '../../../seguridad_usuarios';
 import { listarCatalogo } from '../../api/consultar_servicios/catalogoApi';
 import BarraPublica from '../../components/consultar_servicios/BarraPublica';
+import EncabezadoCatalogo from '../../components/consultar_servicios/EncabezadoCatalogo';
+import FiltrosCatalogoPublico from '../../components/consultar_servicios/FiltrosCatalogoPublico';
+import PiePublico from '../../components/consultar_servicios/PiePublico';
 import ServicioCard from '../../components/consultar_servicios/ServicioCard';
 import type { FiltrosCatalogo, ServicioCatalogo } from '../../types/consultar_servicios';
 import { rutaParaReservar } from '../../utils/consultar_servicios/reservar';
@@ -23,7 +21,7 @@ const SIN_FILTROS: FiltrosCatalogo = { q: '', precioMin: '', precioMax: '' };
 /**
  * CU13: Consultar Servicios. Vista pública (con o sin sesión) del catálogo de servicios activos:
  * 1) tarjetas con nombre, descripción y precio; 2) búsqueda por texto y rango de precio;
- * 3) "Reservar" lleva a CU12 (cliente) o CU11 (recepción); sin sesión, primero al login.
+ * 3) "Reservar" lleva a CU12 (cliente) o CU11 (recepción); sin sesión, a reservar sin cuenta.
  */
 export default function ConsultarServiciosPage() {
   const navigate = useNavigate();
@@ -55,18 +53,15 @@ export default function ConsultarServiciosPage() {
     };
   }, [filtros]);
 
-  function buscar(e: FormEvent) {
-    e.preventDefault();
+  function aplicar(nuevos: FiltrosCatalogo) {
     setCargando(true);
     setError('');
-    setFiltros({ ...escritos });
+    setFiltros({ ...nuevos });
   }
 
   function limpiar() {
     setEscritos(SIN_FILTROS);
-    setCargando(true);
-    setError('');
-    setFiltros(SIN_FILTROS);
+    aplicar(SIN_FILTROS);
   }
 
   /**
@@ -83,73 +78,35 @@ export default function ConsultarServiciosPage() {
   }
 
   const hayFiltros = filtros.q.trim() !== '' || filtros.precioMin !== '' || filtros.precioMax !== '';
-  // Sin sesión se ofrece igual (lleva al login); con sesión, solo a quien puede agendar.
+  // Sin sesión se ofrece igual (lleva a reservar sin cuenta); con sesión, solo a quien puede agendar.
   const puedeReservar = !usuario || rutaParaReservar(0, tienePermiso) !== null;
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', flexDirection: 'column' }}>
       <BarraPublica />
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Encabezado: botón volver + título */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2, flexWrap: 'wrap' }}>
-          <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')}>
-            Volver al inicio
-          </Button>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', flex: 1 }}>
-            Nuestros Servicios
-          </Typography>
-          <Button onClick={() => navigate('/catalogo/productos')}>Ver productos</Button>
-        </Box>
+      <EncabezadoCatalogo activo="servicios" />
 
+      <Box component="main" sx={{ width: '100%', boxSizing: 'border-box', maxWidth: ANCHO_PUBLICO, mx: 'auto',
+        px: { xs: 2, sm: 4 }, pt: 4, pb: { xs: 7, md: 12 }, display: 'flex', flexDirection: 'column', gap: 3 }}>
         {/* Paso 2: búsqueda por texto y rango de precio */}
-        <Paper
-          component="form"
-          onSubmit={buscar}
-          noValidate
-          sx={{ p: 2, mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}
-        >
-          <TextField
-            label="Buscar servicio"
-            placeholder="Nombre o descripción"
-            value={escritos.q}
-            onChange={(e) => setEscritos({ ...escritos, q: e.target.value })}
-            sx={{ flex: '1 1 240px' }}
-          />
-          <TextField
-            label="Precio mínimo (Bs)"
-            type="number"
-            value={escritos.precioMin}
-            onChange={(e) => setEscritos({ ...escritos, precioMin: e.target.value })}
-            slotProps={{ htmlInput: { min: 0 } }}
-            sx={{ width: { xs: '100%', sm: 170 } }}
-          />
-          <TextField
-            label="Precio máximo (Bs)"
-            type="number"
-            value={escritos.precioMax}
-            onChange={(e) => setEscritos({ ...escritos, precioMax: e.target.value })}
-            slotProps={{ htmlInput: { min: 0 } }}
-            sx={{ width: { xs: '100%', sm: 170 } }}
-          />
-          <Button type="submit" variant="contained" startIcon={<SearchIcon />}>
-            Buscar
-          </Button>
-          {hayFiltros && <Button onClick={limpiar}>Limpiar filtros</Button>}
-        </Paper>
+        <FiltrosCatalogoPublico
+          valores={escritos}
+          onCambiar={setEscritos}
+          onBuscar={() => aplicar(escritos)}
+          onLimpiar={hayFiltros ? limpiar : undefined}
+          etiquetaBusqueda="Buscar servicio"
+        />
 
-        {/* Estado de carga */}
-        {cargando && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
-            <CircularProgress />
-          </Box>
+        {!cargando && !error && servicios.length > 0 && (
+          <Typography color="text.secondary" sx={{ fontSize: 14 }}>
+            <Box component="strong" sx={{ color: 'text.primary' }}>
+              {servicios.length} {servicios.length === 1 ? 'servicio' : 'servicios'}
+            </Box>{' '}· del más caro al más barato
+          </Typography>
         )}
 
         {/* Error de conexión o de filtros (p. ej. mínimo mayor que el máximo) */}
-        {!cargando && error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+        {!cargando && error && <Alert severity="error">{error}</Alert>}
 
         {/* Flujo 3a: sin servicios disponibles / sin resultados de la búsqueda */}
         {!cargando && !error && servicios.length === 0 && (
@@ -158,28 +115,15 @@ export default function ConsultarServiciosPage() {
           </Alert>
         )}
 
-        {!cargando && !error && servicios.length > 0 && (
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr',
-                sm: 'repeat(2, 1fr)',
-                md: 'repeat(3, 1fr)',
-              },
-              gap: 3,
-            }}
-          >
-            {servicios.map((servicio) => (
-              <ServicioCard
-                key={servicio.idServicio}
-                servicio={servicio}
-                onReservar={puedeReservar ? reservar : undefined}
-              />
-            ))}
-          </Box>
-        )}
-      </Container>
+        <Box sx={{ display: 'grid', gap: 2.5, gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' } }}>
+          {cargando && [0, 1, 2].map((i) => <Skeleton key={i} variant="rounded" height={210} sx={{ borderRadius: '22px' }} />)}
+          {!cargando && !error && servicios.map((servicio) => (
+            <ServicioCard key={servicio.idServicio} servicio={servicio} onReservar={puedeReservar ? reservar : undefined} />
+          ))}
+        </Box>
+      </Box>
+
+      <PiePublico />
     </Box>
   );
 }

@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { sxEtiqueta, sxTituloSeccion } from '../../../../shared/styles/publico';
 import { listarCatalogoProductos } from '../../api/consultar_catalogo_productos/catalogoProductosApi';
 import type { ProductoCatalogo } from '../../types/consultar_catalogo_productos';
 import ProductoCard from './ProductoCard';
@@ -54,20 +55,22 @@ export default function CarruselProductos() {
 
   return (
     <Box component="section" aria-labelledby="portada-productos">
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3, flexWrap: 'wrap' }}>
-        <Typography id="portada-productos" variant="h4" component="h2" sx={{ fontWeight: 600 }}>
-          Productos
-        </Typography>
-        <Typography color="text.secondary" sx={{ flex: 1, minWidth: 160 }}>
-          De venta en la barbería.
-        </Typography>
-        <Button onClick={() => navigate('/catalogo/productos')}>Ver todos</Button>
-        <IconButton aria-label="Productos anteriores" onClick={() => desplazar(-1)} disabled={!puedeIzq}>
-          <ChevronLeftIcon />
-        </IconButton>
-        <IconButton aria-label="Más productos" onClick={() => desplazar(1)} disabled={!puedeDer}>
-          <ChevronRightIcon />
-        </IconButton>
+      <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1.5, mb: { xs: 3, md: 4 }, flexWrap: 'wrap' }}>
+        <Box sx={{ flex: '1 1 320px', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          <Typography component="span" sx={sxEtiqueta}>Productos</Typography>
+          <Typography id="portada-productos" component="h2" sx={sxTituloSeccion}>Llévate el acabado a casa</Typography>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+          <Button onClick={() => navigate('/catalogo/productos')} sx={{ fontSize: 15, mr: 1 }}>Ver todos</Button>
+          <IconButton aria-label="Productos anteriores" onClick={() => desplazar(-1)} disabled={!puedeIzq}
+            sx={{ borderRadius: '50%', border: 1, borderColor: puedeIzq ? 'primary.main' : 'divider', color: 'primary.main' }}>
+            <ChevronLeftIcon />
+          </IconButton>
+          <IconButton aria-label="Más productos" onClick={() => desplazar(1)} disabled={!puedeDer}
+            sx={{ borderRadius: '50%', border: 1, borderColor: puedeDer ? 'primary.main' : 'divider', color: 'primary.main' }}>
+            <ChevronRightIcon />
+          </IconButton>
+        </Box>
       </Box>
 
       <Box
@@ -79,7 +82,9 @@ export default function CarruselProductos() {
           display: 'grid',
           gridAutoFlow: 'column',
           gridAutoColumns: { xs: '78%', sm: '42%', md: '30%', lg: '23%' },
-          gap: 3,
+          gap: 2.5,
+          // Deja ver el borde de la tarjeta al elevarse con el mouse.
+          pt: 0.5,
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           scrollPaddingInline: 4,
