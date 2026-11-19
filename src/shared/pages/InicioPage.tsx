@@ -17,6 +17,9 @@ import EstadoAgendaChip from '../../modulos/servicios_reservas/components/consul
 import { obtenerError } from '../utils/obtenerError';
 import EmptyState from '../components/EmptyState';
 import MetricCard from '../components/MetricCard';
+import StockBajoCard from '../components/StockBajoCard';
+import AddIcon from '@mui/icons-material/Add';
+import { FUENTE_TITULOS, sxEtiqueta, sxPildora } from '../styles/publico';
 
 import { relojNegocio, resumirAgenda } from '../utils/resumenInicio';
 
@@ -61,16 +64,26 @@ export default function InicioPage() {
     { nombre: 'Caja', detalle: 'Revisar la jornada', ruta: '/caja', permiso: tienePermiso('CAJA_CONSULTAR'), icono: <WalletIcon /> },
   ].filter((acceso) => acceso.permiso);
 
+  const puedeVerStock = tienePermiso('PRODUCTO_GESTIONAR') || tienePermiso('PRODUCTO_CONSULTAR');
+  const primerNombre = usuario?.nombre.trim().split(/\s+/)[0] ?? '';
+
   return <Stack spacing={3.5}>
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: { sm: 'center' } }}>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: { xs: 'column', md: 'row' }, gap: 2, alignItems: { md: 'flex-end' } }}>
       <Box sx={{ minWidth: 0 }}>
-        <Typography variant="overline" color="primary.main">Resumen de actividad</Typography>
-        <Typography component="h1" variant="h4" sx={{ mt: 0.5, overflowWrap: 'anywhere' }}>Bienvenido, {usuario?.nombre}</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Este es el resumen de actividad de HOUSE of CUT.</Typography>
+        <Typography component="span" sx={sxEtiqueta}>Resumen de hoy</Typography>
+        <Typography component="h1" sx={{ mt: 1, fontFamily: FUENTE_TITULOS, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.02em',
+          fontSize: { xs: 32, sm: 40 }, lineHeight: 1.1, overflowWrap: 'anywhere' }}>
+          Hola, {primerNombre}
+        </Typography>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mt: 1, color: 'text.secondary' }}>
+          <CalendarMonthIcon sx={{ fontSize: 18 }} />
+          <Typography variant="body2">{new Date(`${reloj.fecha}T12:00:00-04:00`).toLocaleDateString('es-BO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/La_Paz' })}</Typography>
+        </Stack>
       </Box>
-      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexShrink: 0, color: 'text.secondary' }}>
-        <CalendarMonthIcon sx={{ fontSize: 18 }} />
-        <Typography variant="body2">{new Date(`${reloj.fecha}T12:00:00-04:00`).toLocaleDateString('es-BO', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/La_Paz' })}</Typography>
+      {/* Acciones del día según los permisos del usuario. */}
+      <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', flexShrink: 0 }}>
+        {tienePermiso('VENTA_REGISTRAR') && <Button component={Link} to="/ventas/registrar" variant="outlined" sx={sxPildora}>Registrar venta</Button>}
+        {tienePermiso('RESERVA_CREAR') && <Button component={Link} to="/citas/nueva" variant="contained" startIcon={<AddIcon />} sx={sxPildora}>Nueva cita</Button>}
       </Stack>
     </Box>
     {error && <Alert severity="error" action={<Button color="inherit" onClick={actualizar}>Reintentar</Button>}>{error}</Alert>}
@@ -80,6 +93,7 @@ export default function InicioPage() {
       <Grid size={{ xs: 12, sm: 6, xl: 3 }}><MetricCard label="Ingresos del día" value={null} icon={<WalletIcon />} detail="No hay un resumen diario consolidado disponible" /></Grid>
       <Grid size={{ xs: 12, sm: 6, xl: 3 }}><MetricCard label="Citas pendientes" value={pendientes} icon={<ScheduleIcon />} loading={cargando} detail={detalle} /></Grid>
     </Grid>
+    <Box sx={{ display: 'grid', gap: 2, alignItems: 'start', gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: 'minmax(0, 2fr) minmax(0, 1fr)' } }}>
     <Card>
       <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}>
         <Box><Typography component="h2" variant="h6">Próximas citas</Typography><Typography variant="body2" color="text.secondary">Las siguientes reservas de hoy · {puedeVerTodas ? 'Todos los barberos' : 'Tu agenda'}</Typography></Box>
@@ -100,14 +114,26 @@ export default function InicioPage() {
           </TableRow>)}</TableBody>
         </Table></TableContainer>}
     </Card>
-    <Box component="section" aria-label="Accesos rápidos">
-      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>Accesos rápidos</Typography>
-      <Grid container spacing={2}>{accesos.map((acceso) => <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={acceso.ruta}>
-        <Button component={Link} to={acceso.ruta} color="inherit" variant="outlined" fullWidth sx={{ justifyContent: 'flex-start', p: 2, gap: 1.5, textAlign: 'left', bgcolor: 'background.paper', height: '100%' }}>
-          <Box sx={{ color: 'text.secondary', display: 'flex' }}>{acceso.icono}</Box><Box sx={{ flexGrow: 1 }}><Typography component="span" variant="body2" sx={{ fontWeight: 600, display: 'block' }}>{acceso.nombre}</Typography><Typography component="span" variant="caption" color="text.secondary">{acceso.detalle}</Typography></Box><ArrowForwardIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-        </Button>
-      </Grid>)}</Grid>
-      {accesos.length === 0 && <Alert severity="info">Los apartados disponibles para tu perfil se muestran en el menú de navegación.</Alert>}
+    <Stack spacing={2}>
+      {puedeVerStock && <StockBajoCard />}
+      <Card component="section" aria-label="Accesos rápidos">
+        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Typography component="h2" variant="h6" sx={{ mb: 1 }}>Accesos rápidos</Typography>
+          {accesos.map((acceso) => (
+            <Button key={acceso.ruta} component={Link} to={acceso.ruta} color="inherit" fullWidth
+              sx={{ justifyContent: 'flex-start', px: 1.5, py: 1.25, gap: 1.5, textAlign: 'left', bgcolor: 'action.hover', borderRadius: 2 }}>
+              <Box sx={{ color: 'primary.main', display: 'flex' }}>{acceso.icono}</Box>
+              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                <Typography component="span" variant="body2" sx={{ fontWeight: 600, display: 'block' }}>{acceso.nombre}</Typography>
+                <Typography component="span" variant="caption" color="text.secondary">{acceso.detalle}</Typography>
+              </Box>
+              <ArrowForwardIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+            </Button>
+          ))}
+          {accesos.length === 0 && <Alert severity="info">Los apartados disponibles para tu perfil se muestran en el menú de navegación.</Alert>}
+        </CardContent>
+      </Card>
+    </Stack>
     </Box>
     <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', alignItems: 'center' }}>
       <Typography variant="caption" color="text.secondary">Sesión actual</Typography>{usuario?.roles.map((rol) => <Chip key={rol} size="small" variant="outlined" label={rol} />)}

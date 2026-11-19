@@ -10,7 +10,7 @@ import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { cambiarEstadoCita, listarBarberos, listarCitas } from '../../api/gestionar_citas/citasApi';
 import CitasFiltros from '../../components/gestionar_citas/CitasFiltros';
-import CitasTabla from '../../components/gestionar_citas/CitasTabla';
+import CitasLista from '../../components/gestionar_citas/CitasLista';
 import ReprogramarDialog from '../../components/gestionar_citas/ReprogramarDialog';
 import ComprobanteAnticipo from '../../components/registrar_pago_anticipo/ComprobanteAnticipo';
 import RegistrarAnticipoDialog from '../../components/registrar_pago_anticipo/RegistrarAnticipoDialog';
@@ -157,7 +157,7 @@ export default function CitasListPage() {
       )}
       {cargando && <LinearProgress />}
 
-      <CitasTabla
+      <CitasLista
         citas={citas}
         mostrarVacio={!cargando && !error}
         total={total}

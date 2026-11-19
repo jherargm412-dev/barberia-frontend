@@ -15,6 +15,13 @@ import ProductoDetalleDialog from '../../components/gestionar_productos_insumos/
 import ProductosTabla from '../../components/gestionar_productos_insumos/ProductosTabla';
 import { PERMISOS } from '../../constants/gestionar_productos_insumos';
 import type { Producto, RespuestaProducto } from '../../types/gestionar_productos_insumos';
+import { stockBajo } from '../../utils/gestionar_productos_insumos/productoForm';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+
+type FiltroProductos = 'todos' | 'VENTA' | 'INSUMO' | 'bajo';
 
 /**
  * CU22 paso 2 (listado) y flujos Consultar, Habilitar, Deshabilitar y Ajustar stock.
@@ -46,6 +53,8 @@ export default function ProductosListPage() {
   const [vecesAjuste, setVecesAjuste] = useState(0);
   // Producto cuyo catálogo (imagen, mostrar/ocultar) se está gestionando; null = cerrado.
   const [enCatalogo, setEnCatalogo] = useState<Producto | null>(null);
+  const [filtro, setFiltro] = useState<FiltroProductos>('todos');
+  const [texto, setTexto] = useState('');
 
   useEffect(() => {
     listarProductos()
@@ -102,6 +111,10 @@ export default function ProductosListPage() {
   }
 
   const vaADeshabilitar = porCambiar?.activo === true;
+  const busqueda = texto.trim().toLowerCase();
+  const filtrados = productos
+    .filter((p) => filtro === 'todos' || (filtro === 'bajo' ? p.activo && stockBajo(p) : p.tipo === filtro))
+    .filter((p) => !busqueda || p.nombre.toLowerCase().includes(busqueda));
 
   return (
     <>
@@ -125,9 +138,22 @@ export default function ProductosListPage() {
       )}
       {cargando && <LinearProgress />}
 
+      {/* Filtros rápidos (en el navegador: el listado ya trae todos los ítems). */}
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2, alignItems: { sm: 'center' } }}>
+        <ToggleButtonGroup exclusive size="small" value={filtro} onChange={(_, v: FiltroProductos | null) => v && setFiltro(v)}
+          aria-label="Filtrar ítems" sx={{ flexWrap: 'wrap' }}>
+          <ToggleButton value="todos">Todos · {productos.length}</ToggleButton>
+          <ToggleButton value="VENTA">Productos · {productos.filter((p) => p.tipo === 'VENTA').length}</ToggleButton>
+          <ToggleButton value="INSUMO">Insumos · {productos.filter((p) => p.tipo === 'INSUMO').length}</ToggleButton>
+          <ToggleButton value="bajo" sx={{ color: 'warning.main' }}>Stock bajo · {productos.filter((p) => p.activo && stockBajo(p)).length}</ToggleButton>
+        </ToggleButtonGroup>
+        <TextField size="small" label="Buscar por nombre" value={texto} onChange={(e) => setTexto(e.target.value)}
+          sx={{ flex: 1, maxWidth: { sm: 320 } }} />
+      </Stack>
+
       <ProductosTabla
         mostrarVacio={!cargando && !error}
-        productos={productos}
+        productos={filtrados}
         onVer={setViendo}
         onCambiarEstado={pedirConfirmacion}
         onAjustarStock={abrirAjuste}

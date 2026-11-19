@@ -7,7 +7,6 @@ import ContentCutIcon from '@mui/icons-material/ContentCutOutlined';
 import CreditCardIcon from '@mui/icons-material/CreditCardOutlined';
 import EventAvailableIcon from '@mui/icons-material/EventAvailableOutlined';
 import EventIcon from '@mui/icons-material/EventOutlined';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import HistoryIcon from '@mui/icons-material/HistoryOutlined';
 import HomeIcon from '@mui/icons-material/HomeOutlined';
@@ -25,7 +24,6 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import Collapse from '@mui/material/Collapse';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -38,6 +36,7 @@ import { useState, type ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../modulos/seguridad_usuarios';
 import ThemeModeButton from '../components/ThemeModeButton';
+import { FUENTE_TITULOS } from '../styles/publico';
 import PaymentsIcon from '@mui/icons-material/PaymentsOutlined';
 
 const ANCHO_MENU = 280;
@@ -127,17 +126,6 @@ export default function MainLayout() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
-  const [rutaAnterior, setRutaAnterior] = useState(pathname);
-  const [gruposAbiertos, setGruposAbiertos] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(GRUPOS.map((grupo) => [grupo.titulo, grupo.opciones.some((opcion) => rutaSeleccionada(opcion.ruta, pathname))])),
-  );
-
-  // Sincroniza el grupo también al navegar desde enlaces, historial o accesos rápidos.
-  if (rutaAnterior !== pathname) {
-    setRutaAnterior(pathname);
-    const actual = GRUPOS.find((grupo) => grupo.opciones.some((opcion) => rutaSeleccionada(opcion.ruta, pathname)));
-    if (actual) setGruposAbiertos((anteriores) => ({ ...anteriores, [actual.titulo]: true }));
-  }
 
   const gruposVisibles = GRUPOS.map((grupo) => ({
     ...grupo,
@@ -150,9 +138,6 @@ export default function MainLayout() {
   }
 
   function irA(opcion: OpcionMenu) {
-    // Mantiene visible el apartado elegido al navegar desde el menú.
-    const grupo = GRUPOS.find((actual) => actual.opciones.includes(opcion));
-    if (grupo) setGruposAbiertos((anteriores) => ({ ...anteriores, [grupo.titulo]: true }));
     navigate(opcion.ruta);
     setMenuMovilAbierto(false);
   }
@@ -165,7 +150,7 @@ export default function MainLayout() {
         aria-current={rutaSeleccionada(opcion.ruta, pathname) ? 'page' : undefined}
         onClick={() => irA(opcion)}
         sx={{
-          pl: anidada ? 3 : 1.5, position: 'relative',
+          pl: anidada ? 1.75 : 1.5, position: 'relative',
           '&.Mui-selected::before': { content: '""', position: 'absolute', left: 0, top: 11, bottom: 11, width: 3, bgcolor: 'primary.main', borderRadius: 2 },
         }}
       >
@@ -184,25 +169,16 @@ export default function MainLayout() {
       </Box>
       <List component="nav" aria-label="Navegación principal" sx={{ px: 1.5, pb: 3 }}>
         {opcionMenu(INICIO)}
+        {/* Grupos siempre abiertos, con su nombre como encabezado: todo el menú se ve de un vistazo. */}
         {gruposVisibles.map((grupo) => (
-          <Box key={grupo.titulo} sx={{ mt: 1 }}>
-            <ListItemButton
-              sx={{ color: grupo.opciones.some((opcion) => rutaSeleccionada(opcion.ruta, pathname)) ? 'text.primary' : 'text.secondary' }}
-              aria-expanded={Boolean(gruposAbiertos[grupo.titulo])}
-              aria-label={`${gruposAbiertos[grupo.titulo] ? 'Contraer' : 'Desplegar'} ${grupo.titulo}`}
-              onClick={() => setGruposAbiertos((anteriores) => ({
-                ...anteriores, [grupo.titulo]: !anteriores[grupo.titulo],
-              }))}
-            >
-              <ListItemIcon>{grupo.icono}</ListItemIcon>
-              <ListItemText primary={grupo.titulo} slotProps={{ primary: { noWrap: true, sx: { fontSize: 13, fontWeight: 600 } } }} />
-              <ExpandMoreIcon sx={{ fontSize: 18, transform: gruposAbiertos[grupo.titulo] ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms cubic-bezier(0.2, 0, 0, 1)' }} />
-            </ListItemButton>
-            <Collapse in={Boolean(gruposAbiertos[grupo.titulo])} timeout={180} unmountOnExit>
-              <List component="div" disablePadding>
-                {grupo.opciones.map((opcion) => opcionMenu(opcion, true))}
-              </List>
-            </Collapse>
+          <Box key={grupo.titulo} component="section" aria-label={grupo.titulo} sx={{ mt: 2 }}>
+            <Typography component="h2" sx={{ px: 1.5, pb: 0.75, fontSize: 11, fontWeight: 600, letterSpacing: '0.14em',
+              textTransform: 'uppercase', color: 'text.secondary', opacity: 0.85 }}>
+              {grupo.titulo}
+            </Typography>
+            <List component="div" disablePadding>
+              {grupo.opciones.map((opcion) => opcionMenu(opcion, true))}
+            </List>
           </Box>
         ))}
         {(!PERFIL.permiso || (Array.isArray(PERFIL.permiso) ? PERFIL.permiso.some((permiso) => tienePermiso(permiso)) : tienePermiso(PERFIL.permiso))) && opcionMenu(PERFIL)}
@@ -224,9 +200,9 @@ export default function MainLayout() {
             <MenuIcon />
           </IconButton>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexGrow: 1, minWidth: 0 }}>
-            <Box sx={{ width: 34, height: 34, border: 1, borderColor: 'divider', borderRadius: 1, display: { xs: 'none', sm: 'grid' }, placeItems: 'center', color: 'primary.main' }}><ContentCutIcon sx={{ fontSize: 20 }} /></Box>
-            <Typography noWrap sx={{ fontWeight: 750, fontSize: { xs: 14, sm: 16 }, letterSpacing: '0.035em' }}>
-              HOUSE <Box component="span" sx={{ fontWeight: 400, color: 'text.secondary', fontSize: '0.85em' }}>of</Box> CUT
+            <Box sx={{ width: 34, height: 34, border: 1, borderColor: 'primary.main', borderRadius: '50%', display: { xs: 'none', sm: 'grid' }, placeItems: 'center', color: 'primary.main' }}><ContentCutIcon sx={{ fontSize: 18 }} /></Box>
+            <Typography noWrap sx={{ fontFamily: FUENTE_TITULOS, fontWeight: 600, fontSize: { xs: 16, sm: 18 }, letterSpacing: '0.14em' }}>
+              HOUSE <Box component="span" sx={{ fontWeight: 500, color: 'primary.main' }}>of</Box> CUT
             </Typography>
           </Box>
           {/* Identidad de la sesión actual; los roles se leen de la autenticación existente. */}

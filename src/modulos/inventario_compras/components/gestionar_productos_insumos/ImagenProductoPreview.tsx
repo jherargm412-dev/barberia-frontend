@@ -11,13 +11,15 @@ interface Props {
   version: number | null;
   nombre: string;
   alto?: number;
+  /** Miniatura cuadrada para tablas: sin textos, solo el ícono si no hay imagen. */
+  compacto?: boolean;
 }
 
 /**
  * Vista previa de la imagen en el panel. Se pide con el token (sirve también para ítems ocultos o
  * deshabilitados, que el catálogo público no muestra) y se libera el objeto al desmontar.
  */
-export default function ImagenProductoPreview({ idProducto, version, nombre, alto = 180 }: Props) {
+export default function ImagenProductoPreview({ idProducto, version, nombre, alto = 180, compacto = false }: Props) {
   const [url, setUrl] = useState<string | null>(null);
   const [fallo, setFallo] = useState(false);
 
@@ -42,7 +44,8 @@ export default function ImagenProductoPreview({ idProducto, version, nombre, alt
 
   const marco = {
     height: alto,
-    borderRadius: 1,
+    ...(compacto ? { width: alto, flexShrink: 0 } : {}),
+    borderRadius: compacto ? 1.5 : 1,
     bgcolor: 'action.hover',
     display: 'flex',
     alignItems: 'center',
@@ -50,6 +53,9 @@ export default function ImagenProductoPreview({ idProducto, version, nombre, alt
     overflow: 'hidden',
   } as const;
 
+  if ((version === null || fallo) && compacto) {
+    return <Box sx={{ ...marco, color: 'text.disabled' }} aria-hidden><ImageIcon fontSize="small" /></Box>;
+  }
   if (version === null || fallo) {
     return (
       <Box sx={{ ...marco, flexDirection: 'column', color: 'text.secondary', gap: 0.5 }}>
@@ -61,9 +67,10 @@ export default function ImagenProductoPreview({ idProducto, version, nombre, alt
   return (
     <Box sx={marco}>
       {url ? (
-        <Box component="img" src={url} alt={nombre} sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+        <Box component="img" src={url} alt={nombre}
+          sx={compacto ? { width: '100%', height: '100%', objectFit: 'cover' } : { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
       ) : (
-        <CircularProgress size={28} />
+        <CircularProgress size={compacto ? 16 : 28} />
       )}
     </Box>
   );

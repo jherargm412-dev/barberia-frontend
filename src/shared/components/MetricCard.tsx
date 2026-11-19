@@ -4,6 +4,7 @@ import CardContent from '@mui/material/CardContent';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
+import { FUENTE_TITULOS } from '../styles/publico';
 
 interface Props { label: string; value: number | null; icon: ReactNode; loading?: boolean; detail: string }
 
@@ -16,7 +17,7 @@ export default function MetricCard({ label, value, icon, loading, detail }: Prop
     </Box>
     {loading ? <Skeleton width={80} height={48} /> : value === null
       ? <Typography sx={{ fontSize: 18, fontWeight: 600, lineHeight: '48px' }}>Datos no disponibles</Typography>
-      : <Typography sx={{ fontSize: 34, lineHeight: '48px', fontWeight: 650, letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums' }}>{value}</Typography>}
+      : <Typography sx={{ fontFamily: FUENTE_TITULOS, fontSize: 42, lineHeight: '48px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{value}</Typography>}
     <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 1 }}>{detail}</Typography>
   </CardContent></Card>;
 }
