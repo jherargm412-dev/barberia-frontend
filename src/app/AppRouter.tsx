@@ -60,7 +60,9 @@ import {
   CajaHistorialPage, CajaPage, PasarelaPagoPage, PERMISOS_CAJA,
   PERMISO_VENTA_REGISTRAR, RegistrarVentaPage,
 } from '../modulos/ventas_caja';
-import { PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosListPage } from '../modulos/inventario_compras';
+import {
+  CatalogoProductosAdminPage, ConsultarProductosPage, PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosListPage,
+} from '../modulos/inventario_compras';
 import InicioPage from '../shared/pages/InicioPage';
 import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
 import { CompraRegistrarPage, ComprasListPage, PERMISOS_COMPRAS } from '../modulos/inventario_compras';
@@ -77,6 +79,8 @@ export default function AppRouter() {
       <Route path="/activar" element={<ActivarCuentaPage />} />
       {/* CU13 Consultar Servicios: catálogo público, se abre desde el login sin iniciar sesión. */}
       <Route path="/catalogo" element={<ConsultarServiciosPage />} />
+      {/* CU23 Consultar Catálogo de Productos: público, sin iniciar sesión. */}
+      <Route path="/catalogo/productos" element={<ConsultarProductosPage />} />
       {/* CU12 + CU14 sin cuenta: reservar con nombre y teléfono, y "Mi cita" (enlace secreto) para ver y pagar. */}
       <Route path="/reservar-sin-cuenta" element={<ReservaInvitadoPage />} />
       <Route path="/mi-cita/:codigo" element={<CitaInvitadoPage />} />
@@ -165,6 +169,8 @@ export default function AppRouter() {
               la Recepcionista (PRODUCTO_CONSULTAR) solo ve el listado y el detalle. */}
           <Route element={<RequierePermiso permiso={[PERMISOS_PRODUCTOS.GESTIONAR, PERMISOS_PRODUCTOS.CONSULTAR]} />}>
             <Route path="/productos" element={<ProductosListPage />} />
+            {/* Solo los productos de venta, como se ven en el catálogo público (CU23). */}
+            <Route path="/catalogo-productos" element={<CatalogoProductosAdminPage />} />
           </Route>
           <Route element={<RequierePermiso permiso={PERMISOS_PRODUCTOS.GESTIONAR} />}>
             <Route path="/productos/nuevo" element={<ProductoCrearPage />} />

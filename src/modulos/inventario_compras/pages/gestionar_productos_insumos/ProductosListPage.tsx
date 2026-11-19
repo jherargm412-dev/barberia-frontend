@@ -10,10 +10,11 @@ import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { useAuth } from '../../../seguridad_usuarios';
 import { cambiarEstadoProducto, listarProductos } from '../../api/gestionar_productos_insumos/productosApi';
 import AjusteStockDialog from '../../components/gestionar_productos_insumos/AjusteStockDialog';
+import CatalogoProductoDialog from '../../components/gestionar_productos_insumos/CatalogoProductoDialog';
 import ProductoDetalleDialog from '../../components/gestionar_productos_insumos/ProductoDetalleDialog';
 import ProductosTabla from '../../components/gestionar_productos_insumos/ProductosTabla';
 import { PERMISOS } from '../../constants/gestionar_productos_insumos';
-import type { Producto } from '../../types/gestionar_productos_insumos';
+import type { Producto, RespuestaProducto } from '../../types/gestionar_productos_insumos';
 
 /**
  * CU22 paso 2 (listado) y flujos Consultar, Habilitar, Deshabilitar y Ajustar stock.
@@ -43,6 +44,8 @@ export default function ProductosListPage() {
   const [porAjustar, setPorAjustar] = useState<Producto | null>(null);
   const [ajustando, setAjustando] = useState(false);
   const [vecesAjuste, setVecesAjuste] = useState(0);
+  // Producto cuyo catálogo (imagen, mostrar/ocultar) se está gestionando; null = cerrado.
+  const [enCatalogo, setEnCatalogo] = useState<Producto | null>(null);
 
   useEffect(() => {
     listarProductos()
@@ -74,6 +77,11 @@ export default function ProductosListPage() {
     setError('');
     setMensaje(mensajeBackend);
     actualizarLista();
+  }
+
+  // El diálogo de catálogo muestra su propio mensaje; aquí solo se refleja el cambio en la fila.
+  function catalogoActualizado({ producto }: RespuestaProducto) {
+    setProductos((lista) => lista.map((p) => (p.idProducto === producto.idProducto ? producto : p)));
   }
 
   async function confirmarCambioEstado() {
@@ -123,7 +131,15 @@ export default function ProductosListPage() {
         onVer={setViendo}
         onCambiarEstado={pedirConfirmacion}
         onAjustarStock={abrirAjuste}
+        onGestionarCatalogo={setEnCatalogo}
         soloLectura={!puedeGestionar}
+      />
+
+      <CatalogoProductoDialog
+        key={enCatalogo?.idProducto ?? 'cerrado'}
+        producto={enCatalogo}
+        onCerrar={() => setEnCatalogo(null)}
+        onActualizado={catalogoActualizado}
       />
 
       <AjusteStockDialog

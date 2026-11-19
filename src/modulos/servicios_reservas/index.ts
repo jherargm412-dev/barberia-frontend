@@ -38,6 +38,8 @@ export { PERMISOS_AGENDA } from './constants/consultar_agenda';
 // CU13 Consultar Servicios (catálogo público, sin sesión)
 export { default as ConsultarServiciosPage } from './pages/consultar_servicios/ConsultarServiciosPage';
 export { default as PortadaPage } from './pages/consultar_servicios/PortadaPage';
+// Barra de las páginas públicas; también la usa el catálogo de productos (CU23).
+export { default as BarraPublica } from './components/consultar_servicios/BarraPublica';
 export { default as ReservarServicioPage } from './pages/consultar_servicios/ReservarServicioPage';
 
 

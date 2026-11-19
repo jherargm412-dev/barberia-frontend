@@ -43,6 +43,34 @@ export async function ajustarStock(id: number, datos: AjusteStockRequest) {
   return respuesta.data;
 }
 
+/** Catálogo público (CU23): se envía el valor destino, así un doble clic no lo revierte. */
+export async function cambiarCatalogoProducto(id: number, enCatalogo: boolean) {
+  const respuesta = await http.patch<RespuestaProducto>(`/productos/${id}/catalogo`, { enCatalogo });
+  return respuesta.data;
+}
+
+/** Sube o reemplaza la imagen (JPG, PNG o WebP, máx. 2 MB). */
+export async function subirImagenProducto(id: number, archivo: File) {
+  const datos = new FormData();
+  datos.append('archivo', archivo);
+  const respuesta = await http.put<RespuestaProducto>(`/productos/${id}/imagen`, datos);
+  return respuesta.data;
+}
+
+export async function quitarImagenProducto(id: number) {
+  const respuesta = await http.delete<RespuestaProducto>(`/productos/${id}/imagen`);
+  return respuesta.data;
+}
+
+/**
+ * Imagen para la vista previa del panel. Se pide con el token (un <img> no puede enviarlo),
+ * por eso vuelve como Blob; también sirve para ítems ocultos o deshabilitados.
+ */
+export async function obtenerImagenProducto(id: number) {
+  const respuesta = await http.get<Blob>(`/productos/${id}/imagen`, { responseType: 'blob' });
+  return respuesta.data;
+}
+
 /** Historial de ajustes de stock del ítem, del más reciente al más antiguo. */
 export async function listarAjustes(id: number) {
   const respuesta = await http.get<AjusteStock[]>(`/productos/${id}/ajustes`);

@@ -95,9 +95,10 @@ export default function ConsultarServiciosPage() {
           <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/')}>
             Volver al inicio
           </Button>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', flex: 1 }}>
             Nuestros Servicios
           </Typography>
+          <Button onClick={() => navigate('/catalogo/productos')}>Ver productos</Button>
         </Box>
 
         {/* Paso 2: búsqueda por texto y rango de precio */}

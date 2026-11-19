@@ -9,6 +9,7 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CarruselProductos } from '../../../inventario_compras';
 import { listarCatalogo } from '../../api/consultar_servicios/catalogoApi';
 import BarraPublica from '../../components/consultar_servicios/BarraPublica';
 import ServicioCard from '../../components/consultar_servicios/ServicioCard';
@@ -97,6 +98,11 @@ export default function PortadaPage() {
             ))}
           </Box>
         )}
+      </Container>
+
+      {/* Productos (CU23): fila deslizable; no aparece si no hay productos visibles. */}
+      <Container maxWidth="lg" sx={{ pb: 6 }}>
+        <CarruselProductos />
       </Container>
     </Box>
   );

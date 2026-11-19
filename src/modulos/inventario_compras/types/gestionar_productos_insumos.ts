@@ -15,6 +15,10 @@ export interface Producto {
   stockMinimo: number;
   stockActual: number;
   activo: boolean;
+  /** Catálogo público (CU23): si se muestra ahí (además de estar activo y ser de VENTA). */
+  enCatalogo: boolean;
+  /** Versión de la imagen (cambia al reemplazarla); null = sin imagen. */
+  imagenVersion: number | null;
 }
 
 /**

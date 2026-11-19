@@ -2,6 +2,7 @@ import InboxIcon from '@mui/icons-material/InboxOutlined';
 import BlockIcon from '@mui/icons-material/Block';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
+import StorefrontIcon from '@mui/icons-material/StorefrontOutlined';
 import TuneIcon from '@mui/icons-material/Tune';
 import VisibilityIcon from '@mui/icons-material/VisibilityOutlined';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -19,7 +20,7 @@ import EmptyState from '../../../../shared/components/EmptyState';
 import Table from '../../../../shared/components/ResponsiveTable';
 import type { Producto } from '../../types/gestionar_productos_insumos';
 import { etiquetaTipo, formatearMonto, stockBajo } from '../../utils/gestionar_productos_insumos/productoForm';
-import EstadoProductoChip from './EstadoProductoChip';
+import EstadoProductoChip, { OcultoCatalogoChip } from './EstadoProductoChip';
 
 const COLUMNAS = ['Tipo', 'Nombre', 'Costo', 'Precio de venta', 'Stock actual', 'Stock mínimo', 'Estado', 'Acciones'];
 
@@ -33,6 +34,8 @@ interface Props {
   onCambiarEstado: (producto: Producto) => void;
   /** Flujo Ajustar stock: la página abre el diálogo. */
   onAjustarStock: (producto: Producto) => void;
+  /** Catálogo público (imagen, mostrar/ocultar): solo productos de venta. */
+  onGestionarCatalogo: (producto: Producto) => void;
   /** Sin PRODUCTO_GESTIONAR (Recepcionista) solo se muestra el botón Ver. */
   soloLectura?: boolean;
 }
@@ -42,7 +45,7 @@ interface Props {
  * También el stock actual, con la alerta cuando llega al mínimo.
  */
 export default function ProductosTabla({
-  mostrarVacio = true, productos, onVer, onCambiarEstado, onAjustarStock, soloLectura = false,
+  mostrarVacio = true, productos, onVer, onCambiarEstado, onAjustarStock, onGestionarCatalogo, soloLectura = false,
 }: Props) {
   const navigate = useNavigate();
 
@@ -97,6 +100,7 @@ export default function ProductosTabla({
                 <TableCell align="right">{p.stockMinimo}</TableCell>
                 <TableCell>
                   <EstadoProductoChip activo={p.activo} />
+                  {p.tipo === 'VENTA' && !p.enCatalogo && <OcultoCatalogoChip />}
                 </TableCell>
                 <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                   <Tooltip title="Ver">
@@ -114,6 +118,13 @@ export default function ProductosTabla({
                           </IconButton>
                         </span>
                       </Tooltip>
+                      {p.tipo === 'VENTA' && (
+                        <Tooltip title="Catálogo e imagen">
+                          <IconButton size="small" aria-label="Gestionar catálogo e imagen" onClick={() => onGestionarCatalogo(p)}>
+                            <StorefrontIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                       <Tooltip title="Editar">
                         <IconButton size="small" aria-label="Editar ítem" onClick={() => navigate(`/productos/${p.idProducto}/editar`)}>
                           <EditIcon />
