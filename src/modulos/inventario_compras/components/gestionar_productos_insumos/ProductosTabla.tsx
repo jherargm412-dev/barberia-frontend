@@ -30,7 +30,7 @@ import { etiquetaTipo, formatearMonto, stockBajo } from '../../utils/gestionar_p
 import EstadoProductoChip, { OcultoCatalogoChip } from './EstadoProductoChip';
 import ImagenProductoPreview from './ImagenProductoPreview';
 
-const COLUMNAS = ['Ítem', 'Tipo', 'Costo', 'Precio de venta', 'Stock', 'Estado', 'Acciones'];
+const COLUMNAS = ['Ítem', 'Tipo', 'Costo', 'Costo promedio', 'Precio de venta', 'Stock', 'Estado', 'Acciones'];
 
 interface Props {
   /** Oculta el estado vacío mientras carga o se muestra un error. */
@@ -66,12 +66,13 @@ export default function ProductosTabla({
   return (
     <Paper elevation={0}>
       <TableContainer>
-        <Table columns={COLUMNAS} sx={{ minWidth: 880 }}>
+        <Table columns={COLUMNAS} sx={{ minWidth: 960 }}>
           <TableHead>
             <TableRow>
               <TableCell>Ítem</TableCell>
               <TableCell>Tipo</TableCell>
               <TableCell align="right">Costo</TableCell>
+              <TableCell align="right">Costo promedio</TableCell>
               <TableCell align="right">Precio de venta</TableCell>
               <TableCell sx={{ width: 170 }}>Stock</TableCell>
               <TableCell>Estado</TableCell>
@@ -101,6 +102,7 @@ export default function ProductosTabla({
                   </TableCell>
                   <TableCell sx={{ whiteSpace: 'nowrap' }}>{etiquetaTipo(p.tipo)}</TableCell>
                   <TableCell align="right" sx={{ whiteSpace: 'nowrap', color: 'text.secondary' }}>{formatearMonto(p.costo)}</TableCell>
+                  <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>{formatearMonto(p.costoPromedio ?? p.costo)}</TableCell>
                   <TableCell align="right" sx={{ whiteSpace: 'nowrap', fontWeight: 600 }}>{formatearMonto(p.precioVenta)}</TableCell>
                   <TableCell>
                     {/* Stock frente al mínimo; la alerta solo para ítems activos. */}
