@@ -13,3 +13,6 @@ export { PERMISOS_PROVEEDORES } from './constants/gestionar_proveedores';
 export { default as ComprasListPage } from './pages/registrar_compras/ComprasListPage';
 export { default as CompraRegistrarPage } from './pages/registrar_compras/CompraRegistrarPage';
 export { PERMISOS_COMPRAS } from './constants/registrar_compras';
+// CU26 Registrar Movimiento de Inventario
+export { default as MovimientosListPage } from './pages/registrar_movimiento_inventario/MovimientosListPage';
+export { PERMISOS_MOVIMIENTOS } from './constants/registrar_movimiento_inventario';

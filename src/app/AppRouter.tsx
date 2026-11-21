@@ -64,6 +64,7 @@ import { PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosLis
 import InicioPage from '../shared/pages/InicioPage';
 import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
 import { CompraRegistrarPage, ComprasListPage, PERMISOS_COMPRAS } from '../modulos/inventario_compras';
+import { MovimientosListPage, PERMISOS_MOVIMIENTOS } from '../modulos/inventario_compras';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 import LiquidacionPage from '../modulos/gestion_empleados/pages/liquidar_comisiones/LiquidacionPage';
 
@@ -174,6 +175,11 @@ export default function AppRouter() {
           <Route element={<RequierePermiso permiso={PERMISOS_COMPRAS.REGISTRAR} />}>
             <Route path="/compras" element={<ComprasListPage />} />
             <Route path="/compras/nueva" element={<CompraRegistrarPage />} />
+          </Route>
+          {/* CU26 Movimientos de inventario y kardex: INVENTARIO_MOVIMIENTO_CONSULTAR (Administrador y Recepcionista).
+              Registrar exige además STOCK_AJUSTAR (todos los tipos) o INVENTARIO_CONSUMO_REGISTRAR (consumo interno). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_MOVIMIENTOS.CONSULTAR} />}>
+            <Route path="/inventario/movimientos" element={<MovimientosListPage />} />
           </Route>
 
           {/* CU11 Gestionar Cita: la agenda exige AGENDA_CONSULTAR y agendar, RESERVA_CREAR. */}
