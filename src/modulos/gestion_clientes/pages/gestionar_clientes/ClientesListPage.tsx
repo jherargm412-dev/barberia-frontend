@@ -16,6 +16,7 @@ import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import AddIcon from '@mui/icons-material/Add';
+import HistorialClienteDialog from '../../components/consultar_historial/HistorialClienteDialog';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
@@ -42,6 +43,9 @@ export default function ClientesListPage() {
   // Cliente al que se le cambiará el estado: si está activo se desactiva y si no, se activa.
   const [porCambiar, setPorCambiar] = useState<Cliente | null>(null);
   const [procesando, setProcesando] = useState(false);
+
+  // --- NUEVO ESTADO PARA EL CU07 ---
+  const [clienteHistorial, setClienteHistorial] = useState<Cliente | null>(null);
 
   /** Actualiza el listado cuando cambian los filtros o la página. */
   useEffect(() => {
@@ -102,6 +106,10 @@ export default function ClientesListPage() {
           <TableCell>{cliente.fechaRegistro}</TableCell><TableCell><Chip size="small" variant="outlined" label={cliente.activo ? 'Activo' : 'Inactivo'} /></TableCell>
           <TableCell>
             <Button size="small" onClick={() => navigate(`/clientes/${cliente.idCliente}`)}>Consultar</Button>
+            
+            {/* --- BOTÓN NUEVO PARA EL CU07 --- */}
+            <Button size="small" onClick={() => setClienteHistorial(cliente)}>Ver Historial</Button>
+
             {tienePermiso(PERMISOS_CLIENTES.EDITAR) && <Button size="small" onClick={() => navigate(`/clientes/${cliente.idCliente}/editar`)}>Modificar</Button>}
             {tienePermiso(PERMISOS_CLIENTES.EDITAR) && (cliente.activo
               ? <Button size="small" color="error" onClick={() => setPorCambiar(cliente)}>Desactivar</Button>
@@ -121,5 +129,13 @@ export default function ClientesListPage() {
         : `¿Activar a ${porCambiar?.nombre}? Volverá a figurar como cliente activo.`}
       textoConfirmar={porCambiar?.activo ? 'Desactivar' : 'Activar'} cargando={procesando}
       onConfirmar={confirmarCambioEstado} onCancelar={() => setPorCambiar(null)} />
+    
+    {/* --- MODAL NUEVO PARA EL CU07 --- */}
+    <HistorialClienteDialog
+      abierto={clienteHistorial !== null}
+      clienteId={clienteHistorial?.idCliente ?? null}
+      nombreCliente={clienteHistorial?.nombre ?? ''}
+      onCerrar={() => setClienteHistorial(null)}
+    />
   </>;
 }
