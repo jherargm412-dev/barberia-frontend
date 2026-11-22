@@ -67,6 +67,7 @@ import InicioPage from '../shared/pages/InicioPage';
 import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
 import { CompraRegistrarPage, ComprasListPage, PERMISOS_COMPRAS } from '../modulos/inventario_compras';
 import { MovimientosListPage, PERMISOS_MOVIMIENTOS } from '../modulos/inventario_compras';
+import { ReportesPage, PERMISO_REPORTES } from '../modulos/reportes';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 import LiquidacionPage from '../modulos/gestion_empleados/pages/liquidar_comisiones/LiquidacionPage';
 
@@ -186,6 +187,10 @@ export default function AppRouter() {
               Registrar exige además STOCK_AJUSTAR (todos los tipos) o INVENTARIO_CONSUMO_REGISTRAR (consumo interno). */}
           <Route element={<RequierePermiso permiso={PERMISOS_MOVIMIENTOS.CONSULTAR} />}>
             <Route path="/inventario/movimientos" element={<MovimientosListPage />} />
+          </Route>
+          {/* Generar Reportes (RF29/RF30): solo el Administrador (REPORTE_GENERAR, migración V2). */}
+          <Route element={<RequierePermiso permiso={PERMISO_REPORTES} />}>
+            <Route path="/reportes" element={<ReportesPage />} />
           </Route>
 
           {/* CU11 Gestionar Cita: la agenda exige AGENDA_CONSULTAR y agendar, RESERVA_CREAR. */}

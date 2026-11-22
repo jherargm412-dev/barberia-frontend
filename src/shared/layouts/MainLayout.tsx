@@ -21,6 +21,7 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCartOutlined';
 import StorefrontIcon from '@mui/icons-material/StorefrontOutlined';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
+import AssessmentIcon from '@mui/icons-material/AssessmentOutlined';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -115,6 +116,12 @@ const GRUPOS: GrupoMenu[] = [
       { texto: 'Compras', ruta: '/compras', icono: <ShoppingCartIcon />, permiso: 'COMPRA_REGISTRAR' },
       // CU26: entradas/salidas manuales, consumo interno, mermas, ajustes por conteo y kardex.
       { texto: 'Movimientos de inventario', ruta: '/inventario/movimientos', icono: <SwapVertIcon />, permiso: 'INVENTARIO_MOVIMIENTO_CONSULTAR' },
+    ],
+  },
+  {
+    titulo: 'Reportes', icono: <AssessmentIcon />, opciones: [
+      // RF29/RF30: ventas, caja, inventario, comisiones, desempeño y visitas; exportables a PDF, Excel y HTML.
+      { texto: 'Reportes', ruta: '/reportes', icono: <AssessmentIcon />, permiso: 'REPORTE_GENERAR' },
     ],
   },
 ];
