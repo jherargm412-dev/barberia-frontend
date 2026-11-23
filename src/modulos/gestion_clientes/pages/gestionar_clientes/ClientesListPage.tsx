@@ -17,7 +17,7 @@ import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import AddIcon from '@mui/icons-material/Add';
 import { useEffect, useState, type FormEvent } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
 import PageHeader from '../../../../shared/components/PageHeader';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
@@ -31,9 +31,11 @@ export default function ClientesListPage() {
   const navigate = useNavigate();
   const ubicacion = useLocation();
   const { tienePermiso } = useAuth();
-  const [busqueda, setBusqueda] = useState('');
+  // CU28: "buscar cliente Pérez" abre /clientes?buscar=Pérez con la búsqueda aplicada.
+  const buscarInicial = useSearchParams()[0].get('buscar')?.trim() ?? '';
+  const [busqueda, setBusqueda] = useState(buscarInicial);
   const [estado, setEstado] = useState<boolean | ''>('');
-  const [filtros, setFiltros] = useState<FiltrosClientes>({ q: '', activo: '', page: 0, size: 10 });
+  const [filtros, setFiltros] = useState<FiltrosClientes>({ q: buscarInicial, activo: '', page: 0, size: 10 });
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [total, setTotal] = useState(0);
   const [cargando, setCargando] = useState(true);

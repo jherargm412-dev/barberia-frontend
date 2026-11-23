@@ -3,7 +3,8 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { opcionDeUrl } from '../../../../shared/utils/parametrosUrl';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
 import PageHeader from '../../../../shared/components/PageHeader';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
@@ -21,7 +22,8 @@ import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
-type FiltroProductos = 'todos' | 'VENTA' | 'INSUMO' | 'bajo';
+const FILTROS_PRODUCTOS = ['todos', 'VENTA', 'INSUMO', 'bajo'] as const;
+type FiltroProductos = typeof FILTROS_PRODUCTOS[number];
 
 /**
  * CU22 paso 2 (listado) y flujos Consultar, Habilitar, Deshabilitar y Ajustar stock.
@@ -53,8 +55,10 @@ export default function ProductosListPage() {
   const [vecesAjuste, setVecesAjuste] = useState(0);
   // Producto cuyo catálogo (imagen, mostrar/ocultar) se está gestionando; null = cerrado.
   const [enCatalogo, setEnCatalogo] = useState<Producto | null>(null);
-  const [filtro, setFiltro] = useState<FiltroProductos>('todos');
-  const [texto, setTexto] = useState('');
+  // CU28: "buscar producto cera" o "stock bajo" abren la lista con ?buscar= o ?filtro=bajo.
+  const [parametros] = useSearchParams();
+  const [filtro, setFiltro] = useState<FiltroProductos>(opcionDeUrl(parametros.get('filtro'), FILTROS_PRODUCTOS) ?? 'todos');
+  const [texto, setTexto] = useState(parametros.get('buscar')?.trim() ?? '');
 
   useEffect(() => {
     listarProductos()

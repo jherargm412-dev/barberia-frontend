@@ -68,6 +68,7 @@ import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '
 import { CompraRegistrarPage, ComprasListPage, PERMISOS_COMPRAS } from '../modulos/inventario_compras';
 import { MovimientosListPage, PERMISOS_MOVIMIENTOS } from '../modulos/inventario_compras';
 import { ReportesPage, PERMISO_REPORTES } from '../modulos/reportes';
+import { ComandosVozPage, PERMISO_VOZ } from '../modulos/asistencia_usuario';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 import LiquidacionPage from '../modulos/gestion_empleados/pages/liquidar_comisiones/LiquidacionPage';
 
@@ -191,6 +192,10 @@ export default function AppRouter() {
           {/* Generar Reportes (RF29/RF30): solo el Administrador (REPORTE_GENERAR, migración V2). */}
           <Route element={<RequierePermiso permiso={PERMISO_REPORTES} />}>
             <Route path="/reportes" element={<ReportesPage />} />
+          </Route>
+          {/* CU28 Comando de Voz: lista de comandos y prueba escrita (VOZ_USAR, migración V33, los cuatro roles). */}
+          <Route element={<RequierePermiso permiso={PERMISO_VOZ} />}>
+            <Route path="/comandos-voz" element={<ComandosVozPage />} />
           </Route>
 
           {/* CU11 Gestionar Cita: la agenda exige AGENDA_CONSULTAR y agendar, RESERVA_CREAR. */}

@@ -37,9 +37,11 @@ import Typography from '@mui/material/Typography';
 import { useState, type ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../modulos/seguridad_usuarios';
+import { BotonComandoVoz, ComandoVozProvider, type EstadoNavegacionVoz } from '../../modulos/asistencia_usuario';
 import ThemeModeButton from '../components/ThemeModeButton';
 import { FUENTE_TITULOS } from '../styles/publico';
 import PaymentsIcon from '@mui/icons-material/PaymentsOutlined';
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOverOutlined';
 
 const ANCHO_MENU = 280;
 
@@ -124,6 +126,12 @@ const GRUPOS: GrupoMenu[] = [
       { texto: 'Reportes', ruta: '/reportes', icono: <AssessmentIcon />, permiso: 'REPORTE_GENERAR' },
     ],
   },
+  {
+    titulo: 'Asistencia', icono: <RecordVoiceOverIcon />, opciones: [
+      // CU28: lista de comandos de voz y prueba escrita; el micrófono está en la barra superior.
+      { texto: 'Comandos de voz', ruta: '/comandos-voz', icono: <RecordVoiceOverIcon />, permiso: 'VOZ_USAR' },
+    ],
+  },
 ];
 
 function rutaSeleccionada(ruta: string, pathname: string) {
@@ -134,13 +142,28 @@ function rutaSeleccionada(ruta: string, pathname: string) {
 export default function MainLayout() {
   const { usuario, cerrarSesion, tienePermiso } = useAuth();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const ubicacion = useLocation();
+  const { pathname } = ubicacion;
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
+  // CU28: cuando un comando de voz abre la misma pantalla con otro filtro llega una marca nueva en la
+  // navegación; entonces se vuelve a montar la pantalla (en el mismo render que la URL nueva) para que lea
+  // los filtros. Si la marca desaparece en una navegación posterior, no se vuelve a montar.
+  const marcaVoz = (ubicacion.state as Partial<EstadoNavegacionVoz> | null)?.comandoVoz;
+  const [versionPantalla, setVersionPantalla] = useState(0);
+  const [ultimaMarcaVoz, setUltimaMarcaVoz] = useState(marcaVoz);
+  if (marcaVoz !== undefined && marcaVoz !== ultimaMarcaVoz) {
+    setUltimaMarcaVoz(marcaVoz);
+    setVersionPantalla((v) => v + 1);
+  }
 
   const gruposVisibles = GRUPOS.map((grupo) => ({
     ...grupo,
     opciones: grupo.opciones.filter((opcion) => !opcion.permiso || (Array.isArray(opcion.permiso) ? opcion.permiso.some((permiso) => tienePermiso(permiso)) : tienePermiso(opcion.permiso))),
   })).filter((grupo) => grupo.opciones.length > 0);
+  const perfilVisible = !PERFIL.permiso || (Array.isArray(PERFIL.permiso) ? PERFIL.permiso.some((permiso) => tienePermiso(permiso)) : tienePermiso(PERFIL.permiso));
+  // Lo que "abrir …" puede abrir por voz: exactamente lo que el menú muestra a este usuario.
+  const opcionesVoz = [INICIO, ...gruposVisibles.flatMap((grupo) => grupo.opciones), ...(perfilVisible ? [PERFIL] : [])]
+    .map(({ texto, ruta }) => ({ texto, ruta }));
 
   async function salir() {
     await cerrarSesion();
@@ -191,12 +214,13 @@ export default function MainLayout() {
             </List>
           </Box>
         ))}
-        {(!PERFIL.permiso || (Array.isArray(PERFIL.permiso) ? PERFIL.permiso.some((permiso) => tienePermiso(permiso)) : tienePermiso(PERFIL.permiso))) && opcionMenu(PERFIL)}
+        {perfilVisible && opcionMenu(PERFIL)}
       </List>
     </>
   );
 
   return (
+    <ComandoVozProvider opciones={opcionesVoz}>
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
@@ -225,6 +249,7 @@ export default function MainLayout() {
               <Typography variant="caption" color="text.secondary" noWrap component="p">{usuario?.roles.join(' · ')}</Typography>
             </Box>
           </Box>
+          <BotonComandoVoz />
           <ThemeModeButton />
           <Tooltip title="Cerrar sesión">
             <Button color="inherit" onClick={salir} aria-label="Cerrar sesión"
@@ -261,8 +286,9 @@ export default function MainLayout() {
       <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3, lg: 4 }, minWidth: 0 }}>
         <Toolbar />
         {/* Aquí React Router pinta la página de la ruta actual. */}
-        <Box sx={{ maxWidth: 1440, mx: 'auto' }}><Outlet /></Box>
+        <Box key={versionPantalla} sx={{ maxWidth: 1440, mx: 'auto' }}><Outlet /></Box>
       </Box>
     </Box>
+    </ComandoVozProvider>
   );
 }

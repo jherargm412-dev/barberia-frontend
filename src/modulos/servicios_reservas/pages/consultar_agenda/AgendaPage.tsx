@@ -4,7 +4,8 @@ import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
 import Stack from '@mui/material/Stack';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { fechaDeUrl, opcionDeUrl } from '../../../../shared/utils/parametrosUrl';
 import { useAuth } from '../../../seguridad_usuarios';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarAgenda, listarBarberosAgenda } from '../../api/consultar_agenda/agendaApi';
@@ -39,7 +40,14 @@ export default function AgendaPage() {
   const verTodas = tienePermiso(PERMISOS_AGENDA.TODAS);
   const puedeVer = verTodas || tienePermiso(PERMISOS_AGENDA.PROPIA);
 
-  const [filtros, setFiltros] = useState<FiltrosAgenda>({ fecha: hoy(), vista: 'DIA', estado: '', barberoId: '' });
+  // CU28: "agenda de mañana" / "agenda de la semana" abren /agenda?fecha=…&vista=….
+  const [parametros] = useSearchParams();
+  const [filtros, setFiltros] = useState<FiltrosAgenda>({
+    fecha: fechaDeUrl(parametros.get('fecha')) ?? hoy(),
+    vista: opcionDeUrl(parametros.get('vista'), ['DIA', 'SEMANA'] as const) ?? 'DIA',
+    estado: '',
+    barberoId: '',
+  });
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [barberos, setBarberos] = useState<BarberoAgenda[]>([]);
   const [cargando, setCargando] = useState(puedeVer);
