@@ -23,6 +23,7 @@ import {
   stockBajo,
 } from '../../utils/gestionar_productos_insumos/productoForm';
 import EstadoProductoChip from './EstadoProductoChip';
+import ImagenProductoPreview from './ImagenProductoPreview';
 
 interface Props {
   /** null = diálogo cerrado. */
@@ -93,10 +94,24 @@ export default function ProductoDetalleDialog({ producto, onCerrar, verHistorial
               <Dato etiqueta="Estado"><EstadoProductoChip activo={producto.activo} /></Dato>
               <Dato etiqueta="Descripción" ancho>{producto.descripcion ?? '—'}</Dato>
               <Dato etiqueta="Costo">{formatearMonto(producto.costo)}</Dato>
+              <Dato etiqueta="Costo promedio">{formatearMonto(producto.costoPromedio ?? producto.costo)}</Dato>
               <Dato etiqueta="Precio de venta">{formatearMonto(producto.precioVenta)}</Dato>
               {producto.tipo === 'VENTA' && <Dato etiqueta="Comisión por unidad">{formatearMonto(producto.comisionUnitaria ?? 0)}</Dato>}
               <Dato etiqueta="Stock actual">{producto.stockActual}</Dato>
               <Dato etiqueta="Stock mínimo">{producto.stockMinimo}</Dato>
+              {producto.tipo === 'VENTA' && (
+                <>
+                  <Dato etiqueta="Catálogo público">{producto.enCatalogo ? 'Visible' : 'Oculto'}</Dato>
+                  <Dato etiqueta="Imagen" ancho>
+                    <ImagenProductoPreview
+                      idProducto={producto.idProducto}
+                      version={producto.imagenVersion}
+                      nombre={producto.nombre}
+                      alto={140}
+                    />
+                  </Dato>
+                </>
+              )}
             </Box>
             {verHistorial && (
               <>

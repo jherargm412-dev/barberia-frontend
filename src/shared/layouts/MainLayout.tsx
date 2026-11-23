@@ -7,7 +7,6 @@ import ContentCutIcon from '@mui/icons-material/ContentCutOutlined';
 import CreditCardIcon from '@mui/icons-material/CreditCardOutlined';
 import EventAvailableIcon from '@mui/icons-material/EventAvailableOutlined';
 import EventIcon from '@mui/icons-material/EventOutlined';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import HistoryIcon from '@mui/icons-material/HistoryOutlined';
 import HomeIcon from '@mui/icons-material/HomeOutlined';
@@ -20,11 +19,13 @@ import Tooltip from '@mui/material/Tooltip';
 import PeopleIcon from '@mui/icons-material/PeopleOutlined';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCartOutlined';
+import StorefrontIcon from '@mui/icons-material/StorefrontOutlined';
+import SwapVertIcon from '@mui/icons-material/SwapVert';
+import AssessmentIcon from '@mui/icons-material/AssessmentOutlined';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import Collapse from '@mui/material/Collapse';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -36,8 +37,11 @@ import Typography from '@mui/material/Typography';
 import { useState, type ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../modulos/seguridad_usuarios';
+import { BotonComandoVoz, ComandoVozProvider, type EstadoNavegacionVoz } from '../../modulos/asistencia_usuario';
 import ThemeModeButton from '../components/ThemeModeButton';
+import { FUENTE_TITULOS } from '../styles/publico';
 import PaymentsIcon from '@mui/icons-material/PaymentsOutlined';
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOverOutlined';
 
 const ANCHO_MENU = 280;
 
@@ -107,9 +111,25 @@ const GRUPOS: GrupoMenu[] = [
     titulo: 'Inventario y compras', icono: <Inventory2Icon />, opciones: [
       // CU22: productos de venta e insumos de consumo interno.
       { texto: 'Productos e insumos', ruta: '/productos', icono: <Inventory2Icon />, permiso: ['PRODUCTO_GESTIONAR', 'PRODUCTO_CONSULTAR'] },
+      // CU22/CU23: solo los productos de venta, con imagen y visibilidad en el catálogo público.
+      { texto: 'Catálogo de productos', ruta: '/catalogo-productos', icono: <StorefrontIcon />, permiso: ['PRODUCTO_GESTIONAR', 'PRODUCTO_CONSULTAR'] },
       { texto: 'Proveedores', ruta: '/proveedores', icono: <LocalShippingIcon />, permiso: 'PROVEEDOR_GESTIONAR' },
       // CU25: compras a proveedores; suman al stock.
       { texto: 'Compras', ruta: '/compras', icono: <ShoppingCartIcon />, permiso: 'COMPRA_REGISTRAR' },
+      // CU26: entradas/salidas manuales, consumo interno, mermas, ajustes por conteo y kardex.
+      { texto: 'Movimientos de inventario', ruta: '/inventario/movimientos', icono: <SwapVertIcon />, permiso: 'INVENTARIO_MOVIMIENTO_CONSULTAR' },
+    ],
+  },
+  {
+    titulo: 'Reportes', icono: <AssessmentIcon />, opciones: [
+      // RF29/RF30: ventas, caja, inventario, comisiones, desempeño y visitas; exportables a PDF, Excel y HTML.
+      { texto: 'Reportes', ruta: '/reportes', icono: <AssessmentIcon />, permiso: 'REPORTE_GENERAR' },
+    ],
+  },
+  {
+    titulo: 'Asistencia', icono: <RecordVoiceOverIcon />, opciones: [
+      // CU28: lista de comandos de voz y prueba escrita; el micrófono está en la barra superior.
+      { texto: 'Comandos de voz', ruta: '/comandos-voz', icono: <RecordVoiceOverIcon />, permiso: 'VOZ_USAR' },
     ],
   },
 ];
@@ -122,24 +142,28 @@ function rutaSeleccionada(ruta: string, pathname: string) {
 export default function MainLayout() {
   const { usuario, cerrarSesion, tienePermiso } = useAuth();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const ubicacion = useLocation();
+  const { pathname } = ubicacion;
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
-  const [rutaAnterior, setRutaAnterior] = useState(pathname);
-  const [gruposAbiertos, setGruposAbiertos] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(GRUPOS.map((grupo) => [grupo.titulo, grupo.opciones.some((opcion) => rutaSeleccionada(opcion.ruta, pathname))])),
-  );
-
-  // Sincroniza el grupo también al navegar desde enlaces, historial o accesos rápidos.
-  if (rutaAnterior !== pathname) {
-    setRutaAnterior(pathname);
-    const actual = GRUPOS.find((grupo) => grupo.opciones.some((opcion) => rutaSeleccionada(opcion.ruta, pathname)));
-    if (actual) setGruposAbiertos((anteriores) => ({ ...anteriores, [actual.titulo]: true }));
+  // CU28: cuando un comando de voz abre la misma pantalla con otro filtro llega una marca nueva en la
+  // navegación; entonces se vuelve a montar la pantalla (en el mismo render que la URL nueva) para que lea
+  // los filtros. Si la marca desaparece en una navegación posterior, no se vuelve a montar.
+  const marcaVoz = (ubicacion.state as Partial<EstadoNavegacionVoz> | null)?.comandoVoz;
+  const [versionPantalla, setVersionPantalla] = useState(0);
+  const [ultimaMarcaVoz, setUltimaMarcaVoz] = useState(marcaVoz);
+  if (marcaVoz !== undefined && marcaVoz !== ultimaMarcaVoz) {
+    setUltimaMarcaVoz(marcaVoz);
+    setVersionPantalla((v) => v + 1);
   }
 
   const gruposVisibles = GRUPOS.map((grupo) => ({
     ...grupo,
     opciones: grupo.opciones.filter((opcion) => !opcion.permiso || (Array.isArray(opcion.permiso) ? opcion.permiso.some((permiso) => tienePermiso(permiso)) : tienePermiso(opcion.permiso))),
   })).filter((grupo) => grupo.opciones.length > 0);
+  const perfilVisible = !PERFIL.permiso || (Array.isArray(PERFIL.permiso) ? PERFIL.permiso.some((permiso) => tienePermiso(permiso)) : tienePermiso(PERFIL.permiso));
+  // Lo que "abrir …" puede abrir por voz: exactamente lo que el menú muestra a este usuario.
+  const opcionesVoz = [INICIO, ...gruposVisibles.flatMap((grupo) => grupo.opciones), ...(perfilVisible ? [PERFIL] : [])]
+    .map(({ texto, ruta }) => ({ texto, ruta }));
 
   async function salir() {
     await cerrarSesion();
@@ -147,9 +171,6 @@ export default function MainLayout() {
   }
 
   function irA(opcion: OpcionMenu) {
-    // Mantiene visible el apartado elegido al navegar desde el menú.
-    const grupo = GRUPOS.find((actual) => actual.opciones.includes(opcion));
-    if (grupo) setGruposAbiertos((anteriores) => ({ ...anteriores, [grupo.titulo]: true }));
     navigate(opcion.ruta);
     setMenuMovilAbierto(false);
   }
@@ -162,7 +183,7 @@ export default function MainLayout() {
         aria-current={rutaSeleccionada(opcion.ruta, pathname) ? 'page' : undefined}
         onClick={() => irA(opcion)}
         sx={{
-          pl: anidada ? 3 : 1.5, position: 'relative',
+          pl: anidada ? 1.75 : 1.5, position: 'relative',
           '&.Mui-selected::before': { content: '""', position: 'absolute', left: 0, top: 11, bottom: 11, width: 3, bgcolor: 'primary.main', borderRadius: 2 },
         }}
       >
@@ -181,33 +202,25 @@ export default function MainLayout() {
       </Box>
       <List component="nav" aria-label="Navegación principal" sx={{ px: 1.5, pb: 3 }}>
         {opcionMenu(INICIO)}
+        {/* Grupos siempre abiertos, con su nombre como encabezado: todo el menú se ve de un vistazo. */}
         {gruposVisibles.map((grupo) => (
-          <Box key={grupo.titulo} sx={{ mt: 1 }}>
-            <ListItemButton
-              sx={{ color: grupo.opciones.some((opcion) => rutaSeleccionada(opcion.ruta, pathname)) ? 'text.primary' : 'text.secondary' }}
-              aria-expanded={Boolean(gruposAbiertos[grupo.titulo])}
-              aria-label={`${gruposAbiertos[grupo.titulo] ? 'Contraer' : 'Desplegar'} ${grupo.titulo}`}
-              onClick={() => setGruposAbiertos((anteriores) => ({
-                ...anteriores, [grupo.titulo]: !anteriores[grupo.titulo],
-              }))}
-            >
-              <ListItemIcon>{grupo.icono}</ListItemIcon>
-              <ListItemText primary={grupo.titulo} slotProps={{ primary: { noWrap: true, sx: { fontSize: 13, fontWeight: 600 } } }} />
-              <ExpandMoreIcon sx={{ fontSize: 18, transform: gruposAbiertos[grupo.titulo] ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms cubic-bezier(0.2, 0, 0, 1)' }} />
-            </ListItemButton>
-            <Collapse in={Boolean(gruposAbiertos[grupo.titulo])} timeout={180} unmountOnExit>
-              <List component="div" disablePadding>
-                {grupo.opciones.map((opcion) => opcionMenu(opcion, true))}
-              </List>
-            </Collapse>
+          <Box key={grupo.titulo} component="section" aria-label={grupo.titulo} sx={{ mt: 2 }}>
+            <Typography component="h2" sx={{ px: 1.5, pb: 0.75, fontSize: 11, fontWeight: 600, letterSpacing: '0.14em',
+              textTransform: 'uppercase', color: 'text.secondary', opacity: 0.85 }}>
+              {grupo.titulo}
+            </Typography>
+            <List component="div" disablePadding>
+              {grupo.opciones.map((opcion) => opcionMenu(opcion, true))}
+            </List>
           </Box>
         ))}
-        {(!PERFIL.permiso || (Array.isArray(PERFIL.permiso) ? PERFIL.permiso.some((permiso) => tienePermiso(permiso)) : tienePermiso(PERFIL.permiso))) && opcionMenu(PERFIL)}
+        {perfilVisible && opcionMenu(PERFIL)}
       </List>
     </>
   );
 
   return (
+    <ComandoVozProvider opciones={opcionesVoz}>
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
@@ -221,9 +234,9 @@ export default function MainLayout() {
             <MenuIcon />
           </IconButton>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexGrow: 1, minWidth: 0 }}>
-            <Box sx={{ width: 34, height: 34, border: 1, borderColor: 'divider', borderRadius: 1, display: { xs: 'none', sm: 'grid' }, placeItems: 'center', color: 'primary.main' }}><ContentCutIcon sx={{ fontSize: 20 }} /></Box>
-            <Typography noWrap sx={{ fontWeight: 750, fontSize: { xs: 14, sm: 16 }, letterSpacing: '0.035em' }}>
-              HOUSE <Box component="span" sx={{ fontWeight: 400, color: 'text.secondary', fontSize: '0.85em' }}>of</Box> CUT
+            <Box sx={{ width: 34, height: 34, border: 1, borderColor: 'primary.main', borderRadius: '50%', display: { xs: 'none', sm: 'grid' }, placeItems: 'center', color: 'primary.main' }}><ContentCutIcon sx={{ fontSize: 18 }} /></Box>
+            <Typography noWrap sx={{ fontFamily: FUENTE_TITULOS, fontWeight: 600, fontSize: { xs: 16, sm: 18 }, letterSpacing: '0.14em' }}>
+              HOUSE <Box component="span" sx={{ fontWeight: 500, color: 'primary.main' }}>of</Box> CUT
             </Typography>
           </Box>
           {/* Identidad de la sesión actual; los roles se leen de la autenticación existente. */}
@@ -236,6 +249,7 @@ export default function MainLayout() {
               <Typography variant="caption" color="text.secondary" noWrap component="p">{usuario?.roles.join(' · ')}</Typography>
             </Box>
           </Box>
+          <BotonComandoVoz />
           <ThemeModeButton />
           <Tooltip title="Cerrar sesión">
             <Button color="inherit" onClick={salir} aria-label="Cerrar sesión"
@@ -272,8 +286,9 @@ export default function MainLayout() {
       <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3, lg: 4 }, minWidth: 0 }}>
         <Toolbar />
         {/* Aquí React Router pinta la página de la ruta actual. */}
-        <Box sx={{ maxWidth: 1440, mx: 'auto' }}><Outlet /></Box>
+        <Box key={versionPantalla} sx={{ maxWidth: 1440, mx: 'auto' }}><Outlet /></Box>
       </Box>
     </Box>
+    </ComandoVozProvider>
   );
 }

@@ -6,10 +6,18 @@ export { default as ProductosListPage } from './pages/gestionar_productos_insumo
 export { default as ProductoCrearPage } from './pages/gestionar_productos_insumos/ProductoCrearPage';
 export { default as ProductoEditarPage } from './pages/gestionar_productos_insumos/ProductoEditarPage';
 export { PERMISOS as PERMISOS_PRODUCTOS } from './constants/gestionar_productos_insumos';
+export { default as CatalogoProductosAdminPage } from './pages/gestionar_productos_insumos/CatalogoProductosAdminPage';
 export { default as ProveedoresListPage } from './pages/gestionar_proveedores/ProveedoresListPage';
 export { default as ProveedorEditarPage } from './pages/gestionar_proveedores/ProveedorEditarPage';
 export { PERMISOS_PROVEEDORES } from './constants/gestionar_proveedores';
+// CU23 Consultar Catálogo de Productos (público)
+export { default as ConsultarProductosPage } from './pages/consultar_catalogo_productos/ConsultarProductosPage';
+// Fila deslizable de productos para la portada pública.
+export { default as CarruselProductos } from './components/consultar_catalogo_productos/CarruselProductos';
 // CU25 Registrar Compras de Productos
 export { default as ComprasListPage } from './pages/registrar_compras/ComprasListPage';
 export { default as CompraRegistrarPage } from './pages/registrar_compras/CompraRegistrarPage';
 export { PERMISOS_COMPRAS } from './constants/registrar_compras';
+// CU26 Registrar Movimiento de Inventario
+export { default as MovimientosListPage } from './pages/registrar_movimiento_inventario/MovimientosListPage';
+export { PERMISOS_MOVIMIENTOS } from './constants/registrar_movimiento_inventario';

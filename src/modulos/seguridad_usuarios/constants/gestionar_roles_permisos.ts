@@ -22,7 +22,7 @@ export const GRUPOS_PERMISOS: { titulo: string; prefijos: string[] }[] = [
   { titulo: 'Reservas y agenda', prefijos: ['RESERVA', 'AGENDA'] },
   { titulo: 'Servicios', prefijos: ['SERVICIO'] },
   { titulo: 'Ventas y caja', prefijos: ['VENTA', 'CAJA'] },
-  { titulo: 'Inventario y compras', prefijos: ['PRODUCTO', 'STOCK', 'PROVEEDOR', 'COMPRA'] },
+  { titulo: 'Inventario y compras', prefijos: ['PRODUCTO', 'STOCK', 'PROVEEDOR', 'COMPRA', 'INVENTARIO'] },
   { titulo: 'Empleados y comisiones', prefijos: ['PAGO', 'COMISION'] },
   { titulo: 'Reportes', prefijos: ['REPORTE'] },
 ];

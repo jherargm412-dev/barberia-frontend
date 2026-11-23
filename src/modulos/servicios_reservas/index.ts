@@ -15,7 +15,10 @@ export { default as CitasListPage } from './pages/gestionar_citas/CitasListPage'
 export { default as CitaCrearPage } from './pages/gestionar_citas/CitaCrearPage';
 export { PERMISOS as PERMISOS_CITAS } from './constants/gestionar_citas';
 export { listarBarberos } from './api/gestionar_citas/citasApi';
-export type { BarberoDisponible } from './types/gestionar_citas';
+export type { BarberoDisponible, EstadoCita } from './types/gestionar_citas';
+// Para CU07 (historial del cliente): mismo chip de estado y formato de fecha que la lista de citas.
+export { default as EstadoCitaChip } from './components/gestionar_citas/EstadoCitaChip';
+export { formatearFecha } from './utils/consultar_agenda/agendaFormato';
 
 // CU10 Consultar Disponibilidad
 export { default as DisponibilidadPage } from './pages/consultar_disponibilidad/DisponibilidadPage';
@@ -38,6 +41,11 @@ export { PERMISOS_AGENDA } from './constants/consultar_agenda';
 // CU13 Consultar Servicios (catálogo público, sin sesión)
 export { default as ConsultarServiciosPage } from './pages/consultar_servicios/ConsultarServiciosPage';
 export { default as PortadaPage } from './pages/consultar_servicios/PortadaPage';
+// Barra de las páginas públicas; también la usa el catálogo de productos (CU23).
+export { default as BarraPublica } from './components/consultar_servicios/BarraPublica';
+export { default as PiePublico } from './components/consultar_servicios/PiePublico';
+export { default as EncabezadoCatalogo } from './components/consultar_servicios/EncabezadoCatalogo';
+export { default as FiltrosCatalogoPublico } from './components/consultar_servicios/FiltrosCatalogoPublico';
 export { default as ReservarServicioPage } from './pages/consultar_servicios/ReservarServicioPage';
 
 

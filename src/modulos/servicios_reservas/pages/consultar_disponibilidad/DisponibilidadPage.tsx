@@ -14,7 +14,8 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { fechaDeUrl, normalizarTexto } from '../../../../shared/utils/parametrosUrl';
 import { useAuth } from '../../../seguridad_usuarios';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarServiciosHabilitados } from '../../api/gestionar_catalogo_servicios/serviciosApi';
@@ -47,7 +48,10 @@ export default function DisponibilidadPage() {
   const [barberos, setBarberos] = useState<BarberoDisponible[]>([]);
   const [servicioId, setServicioId] = useState('');
   const [empleadoId, setEmpleadoId] = useState('');
-  const [fecha, setFecha] = useState(hoy());
+  // CU28: "disponibilidad de corte para mañana" abre /disponibilidad?servicio=corte&fecha=….
+  const [parametros] = useSearchParams();
+  const [servicioPedido] = useState(() => normalizarTexto(parametros.get('servicio') ?? ''));
+  const [fecha, setFecha] = useState(() => fechaDeUrl(parametros.get('fecha')) ?? hoy());
   const [duracion, setDuracion] = useState(DURACION_DEFECTO);
   const [errorCatalogo, setErrorCatalogo] = useState('');
   // Hora de "cualquier barbero" con varios barberos libres: se elige quién en un menú.
@@ -55,9 +59,23 @@ export default function DisponibilidadPage() {
 
   useEffect(() => {
     listarServiciosHabilitados()
-      .then(setServicios)
+      .then((lista) => {
+        setServicios(lista);
+        // Servicio dictado: el de nombre igual; si no, el que empieza o contiene esas palabras (el más corto).
+        const puntaje = (nombre: string) => (nombre === servicioPedido ? 0 : nombre.startsWith(servicioPedido) ? 1 : 2);
+        const elegido = servicioPedido
+          ? lista
+            .filter((s) => normalizarTexto(s.nombre).includes(servicioPedido))
+            .sort((a, b) => puntaje(normalizarTexto(a.nombre)) - puntaje(normalizarTexto(b.nombre)) || a.nombre.length - b.nombre.length)[0]
+          : undefined;
+        if (!elegido) return;
+        setServicioId(String(elegido.idServicio));
+        listarBarberos(elegido.idServicio)
+          .then(setBarberos)
+          .catch((err) => setErrorCatalogo(obtenerError(err).mensaje));
+      })
       .catch((err) => setErrorCatalogo(obtenerError(err).mensaje));
-  }, []);
+  }, [servicioPedido]);
 
   /** Paso 1: al elegir el servicio, el filtro de barbero ofrece solo a quienes lo prestan. */
   function cambiarServicio(id: string) {

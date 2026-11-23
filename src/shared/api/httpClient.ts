@@ -19,7 +19,8 @@ http.interceptors.request.use((config) => {
 function esPaginaPublica(ruta: string) {
   return (
     ['/', '/login', '/catalogo', '/reservar-sin-cuenta', '/recuperar', '/activar'].includes(ruta) ||
-    ruta.startsWith('/mi-cita/')
+    ruta.startsWith('/mi-cita/') ||
+    ruta.startsWith('/catalogo/')
   );
 }
 

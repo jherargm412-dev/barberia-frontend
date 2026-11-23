@@ -4,13 +4,14 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { fechaDeUrl } from '../../../../shared/utils/parametrosUrl';
 import { useAuth } from '../../../seguridad_usuarios';
 import ConfirmDialog from '../../../../shared/components/ConfirmDialog';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { cambiarEstadoCita, listarBarberos, listarCitas } from '../../api/gestionar_citas/citasApi';
 import CitasFiltros from '../../components/gestionar_citas/CitasFiltros';
-import CitasTabla from '../../components/gestionar_citas/CitasTabla';
+import CitasLista from '../../components/gestionar_citas/CitasLista';
 import ReprogramarDialog from '../../components/gestionar_citas/ReprogramarDialog';
 import ComprobanteAnticipo from '../../components/registrar_pago_anticipo/ComprobanteAnticipo';
 import RegistrarAnticipoDialog from '../../components/registrar_pago_anticipo/RegistrarAnticipoDialog';
@@ -27,9 +28,12 @@ export default function CitasListPage() {
   const { tienePermiso } = useAuth();
   const estadoNavegacion = ubicacion.state as { mensaje?: string; fecha?: string; nueva?: Cita } | null;
 
+  // CU28: "citas de mañana" abre /citas?fecha=….
+  const fechaUrl = fechaDeUrl(useSearchParams()[0].get('fecha'));
+
   // Al volver de "Nueva cita" se abre el día de la cita recién creada.
   const [filtros, setFiltros] = useState<FiltrosCitas>({
-    fecha: estadoNavegacion?.fecha ?? hoy(),
+    fecha: estadoNavegacion?.fecha ?? fechaUrl ?? hoy(),
     empleadoId: '',
     estado: '',
     q: '',
@@ -157,7 +161,7 @@ export default function CitasListPage() {
       )}
       {cargando && <LinearProgress />}
 
-      <CitasTabla
+      <CitasLista
         citas={citas}
         mostrarVacio={!cargando && !error}
         total={total}

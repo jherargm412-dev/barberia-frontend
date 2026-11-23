@@ -60,10 +60,15 @@ import {
   CajaHistorialPage, CajaPage, PasarelaPagoPage, PERMISOS_CAJA,
   PERMISO_VENTA_REGISTRAR, RegistrarVentaPage,
 } from '../modulos/ventas_caja';
-import { PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosListPage } from '../modulos/inventario_compras';
+import {
+  CatalogoProductosAdminPage, ConsultarProductosPage, PERMISOS_PRODUCTOS, ProductoCrearPage, ProductoEditarPage, ProductosListPage,
+} from '../modulos/inventario_compras';
 import InicioPage from '../shared/pages/InicioPage';
 import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
 import { CompraRegistrarPage, ComprasListPage, PERMISOS_COMPRAS } from '../modulos/inventario_compras';
+import { MovimientosListPage, PERMISOS_MOVIMIENTOS } from '../modulos/inventario_compras';
+import { ReportesPage, PERMISO_REPORTES } from '../modulos/reportes';
+import { ComandosVozPage, PERMISO_VOZ } from '../modulos/asistencia_usuario';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 import LiquidacionPage from '../modulos/gestion_empleados/pages/liquidar_comisiones/LiquidacionPage';
 
@@ -77,6 +82,8 @@ export default function AppRouter() {
       <Route path="/activar" element={<ActivarCuentaPage />} />
       {/* CU13 Consultar Servicios: catálogo público, se abre desde el login sin iniciar sesión. */}
       <Route path="/catalogo" element={<ConsultarServiciosPage />} />
+      {/* CU23 Consultar Catálogo de Productos: público, sin iniciar sesión. */}
+      <Route path="/catalogo/productos" element={<ConsultarProductosPage />} />
       {/* CU12 + CU14 sin cuenta: reservar con nombre y teléfono, y "Mi cita" (enlace secreto) para ver y pagar. */}
       <Route path="/reservar-sin-cuenta" element={<ReservaInvitadoPage />} />
       <Route path="/mi-cita/:codigo" element={<CitaInvitadoPage />} />
@@ -165,6 +172,8 @@ export default function AppRouter() {
               la Recepcionista (PRODUCTO_CONSULTAR) solo ve el listado y el detalle. */}
           <Route element={<RequierePermiso permiso={[PERMISOS_PRODUCTOS.GESTIONAR, PERMISOS_PRODUCTOS.CONSULTAR]} />}>
             <Route path="/productos" element={<ProductosListPage />} />
+            {/* Solo los productos de venta, como se ven en el catálogo público (CU23). */}
+            <Route path="/catalogo-productos" element={<CatalogoProductosAdminPage />} />
           </Route>
           <Route element={<RequierePermiso permiso={PERMISOS_PRODUCTOS.GESTIONAR} />}>
             <Route path="/productos/nuevo" element={<ProductoCrearPage />} />
@@ -174,6 +183,19 @@ export default function AppRouter() {
           <Route element={<RequierePermiso permiso={PERMISOS_COMPRAS.REGISTRAR} />}>
             <Route path="/compras" element={<ComprasListPage />} />
             <Route path="/compras/nueva" element={<CompraRegistrarPage />} />
+          </Route>
+          {/* CU26 Movimientos de inventario y kardex: INVENTARIO_MOVIMIENTO_CONSULTAR (Administrador y Recepcionista).
+              Registrar exige además STOCK_AJUSTAR (todos los tipos) o INVENTARIO_CONSUMO_REGISTRAR (consumo interno). */}
+          <Route element={<RequierePermiso permiso={PERMISOS_MOVIMIENTOS.CONSULTAR} />}>
+            <Route path="/inventario/movimientos" element={<MovimientosListPage />} />
+          </Route>
+          {/* Generar Reportes (RF29/RF30): solo el Administrador (REPORTE_GENERAR, migración V2). */}
+          <Route element={<RequierePermiso permiso={PERMISO_REPORTES} />}>
+            <Route path="/reportes" element={<ReportesPage />} />
+          </Route>
+          {/* CU28 Comando de Voz: lista de comandos y prueba escrita (VOZ_USAR, migración V33, los cuatro roles). */}
+          <Route element={<RequierePermiso permiso={PERMISO_VOZ} />}>
+            <Route path="/comandos-voz" element={<ComandosVozPage />} />
           </Route>
 
           {/* CU11 Gestionar Cita: la agenda exige AGENDA_CONSULTAR y agendar, RESERVA_CREAR. */}

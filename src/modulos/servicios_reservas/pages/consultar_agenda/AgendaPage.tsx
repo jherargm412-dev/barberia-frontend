@@ -4,17 +4,19 @@ import Button from '@mui/material/Button';
 import LinearProgress from '@mui/material/LinearProgress';
 import Stack from '@mui/material/Stack';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { fechaDeUrl, opcionDeUrl } from '../../../../shared/utils/parametrosUrl';
 import { useAuth } from '../../../seguridad_usuarios';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { listarAgenda, listarBarberosAgenda } from '../../api/consultar_agenda/agendaApi';
 import AgendaFiltros from '../../components/consultar_agenda/AgendaFiltros';
-import AgendaLista from '../../components/consultar_agenda/AgendaLista';
+import AgendaLineaTiempo from '../../components/consultar_agenda/AgendaLineaTiempo';
+import ResumenEstados from '../../components/consultar_agenda/ResumenEstados';
 import AgendaSemana from '../../components/consultar_agenda/AgendaSemana';
 import CitaDetalleDialog from '../../components/consultar_agenda/CitaDetalleDialog';
 import { MENSAJES_AGENDA, PERMISOS_AGENDA } from '../../constants/consultar_agenda';
 import { PERMISOS_ANTICIPO } from '../../constants/registrar_pago_anticipo';
-import type { BarberoAgenda, CitaAgenda, FiltrosAgenda } from '../../types/consultar_agenda';
+import type { BarberoAgenda, CitaAgenda, EstadoAgenda, FiltrosAgenda } from '../../types/consultar_agenda';
 import {
   capitalizar,
   formatearFechaLarga,
@@ -38,7 +40,14 @@ export default function AgendaPage() {
   const verTodas = tienePermiso(PERMISOS_AGENDA.TODAS);
   const puedeVer = verTodas || tienePermiso(PERMISOS_AGENDA.PROPIA);
 
-  const [filtros, setFiltros] = useState<FiltrosAgenda>({ fecha: hoy(), vista: 'DIA', estado: '', barberoId: '' });
+  // CU28: "agenda de mañana" / "agenda de la semana" abren /agenda?fecha=…&vista=….
+  const [parametros] = useSearchParams();
+  const [filtros, setFiltros] = useState<FiltrosAgenda>({
+    fecha: fechaDeUrl(parametros.get('fecha')) ?? hoy(),
+    vista: opcionDeUrl(parametros.get('vista'), ['DIA', 'SEMANA'] as const) ?? 'DIA',
+    estado: '',
+    barberoId: '',
+  });
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [barberos, setBarberos] = useState<BarberoAgenda[]>([]);
   const [cargando, setCargando] = useState(puedeVer);
@@ -55,7 +64,8 @@ export default function AgendaPage() {
   useEffect(() => {
     if (!puedeVer) return;
     let vigente = true;
-    listarAgenda(filtros)
+    // Se pide sin filtro de estado para poder contar cada estado; el filtro de estado se aplica aquí.
+    listarAgenda({ ...filtros, estado: '' })
       .then((citas) => {
         if (!vigente) return;
         setResultado({ filtros, citas });
@@ -92,7 +102,10 @@ export default function AgendaPage() {
 
   const mostrada = resultado?.filtros ?? filtros;
   const semana = mostrada.vista === 'SEMANA';
-  const citas = resultado?.citas ?? [];
+  const todas = resultado?.citas ?? [];
+  const citas = filtros.estado ? todas.filter((c) => c.estado === filtros.estado) : todas;
+  const conteo: Partial<Record<EstadoAgenda, number>> = {};
+  for (const c of todas) conteo[c.estado] = (conteo[c.estado] ?? 0) + 1;
 
   return (
     <Stack spacing={2}>
@@ -106,16 +119,23 @@ export default function AgendaPage() {
         onBuscar={aplicar}
       />
 
+      {resultado && todas.length > 0 && (
+        <ResumenEstados conteo={conteo} total={todas.length} activo={filtros.estado}
+          onElegir={(estado) => setFiltros({ ...filtros, estado })} />
+      )}
+
       {cargando && <LinearProgress />}
       {error && <Alert severity="error">{error}</Alert>}
       {resultado && !cargando && !error && citas.length === 0 && (
-        <Alert severity="info">{semana ? MENSAJES_AGENDA.SIN_CITAS_SEMANA : MENSAJES_AGENDA.SIN_CITAS}</Alert>
+        <Alert severity="info">
+          {todas.length > 0 ? 'Ninguna cita con ese estado.' : semana ? MENSAJES_AGENDA.SIN_CITAS_SEMANA : MENSAJES_AGENDA.SIN_CITAS}
+        </Alert>
       )}
       {citas.length > 0 &&
         (semana ? (
           <AgendaSemana citas={citas} fecha={mostrada.fecha} mostrarBarbero={verTodas} onSeleccionar={setSeleccionada} />
         ) : (
-          <AgendaLista citas={citas} agrupar={verTodas} onSeleccionar={setSeleccionada} />
+          <AgendaLineaTiempo citas={citas} agrupar={verTodas} onSeleccionar={setSeleccionada} />
         ))}
 
       {seleccionada !== null && (
