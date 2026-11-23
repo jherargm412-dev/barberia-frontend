@@ -15,7 +15,10 @@ export { default as CitasListPage } from './pages/gestionar_citas/CitasListPage'
 export { default as CitaCrearPage } from './pages/gestionar_citas/CitaCrearPage';
 export { PERMISOS as PERMISOS_CITAS } from './constants/gestionar_citas';
 export { listarBarberos } from './api/gestionar_citas/citasApi';
-export type { BarberoDisponible } from './types/gestionar_citas';
+export type { BarberoDisponible, EstadoCita } from './types/gestionar_citas';
+// Para CU07 (historial del cliente): mismo chip de estado y formato de fecha que la lista de citas.
+export { default as EstadoCitaChip } from './components/gestionar_citas/EstadoCitaChip';
+export { formatearFecha } from './utils/consultar_agenda/agendaFormato';
 
 // CU10 Consultar Disponibilidad
 export { default as DisponibilidadPage } from './pages/consultar_disponibilidad/DisponibilidadPage';
