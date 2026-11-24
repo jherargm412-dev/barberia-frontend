@@ -37,7 +37,7 @@ import Typography from '@mui/material/Typography';
 import { useState, type ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../modulos/seguridad_usuarios';
-import { BotonComandoVoz, ComandoVozProvider, type EstadoNavegacionVoz } from '../../modulos/asistencia_usuario';
+import { BotonComandoVoz, ComandoVozProvider, type EstadoNavegacionVoz } from '../../modulos/reportes_integraciones';
 import ThemeModeButton from '../components/ThemeModeButton';
 import { FUENTE_TITULOS } from '../styles/publico';
 import PaymentsIcon from '@mui/icons-material/PaymentsOutlined';

@@ -25,7 +25,7 @@ import {
 import CobroStripeDialog from '../../components/gestionar_pasarela_pago/CobroStripeDialog';
 import { PERMISOS_PASARELA } from '../../constants/gestionar_pasarela_pago';
 import type { CobroTarjeta, EstadoStripe, PasarelaPago } from '../../types/gestionar_pasarela_pago';
-import { fecha, hoyBolivia, moneda } from '../../utils/gestionar_caja/formato';
+import { fecha, hoyBolivia, moneda } from '../../../../shared/utils/formato';
 
 /** Muestra solo el inicio de la clave pública. */
 const claveCorta = (clave: string | null) => (clave ? `${clave.slice(0, 12)}…` : '—');

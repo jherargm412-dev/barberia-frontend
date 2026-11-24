@@ -22,13 +22,13 @@ import { listarBarberos, type BarberoDisponible } from '../../../servicios_reser
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { useAuth } from '../../../seguridad_usuarios';
 import {
-  calcularSaldoVenta, cargarFormularioVenta, obtenerCitaParaCobro, obtenerStripeVenta, registrarVenta,
+  calcularSaldoVenta, cargarFormularioVenta, confirmarCobroTarjetaVenta, iniciarCobroTarjetaVenta, obtenerCitaParaCobro,
+  obtenerStripeVenta, registrarVenta,
 } from '../../api/registrar_venta/ventasApi';
 import ClienteVentaSelector from '../../components/registrar_venta/ClienteVentaSelector';
 import ComprobanteVentaDialog from '../../components/registrar_venta/ComprobanteVentaDialog';
-import CobroStripeDialog from '../../components/gestionar_pasarela_pago/CobroStripeDialog';
 import { MENSAJE_SIN_CAJA } from '../../constants/registrar_venta';
-import type { EstadoStripe } from '../../types/gestionar_pasarela_pago';
+import { CobroStripeDialog, type EstadoStripe } from '../../../reportes_integraciones';
 import type {
   CalculoSaldoVenta, CitaParaCobro, ClienteVenta, ComprobanteVenta, MetodoPagoVenta, OpcionesFormularioVenta,
 } from '../../types/registrar_venta';
@@ -663,6 +663,7 @@ export default function RegistrarVentaPage() {
         pasarela={stripe}
         concepto={`Venta CU20${reservaId ? ` · Cita #${reservaId}` : ''}`}
         monto={Number(pagos[indiceTarjeta].monto)}
+        cobrarCon={{ iniciar: iniciarCobroTarjetaVenta, confirmar: confirmarCobroTarjetaVenta }}
         onCerrar={() => setIndiceTarjeta(null)}
         onCobrado={(cobro) => {
           setPagos((actuales) => actuales.map((pago, indice) => indice === indiceTarjeta

@@ -13,9 +13,8 @@ import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { useState, type FormEvent } from 'react';
 import { obtenerError } from '../../../../shared/utils/obtenerError';
 import { confirmarCobroStripe, iniciarCobroStripe } from '../../api/gestionar_pasarela_pago/pasarelaPagoApi';
-import { confirmarCobroTarjetaVenta, iniciarCobroTarjetaVenta } from '../../api/registrar_venta/ventasApi';
 import type { CobroStripeIniciado, CobroTarjeta, EstadoStripe } from '../../types/gestionar_pasarela_pago';
-import { moneda } from '../../utils/gestionar_caja/formato';
+import { moneda } from '../../../../shared/utils/formato';
 
 // Stripe.js se descarga una sola vez por clave pública.
 const cargados = new Map<string, Promise<Stripe | null>>();
@@ -30,10 +29,22 @@ interface Props {
   onCobrado: (cobro: CobroTarjeta) => void;
   concepto?: string;
   monto?: number;
+  /**
+   * Cómo iniciar y confirmar el cobro. Por defecto, el cobro suelto de la pasarela (CU29);
+   * Registrar venta (CU20) pasa los de su propia API para que el pago quede en la venta.
+   */
+  cobrarCon?: FuncionesCobro;
 }
 
+export interface FuncionesCobro {
+  iniciar: (concepto: string, monto: number) => Promise<CobroStripeIniciado>;
+  confirmar: (paymentIntentId: string) => Promise<CobroTarjeta>;
+}
+
+const COBRO_PASARELA: FuncionesCobro = { iniciar: iniciarCobroStripe, confirmar: confirmarCobroStripe };
+
 /** Venta con tarjeta: 1) concepto y monto, 2) datos de la tarjeta en el formulario seguro de Stripe. */
-export default function CobroStripeDialog({ pasarela, onCerrar, onCobrado, concepto: conceptoFijo, monto: montoFijo }: Props) {
+export default function CobroStripeDialog({ pasarela, onCerrar, onCobrado, concepto: conceptoFijo, monto: montoFijo, cobrarCon = COBRO_PASARELA }: Props) {
   const [concepto, setConcepto] = useState(conceptoFijo ?? '');
   const [monto, setMonto] = useState(montoFijo === undefined ? '' : montoFijo.toFixed(2));
   const [cobro, setCobro] = useState<CobroStripeIniciado | null>(null);
@@ -48,8 +59,7 @@ export default function CobroStripeDialog({ pasarela, onCerrar, onCobrado, conce
     }
     setProcesando(true); setError('');
     try {
-      const iniciar = esVenta ? iniciarCobroTarjetaVenta : iniciarCobroStripe;
-      setCobro(await iniciar(concepto.trim(), Number(monto)));
+      setCobro(await cobrarCon.iniciar(concepto.trim(), Number(monto)));
     }
     catch (err) { setError(obtenerError(err).mensaje); }
     finally { setProcesando(false); }
@@ -79,7 +89,7 @@ export default function CobroStripeDialog({ pasarela, onCerrar, onCobrado, conce
       ) : (
         <Elements stripe={stripePara(cobro.clavePublica)} options={{ clientSecret: cobro.clientSecret }}>
           <PagoConTarjeta cobro={cobro} resumen={`${concepto.trim()} · ${moneda(Number(monto))}`}
-            confirmar={esVenta ? confirmarCobroTarjetaVenta : confirmarCobroStripe}
+            confirmar={cobrarCon.confirmar}
             modoPrueba={pasarela.modo !== 'PRODUCCION'} onCerrar={onCerrar} onCobrado={onCobrado} />
         </Elements>
       )}

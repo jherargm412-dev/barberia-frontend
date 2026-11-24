@@ -10,7 +10,7 @@ Cada carpeta aquí es **un módulo del sistema** y tiene el **mismo nombre que s
 | `modulos.servicios_reservas` | `servicios_reservas` |
 | `modulos.ventas_caja` | `ventas_caja` |
 | `modulos.inventario_compras` | `inventario_compras` |
-| `modulos.reportes` | `reportes` |
+| `modulos.reportes_integraciones` | `reportes_integraciones` |
 
 ## Estructura de un módulo
 
