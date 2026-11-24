@@ -15,6 +15,8 @@ import LocalShippingIcon from '@mui/icons-material/LocalShippingOutlined';
 import LogoutIcon from '@mui/icons-material/LogoutOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Tooltip from '@mui/material/Tooltip';
 import PeopleIcon from '@mui/icons-material/PeopleOutlined';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -26,6 +28,7 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
+import Collapse from '@mui/material/Collapse';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
@@ -37,7 +40,7 @@ import Typography from '@mui/material/Typography';
 import { useState, type ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../modulos/seguridad_usuarios';
-import { BotonComandoVoz, ComandoVozProvider, type EstadoNavegacionVoz } from '../../modulos/asistencia_usuario';
+import { BotonComandoVoz, ComandoVozProvider, type EstadoNavegacionVoz } from '../../modulos/reportes_integraciones';
 import ThemeModeButton from '../components/ThemeModeButton';
 import { FUENTE_TITULOS } from '../styles/publico';
 import PaymentsIcon from '@mui/icons-material/PaymentsOutlined';
@@ -63,51 +66,60 @@ interface GrupoMenu {
 }
 
 const INICIO: OpcionMenu = { texto: 'Inicio', ruta: '/', icono: <HomeIcon /> };
-const PERFIL: OpcionMenu = { texto: 'Mi perfil', ruta: '/perfil', icono: <AccountCircleIcon />, permiso: 'PERFIL_EDITAR' };
 
-// Cada grupo conserva los permisos de sus opciones; si ninguna es visible, se oculta completo.
+// Un grupo por paquete del diagrama de paquetes (7), con sus casos de uso dentro. Cada opción conserva su
+// permiso: un grupo sin opciones visibles para el rol no se muestra, y con una sola se muestra como enlace directo.
 const GRUPOS: GrupoMenu[] = [
   {
-    // Agrupa las nuevas pantallas de reservas conservando sus permisos.
-    titulo: 'Citas y horarios', icono: <CalendarMonthIcon />, opciones: [
+    // Paquete 1: seguridad_usuarios (CU02 es el login, no tiene opción en el menú).
+    titulo: 'Seguridad y usuarios', icono: <AdminPanelSettingsIcon />, opciones: [
+      { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
+      { texto: 'Roles y permisos', ruta: '/roles', icono: <AdminPanelSettingsIcon />, permiso: 'ROL_ASIGNAR' },
+      { texto: 'Bitácora', ruta: '/bitacora', icono: <HistoryIcon />, permiso: 'BITACORA_CONSULTAR' },
+      // CU04 Configurar perfil personal: todos los roles con PERFIL_EDITAR.
+      { texto: 'Mi perfil', ruta: '/perfil', icono: <AccountCircleIcon />, permiso: 'PERFIL_EDITAR' },
+    ],
+  },
+  {
+    // Paquete 2: gestion_clientes (CU07 historial: botón "Historial" dentro de la lista de clientes).
+    titulo: 'Gestión de clientes', icono: <PeopleIcon />, opciones: [
+      { texto: 'Clientes', ruta: '/clientes', icono: <PeopleIcon />, permiso: 'CLIENTE_CONSULTAR' },
+    ],
+  },
+  {
+    // Paquete 3: servicios_reservas (CU14 anticipo se abre desde la cita; CU15 cancela solo las reservas web).
+    titulo: 'Servicios y reservas', icono: <CalendarMonthIcon />, opciones: [
+      { texto: 'Servicios', ruta: '/servicios', icono: <ContentCutIcon />, permiso: 'SERVICIO_GESTIONAR' },
+      { texto: 'Horarios', ruta: '/horarios', icono: <EventAvailableIcon />, permiso: 'USUARIO_GESTIONAR' },
+      // CU10: horas libres por servicio y barbero, para agendar.
+      { texto: 'Disponibilidad', ruta: '/disponibilidad', icono: <ScheduleIcon />, permiso: 'RESERVA_CREAR' },
+      { texto: 'Citas', ruta: '/citas', icono: <EventIcon />, permiso: 'AGENDA_CONSULTAR' },
       // CU12: el cliente solicita su cita en línea.
       { texto: 'Solicitar cita', ruta: '/solicitar-cita', icono: <EventNoteIcon />, permiso: 'RESERVA_SOLICITAR' },
       { texto: 'Mis citas', ruta: '/mis-citas', icono: <EventIcon />, permiso: 'RESERVA_SOLICITAR' },
       // CU13: catálogo de servicios (también público, desde el login) para elegir qué reservar.
       { texto: 'Catálogo de servicios', ruta: '/catalogo', icono: <ContentCutIcon />, permiso: ['RESERVA_SOLICITAR', 'RESERVA_CREAR'] },
-      { texto: 'Citas', ruta: '/citas', icono: <EventIcon />, permiso: 'AGENDA_CONSULTAR' },
-      { texto: 'Agenda de Citas', ruta: '/agenda', icono: <CalendarMonthIcon />, permiso: ['AGENDA_CONSULTAR', 'AGENDA_CONSULTAR_PROPIA'] },
-      // CU10: horas libres por servicio y barbero, para agendar.
-      { texto: 'Disponibilidad', ruta: '/disponibilidad', icono: <ScheduleIcon />, permiso: 'RESERVA_CREAR' },
-      { texto: 'Horarios', ruta: '/horarios', icono: <EventAvailableIcon />, permiso: 'USUARIO_GESTIONAR' },
+      { texto: 'Agenda de citas', ruta: '/agenda', icono: <CalendarMonthIcon />, permiso: ['AGENDA_CONSULTAR', 'AGENDA_CONSULTAR_PROPIA'] },
     ],
   },
   {
-    titulo: 'Gestión', icono: <PeopleIcon />, opciones: [
-      { texto: 'Clientes', ruta: '/clientes', icono: <PeopleIcon />, permiso: 'CLIENTE_CONSULTAR' },
+    // Paquete 4: gestion_empleados.
+    titulo: 'Gestión de empleados', icono: <BadgeIcon />, opciones: [
       { texto: 'Barberos', ruta: '/empleados', icono: <BadgeIcon />, permiso: 'USUARIO_GESTIONAR' },
-      { texto: 'Servicios', ruta: '/servicios', icono: <ContentCutIcon />, permiso: 'SERVICIO_GESTIONAR' },
       { texto: 'Liquidaciones', ruta: '/liquidaciones', icono: <PaymentsIcon />, permiso: 'PAGO_EMPLEADO_GENERAR' },
       { texto: 'Comisiones', ruta: '/comisiones', icono: <PaymentsIcon />, permiso: 'COMISION_CONSULTAR_PROPIA' },
     ],
   },
   {
-    titulo: 'Usuarios y permisos', icono: <AdminPanelSettingsIcon />, opciones: [
-      { texto: 'Usuarios', ruta: '/usuarios', icono: <PeopleIcon />, permiso: 'USUARIO_GESTIONAR' },
-      { texto: 'Roles y permisos', ruta: '/roles', icono: <AdminPanelSettingsIcon />, permiso: 'ROL_ASIGNAR' },
-      { texto: 'Bitácora', ruta: '/bitacora', icono: <HistoryIcon />, permiso: 'BITACORA_CONSULTAR' },
-    ],
-  },
-  {
+    // Paquete 5: ventas_caja.
     titulo: 'Ventas y caja', icono: <AccountBalanceWalletIcon />, opciones: [
       { texto: 'Registrar venta', ruta: '/ventas/registrar', icono: <ShoppingCartIcon />, permiso: 'VENTA_REGISTRAR' },
       // CU21 conserva la visibilidad según el permiso de consulta.
       { texto: 'Caja', ruta: '/caja', icono: <AccountBalanceWalletIcon />, permiso: 'CAJA_CONSULTAR' },
-      // Gestionar pasarela de pago: cobros con tarjeta (Stripe) y activación de pasarelas.
-      { texto: 'Pasarela de pago', ruta: '/pasarela-pago', icono: <CreditCardIcon />, permiso: ['PASARELA_PAGO_COBRAR', 'PASARELA_PAGO_GESTIONAR'] },
     ],
   },
   {
+    // Paquete 6: inventario_compras.
     titulo: 'Inventario y compras', icono: <Inventory2Icon />, opciones: [
       // CU22: productos de venta e insumos de consumo interno.
       { texto: 'Productos e insumos', ruta: '/productos', icono: <Inventory2Icon />, permiso: ['PRODUCTO_GESTIONAR', 'PRODUCTO_CONSULTAR'] },
@@ -121,15 +133,14 @@ const GRUPOS: GrupoMenu[] = [
     ],
   },
   {
-    titulo: 'Reportes', icono: <AssessmentIcon />, opciones: [
-      // RF29/RF30: ventas, caja, inventario, comisiones, desempeño y visitas; exportables a PDF, Excel y HTML.
+    // Paquete 7: reportes_integraciones.
+    titulo: 'Reportes e integraciones', icono: <AssessmentIcon />, opciones: [
+      // CU27: ventas, caja, inventario, comisiones, desempeño y visitas; exportables a PDF, Excel y HTML.
       { texto: 'Reportes', ruta: '/reportes', icono: <AssessmentIcon />, permiso: 'REPORTE_GENERAR' },
-    ],
-  },
-  {
-    titulo: 'Asistencia', icono: <RecordVoiceOverIcon />, opciones: [
       // CU28: lista de comandos de voz y prueba escrita; el micrófono está en la barra superior.
       { texto: 'Comandos de voz', ruta: '/comandos-voz', icono: <RecordVoiceOverIcon />, permiso: 'VOZ_USAR' },
+      // CU29: cobros con tarjeta (Stripe) y activación de pasarelas.
+      { texto: 'Pasarela de pago', ruta: '/pasarela-pago', icono: <CreditCardIcon />, permiso: ['PASARELA_PAGO_COBRAR', 'PASARELA_PAGO_GESTIONAR'] },
     ],
   },
 ];
@@ -160,10 +171,28 @@ export default function MainLayout() {
     ...grupo,
     opciones: grupo.opciones.filter((opcion) => !opcion.permiso || (Array.isArray(opcion.permiso) ? opcion.permiso.some((permiso) => tienePermiso(permiso)) : tienePermiso(opcion.permiso))),
   })).filter((grupo) => grupo.opciones.length > 0);
-  const perfilVisible = !PERFIL.permiso || (Array.isArray(PERFIL.permiso) ? PERFIL.permiso.some((permiso) => tienePermiso(permiso)) : tienePermiso(PERFIL.permiso));
   // Lo que "abrir …" puede abrir por voz: exactamente lo que el menú muestra a este usuario.
-  const opcionesVoz = [INICIO, ...gruposVisibles.flatMap((grupo) => grupo.opciones), ...(perfilVisible ? [PERFIL] : [])]
+  const opcionesVoz = [INICIO, ...gruposVisibles.flatMap((grupo) => grupo.opciones)]
     .map(({ texto, ruta }) => ({ texto, ruta }));
+
+  // Grupos desplegados (se pueden abrir varios). El de la pantalla actual se abre solo, también al llegar
+  // por un comando de voz; después el usuario puede cerrarlo.
+  const grupoDeRuta = (ruta: string) =>
+    gruposVisibles.find((grupo) => grupo.opciones.some((opcion) => rutaSeleccionada(opcion.ruta, ruta)))?.titulo;
+  const [abiertos, setAbiertos] = useState<string[]>(() => {
+    const actual = grupoDeRuta(pathname);
+    return actual ? [actual] : [];
+  });
+  const [rutaAnterior, setRutaAnterior] = useState(pathname);
+  if (pathname !== rutaAnterior) {
+    setRutaAnterior(pathname);
+    const actual = grupoDeRuta(pathname);
+    if (actual && !abiertos.includes(actual)) setAbiertos([...abiertos, actual]);
+  }
+
+  function alternarGrupo(titulo: string) {
+    setAbiertos((actuales) => actuales.includes(titulo) ? actuales.filter((t) => t !== titulo) : [...actuales, titulo]);
+  }
 
   async function salir() {
     await cerrarSesion();
@@ -202,19 +231,31 @@ export default function MainLayout() {
       </Box>
       <List component="nav" aria-label="Navegación principal" sx={{ px: 1.5, pb: 3 }}>
         {opcionMenu(INICIO)}
-        {/* Grupos siempre abiertos, con su nombre como encabezado: todo el menú se ve de un vistazo. */}
-        {gruposVisibles.map((grupo) => (
-          <Box key={grupo.titulo} component="section" aria-label={grupo.titulo} sx={{ mt: 2 }}>
-            <Typography component="h2" sx={{ px: 1.5, pb: 0.75, fontSize: 11, fontWeight: 600, letterSpacing: '0.14em',
-              textTransform: 'uppercase', color: 'text.secondary', opacity: 0.85 }}>
-              {grupo.titulo}
-            </Typography>
-            <List component="div" disablePadding>
-              {grupo.opciones.map((opcion) => opcionMenu(opcion, true))}
-            </List>
-          </Box>
-        ))}
-        {perfilVisible && opcionMenu(PERFIL)}
+        <Typography component="h2" sx={{ px: 1.5, pt: 2, pb: 0.75, fontSize: 11, fontWeight: 600, letterSpacing: '0.14em',
+          textTransform: 'uppercase', color: 'text.secondary', opacity: 0.85 }}>
+          Módulos
+        </Typography>
+        {/* Un grupo desplegable por paquete; con una sola opción visible se muestra como enlace directo. */}
+        {gruposVisibles.map((grupo) => {
+          if (grupo.opciones.length === 1) return opcionMenu(grupo.opciones[0]);
+          const abierto = abiertos.includes(grupo.titulo);
+          const idLista = `grupo-${grupo.titulo.replace(/\s+/g, '-').toLowerCase()}`;
+          return (
+            <Box key={grupo.titulo} component="section" aria-label={grupo.titulo}>
+              <ListItemButton onClick={() => alternarGrupo(grupo.titulo)} aria-expanded={abierto} aria-controls={idLista} sx={{ pl: 1.5 }}>
+                <ListItemIcon>{grupo.icono}</ListItemIcon>
+                <ListItemText primary={grupo.titulo} slotProps={{ primary: { noWrap: true, sx: { fontSize: 13.5, fontWeight: 600 } } }} />
+                {abierto ? <ExpandMoreIcon fontSize="small" /> : <ChevronRightIcon fontSize="small" />}
+              </ListItemButton>
+              <Collapse in={abierto} timeout="auto" unmountOnExit>
+                {/* Línea vertical a la izquierda, como en un árbol: marca qué opciones son del grupo. */}
+                <List id={idLista} component="div" disablePadding sx={{ ml: 2.75, pl: 0.5, borderLeft: 1, borderColor: 'divider' }}>
+                  {grupo.opciones.map((opcion) => opcionMenu(opcion, true))}
+                </List>
+              </Collapse>
+            </Box>
+          );
+        })}
       </List>
     </>
   );

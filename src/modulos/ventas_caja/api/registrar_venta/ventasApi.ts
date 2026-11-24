@@ -1,5 +1,5 @@
 import { http } from '../../../../shared/api/httpClient';
-import type { CobroStripeIniciado, CobroTarjeta, EstadoStripe } from '../../types/gestionar_pasarela_pago';
+import type { CobroStripeIniciado, CobroTarjeta, EstadoStripe } from '../../../reportes_integraciones';
 import type {
   CalcularSaldoVentaRequest,
   CalculoSaldoVenta,

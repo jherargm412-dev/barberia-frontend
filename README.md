@@ -1,113 +1,151 @@
-# Barbería House of Cut — Frontend
+# HOUSE of CUT — Sistema de información para la barbería (Frontend)
 
-Aplicación web en React 19 + TypeScript + Vite + Material UI.
-Consume la API del backend: [barberia-backend](https://github.com/jherargm412-dev/barberia-backend).
+Sistema web que permite a la barbería **HOUSE of CUT** gestionar su agenda de citas, el flujo de caja,
+el inventario y el cálculo de comisiones de los barberos, con reportes, bitácora de auditoría,
+pagos con tarjeta y comandos de voz.
 
-## Requisitos
+Este repositorio es la **aplicación web** (React). Consume la API del backend:
+[barberia-backend](https://github.com/jherargm412-dev/barberia-backend).
 
-- **Node.js 20** o superior (incluye `npm`)
-- El **backend corriendo** en `http://localhost:8080` (ver su README)
-- Git
+🌐 **Sistema en línea:** https://houseofcut-test-web.onrender.com/
 
-## Primera vez (configuración local)
+---
 
-1. Clonar el repositorio:
+## Datos académicos
 
-   ```bash
-   git clone https://github.com/jherargm412-dev/barberia-frontend.git
-   cd barberia-frontend
-   ```
-
-2. Instalar dependencias:
-
-   ```bash
-   npm install
-   ```
-
-3. Copiar el archivo de variables:
-
-   ```bash
-   cp .env.example .env       # macOS / Linux / Git Bash / PowerShell
-   copy .env.example .env     # Windows (CMD)
-   ```
-
-   `VITE_API_URL` es la dirección del backend. Si no cambiaste el puerto, déjala como está.
-
-4. Levantar el frontend:
-
-   ```bash
-   npm run dev
-   ```
-
-   Abre `http://localhost:5173`. Inicia sesión con el administrador que configuraste en el
-   `.env` del backend (`APP_SEED_ADMIN_EMAIL` / `APP_SEED_ADMIN_PASSWORD`).
-
-## Comandos
-
-| Comando | Para qué |
+| | |
 |---|---|
-| `npm run dev` | Levanta la app en modo desarrollo (se recarga sola al guardar) |
-| `npm run build` | Revisa los tipos de TypeScript y genera la versión final en `dist/` |
-| `npm run lint` | Revisa el código con ESLint |
+| **Universidad** | Universidad Autónoma Gabriel René Moreno (UAGRM) |
+| **Facultad** | Facultad de Ingeniería en Ciencias de la Computación y Telecomunicaciones |
+| **Materia** | Ingeniería de Requisitos y Modelado |
+| **Docente** | Ing. Angélica Garzón Cuéllar |
+| **Grupo** | 2 |
+| **Metodología** | PUDS (Proceso Unificado de Desarrollo de Software) con UML |
 
-Antes de abrir un Pull Request, corre `npm run build` y `npm run lint`: los dos deben pasar sin errores.
+| Integrante | Registro |
+|---|---|
+| Balceras Quispe Jhan Carla Anthonely | 223041726 |
+| Choque Terrazas Andres Eduardo | 224027026 |
+| Gonzales Montero David Jherar | 224027591 |
+| Hoyos Saldaña Lucas Bastian | 223042838 |
+| Pinto Alba Jose Elias | 223043826 |
+| Porcel Calizaya Luis Fernando | 221045511 |
 
-## Despliegue (Railway)
+---
 
-Railway construye la imagen con el `Dockerfile` (compila con Vite y sirve con nginx) cada vez
-que se hace merge a `main`.
+## Funcionalidades (casos de uso)
 
-- Variable del servicio: `VITE_API_URL=https://<backend>.up.railway.app/api/v1`.
-  Se fija **al compilar**: si la cambias, hay que volver a desplegar (no basta con reiniciar).
-- `nginx/default.conf.template` devuelve `index.html` para cualquier ruta, así funcionan los
-  enlaces directos como `/activar?token=...` y recargar la página en `/usuarios`.
+El sistema implementa **29 casos de uso** organizados en **7 paquetes**, desarrollados en cuatro ciclos.
 
-### Probar la imagen en tu máquina (Docker Desktop)
+| Paquete | Caso de uso | Ciclo |
+|---|---|:---:|
+| **Seguridad y usuarios** (`seguridad_usuarios`) | CU01 Gestionar usuarios y asignar roles | 1 |
+| | CU02 Iniciar sesión | 1 |
+| | CU03 Gestionar roles y permisos | 1 |
+| | CU04 Configurar perfil personal | 1 |
+| | CU05 Consultar bitácora | 1 |
+| **Gestión de clientes** (`gestion_clientes`) | CU06 Gestionar clientes | 1 |
+| | CU07 Consultar historial del cliente | 4 |
+| **Servicios y reservas** (`servicios_reservas`) | CU08 Gestionar catálogo de servicios | 1 |
+| | CU09 Gestionar horarios de disponibilidad | 2 |
+| | CU10 Consultar disponibilidad | 2 |
+| | CU11 Gestionar cita | 2 |
+| | CU12 Solicitar cita | 2 |
+| | CU13 Consultar servicios | 2 |
+| | CU14 Registrar pago de anticipo | 2 |
+| | CU15 Cancelar reserva por no pago de anticipo | 4 |
+| | CU16 Consultar agenda de citas | 2 |
+| **Gestión de empleados** (`gestion_empleados`) | CU17 Gestionar barbero | 1 |
+| | CU18 Registrar liquidación de comisiones | 3 |
+| | CU19 Consultar comisiones | 3 |
+| **Ventas y caja** (`ventas_caja`) | CU20 Registrar venta | 3 |
+| | CU21 Gestionar caja | 2 |
+| **Inventario y compras** (`inventario_compras`) | CU22 Gestionar productos e insumos | 3 |
+| | CU23 Consultar catálogo de productos | 4 |
+| | CU24 Gestionar proveedores | 3 |
+| | CU25 Registrar compras de productos | 3 |
+| | CU26 Registrar movimiento de inventario | 4 |
+| **Reportes e integraciones** (`reportes_integraciones`) | CU27 Generar reportes | 4 |
+| | CU28 Comando de voz | 4 |
+| | CU29 Gestionar pasarela y métodos de pago | 3 |
 
-Con el backend levantado (`docker compose up` en el repo del backend):
+---
 
-```bash
-docker build --build-arg VITE_API_URL=http://localhost:8080/api/v1 -t barberia-frontend .
-docker run --rm -p 8081:80 barberia-frontend
-```
+## Tecnologías
 
-Abre `http://localhost:8081`.
+| Capa | Tecnología |
+|---|---|
+| Backend | Java 21 con Spring Boot 4 (Spring Security con JWT, Spring Data JPA) |
+| Frontend | React 19 + TypeScript + Vite + Material UI |
+| Base de datos | PostgreSQL, con migraciones Flyway |
+| Pagos en línea | Stripe (modo de prueba) |
+| Correo | Brevo |
+| Reportes | Exportación a PDF, Excel y HTML; gráficos con MUI X Charts |
+| Comandos de voz | Reconocimiento del navegador (Web Speech API) y Vosk como respaldo local |
+| Despliegue | Docker + Render |
 
-## 📁 Estructura del Repositorio
+---
+
+## Arquitectura
+
+Aplicación **cliente–servidor** en dos repositorios: un **frontend** web (React) que consume una
+**API REST** (Spring Boot).
+
+| En los diagramas | En el backend | En el frontend |
+|---|---|---|
+| Paquete | `modulos/<paquete>/` | `src/modulos/<paquete>/` |
+| Interfaz | — | Página en `pages/<caso_de_uso>/` |
+| Control | Controlador en `controller/<caso_de_uso>/` y lógica en `service/<caso_de_uso>/` | Llamadas a la API en `api/<caso_de_uso>/` |
+| Entidad | Clase en `entity/` (una tabla de la base de datos) | Tipos en `types/<caso_de_uso>.ts` |
+
+El menú lateral del sistema también está dividido en estos 7 paquetes, con sus casos de uso dentro.
+
+---
+
+## Estructura del repositorio
 
 ```
 barberia-frontend/
-│
-├── public/                     # Íconos y recursos públicos
+├── public/                        Íconos, imágenes y el modelo de voz (Vosk)
 ├── src/
-│   ├── main.tsx                # Punto de entrada de React
-│   ├── app/                    # App, rutas (AppRouter) y tema
-│   ├── shared/                 # Lo común: httpClient, layout, componentes
-│   └── modulos/
-│       ├── seguridad_usuarios/ # CU01, CU02, CU05 (Usuarios, Login, Bitácora)
-│       ├── gestion_clientes/   # CU06 (Clientes)
-│       ├── gestion_empleados/  # Por implementar
-│       ├── servicios_reservas/ # CU08 (Catálogo de servicios, Reservas)
-│       ├── ventas_caja/        # Por implementar
-│       ├── inventario_compras/ # Por implementar
-│       └── reportes/           # Por implementar
-│
-├── nginx/                      # Configuración de nginx para la imagen de Docker
-├── Dockerfile                  # Imagen para Railway
-├── .env.example                # Plantilla de variables (VITE_API_URL)
-├── vite.config.ts              # Configuración de Vite
-└── package.json                # Dependencias y scripts
+│   ├── main.tsx                   Punto de entrada de React
+│   ├── app/                       Rutas (AppRouter) y tema
+│   ├── shared/                    Lo común: httpClient, menú lateral (MainLayout), componentes y utilidades
+│   └── modulos/                   Código por paquete
+│       ├── seguridad_usuarios/        CU01 a CU05
+│       ├── gestion_clientes/          CU06 y CU07
+│       ├── servicios_reservas/        CU08 a CU16
+│       ├── gestion_empleados/         CU17 a CU19
+│       ├── ventas_caja/               CU20 y CU21
+│       ├── inventario_compras/        CU22 a CU26
+│       └── reportes_integraciones/    CU27 a CU29
+│           ├── index.ts               Lo que el paquete exporta al resto de la app
+│           ├── pages/                 Pantallas, una carpeta por caso de uso
+│           ├── components/            Componentes de cada caso de uso
+│           ├── api/                   Llamadas al backend, por caso de uso
+│           └── types/ y constants/    Tipos (copiados de los DTO) y permisos
+├── docs/                          Guías de diseño
+├── nginx/ y Dockerfile            Imagen para probar el despliegue con Docker
+└── README.md
 ```
 
-Dentro de cada módulo va primero la **capa** (`api/`, `components/`, `pages/`…) y dentro de
-cada capa **una carpeta por caso de uso**, igual que en el backend.
-La guía completa está en [src/modulos/README.md](src/modulos/README.md).
+Dentro de cada paquete va primero la **capa** (`pages/`, `components/`, `api/`…) y dentro de cada capa
+**una carpeta por caso de uso**, igual que en el backend. Otros paquetes solo importan lo que exporta su
+`index.ts`. La guía completa está en [src/modulos/README.md](src/modulos/README.md).
 
-## Flujo de trabajo con Git
+---
 
-1. Actualiza `main`: `git checkout main && git pull`
-2. Crea una rama para tu caso de uso: `git checkout -b feature/CU05-reservas`
-3. Haz commits pequeños y sube tu rama: `git push -u origin feature/CU05-reservas`
-4. Abre un **Pull Request** hacia `main` en GitHub para que otro lo revise.
+## Ramas de trabajo (Git)
 
-No hagas push directo a `main`.
+| Rama | Uso |
+|---|---|
+| `main` | Versión estable; es la que se despliega en Render |
+| `dev-prueba` | Integración y pruebas del trabajo de todo el equipo |
+| `dev-jhancarla` | Trabajo de Jhan Carla Anthonely Balceras Quispe |
+| `dev-eduardo` | Trabajo de Andres Eduardo Choque Terrazas |
+| `dev-jherar` | Trabajo de David Jherar Gonzales Montero |
+| `dev-lucas` | Trabajo de Lucas Bastian Hoyos Saldaña |
+| `dev-elias` | Trabajo de Jose Elias Pinto Alba |
+| `dev-fernando` | Trabajo de Luis Fernando Porcel Calizaya |
+
+Flujo: **rama personal → Pull Request a `dev-prueba` → pruebas → Pull Request a `main`**.

@@ -57,7 +57,7 @@ import {
 import MainLayout from '../shared/layouts/MainLayout';
 import { ClienteCrearPage, ClienteDetallePage, ClienteEditarPage, ClientesListPage, PERMISOS_CLIENTES } from '../modulos/gestion_clientes';
 import {
-  CajaHistorialPage, CajaPage, PasarelaPagoPage, PERMISOS_CAJA,
+  CajaHistorialPage, CajaPage, PERMISOS_CAJA,
   PERMISO_VENTA_REGISTRAR, RegistrarVentaPage,
 } from '../modulos/ventas_caja';
 import {
@@ -67,8 +67,9 @@ import InicioPage from '../shared/pages/InicioPage';
 import { ProveedoresListPage, ProveedorEditarPage, PERMISOS_PROVEEDORES } from '../modulos/inventario_compras';
 import { CompraRegistrarPage, ComprasListPage, PERMISOS_COMPRAS } from '../modulos/inventario_compras';
 import { MovimientosListPage, PERMISOS_MOVIMIENTOS } from '../modulos/inventario_compras';
-import { ReportesPage, PERMISO_REPORTES } from '../modulos/reportes';
-import { ComandosVozPage, PERMISO_VOZ } from '../modulos/asistencia_usuario';
+import {
+  ComandosVozPage, PasarelaPagoPage, PERMISO_REPORTES, PERMISO_VOZ, ReportesPage,
+} from '../modulos/reportes_integraciones';
 import NoEncontradoPage from '../shared/pages/NoEncontradoPage';
 import LiquidacionPage from '../modulos/gestion_empleados/pages/liquidar_comisiones/LiquidacionPage';
 

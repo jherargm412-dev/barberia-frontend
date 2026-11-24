@@ -1,4 +1,4 @@
-// Tipos de Generar Reportes (RF29/RF30), copiados de los DTOs del backend (modulos.reportes.dto.generar_reportes).
+// Tipos de Generar Reportes (RF29/RF30), copiados de los DTOs del backend (modulos.reportes_integraciones.dto.generar_reportes).
 
 /** Cómo se muestra un valor; según esto se formatea (montos, fechas…) y se alinea. */
 export type TipoDato = 'TEXTO' | 'ENTERO' | 'DECIMAL' | 'MONEDA' | 'FECHA' | 'FECHA_HORA';
